@@ -1,6 +1,6 @@
 ﻿using System.IO;
 
-namespace AvroSerializer.Abstractions.Types
+namespace AvroSerializer.Primitives
 {
     public static class NullSchema
     {

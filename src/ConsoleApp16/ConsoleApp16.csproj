@@ -7,9 +7,14 @@
         <Nullable>enable</Nullable>
       </PropertyGroup>
 
+      <ItemGroup>
+        <PackageReference Include="AvroConvert" Version="3.3.7" />
+        <PackageReference Include="FluentAssertions" Version="6.11.0" />
+      </ItemGroup>
+
     <ItemGroup>
-      <ProjectReference Include="..\AvroSerializer.Abstractions\AvroSerializer.Abstractions.csproj" />
-      <ProjectReference Include="..\AvroSerializerGenerators\AvroSerializer.Generators.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
+      <ProjectReference Include="..\AvroSerializer.Abstractions\AvroSerializer.csproj" />
+      <ProjectReference Include="..\AvroSerializer.Generators\AvroSerializer.Generators.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
     </ItemGroup>
 
     <ItemGroup>

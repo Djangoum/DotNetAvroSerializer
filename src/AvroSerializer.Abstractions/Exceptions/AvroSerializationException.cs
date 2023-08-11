@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace AvroSerializer.Abstractions.Exceptions
+namespace AvroSerializer.Exceptions
 {
     public class AvroSerializationException : Exception
     {

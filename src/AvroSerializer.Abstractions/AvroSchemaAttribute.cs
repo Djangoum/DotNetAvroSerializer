@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace AvroSerializer.Abstractions
+namespace AvroSerializer
 {
     public class AvroSchemaAttribute : Attribute
     {

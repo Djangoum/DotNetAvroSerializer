@@ -55,7 +55,7 @@ namespace AvroSerializer.Tests
         [Theory]
         [InlineData(1.2d, "333333333333F33F")]
         [InlineData(123.341d, "E7FBA9F1D2155F40")]
-        public void Serializedouble(double originDouble, string hexString)
+        public void SerializeDouble(double originDouble, string hexString)
         {
             var serializer = new DoubleSerializer();
 

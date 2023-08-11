@@ -3,6 +3,8 @@
 Console.WriteLine("Hello, World!");
 
 var serializer = new BooleanSerializer();
+serializer.Serialize(true);
+
 public class UserPromotionAssignationDataEventApiV2
 {
     public Guid EventId { get; set; }

@@ -15,3 +15,5 @@ I'll add a list of missing features to complete a first usable (not production r
 - [ ] Timestamp (micro) Logical Type
 - [ ] Local timestamp (micro) Logical Type
 - [ ] Custom logical types (?)
+
+Everything is pending for deserialization :) 

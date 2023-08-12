@@ -12,7 +12,7 @@ namespace AvroSerializer.Primitives
             {
                 Array.Reverse(bytes);
             }
-            BytesSchema.Write(outputStream, bytes);
+            outputStream.Write(bytes, 0, bytes.Length);
         }
     }
 }

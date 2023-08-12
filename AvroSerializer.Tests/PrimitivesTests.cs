@@ -54,12 +54,35 @@ namespace AvroSerializer.Tests
 
         [Theory]
         [InlineData(1.2d, "333333333333F33F")]
-        [InlineData(123.341d, "E7FBA9F1D2155F40")]
+        [InlineData(124.34d, "F6285C8FC2155F40")]
         public void SerializeDouble(double originDouble, string hexString)
         {
             var serializer = new DoubleSerializer();
 
             var result = serializer.Serialize(originDouble);
+
+            Convert.ToHexString(result).Should().BeEquivalentTo(hexString);
+        }
+
+        [Theory]
+        [InlineData(1.2F, "9A99993F")]
+        [InlineData(124.34F, "14AEF842")]
+        public void SerializeFloat(float originFloat, string hexString)
+        {
+            var serializer = new FloatSerializer();
+
+            var result = serializer.Serialize(originFloat);
+
+            Convert.ToHexString(result).Should().BeEquivalentTo(hexString);
+        }
+
+        [Theory]
+        [InlineData(new byte[] { 123, 253, 100, 10}, "087BFD640A")]
+        public void SerializeBytes(byte[] originBytes, string hexString)
+        {
+            var serializer = new BytesSerializer();
+
+            var result = serializer.Serialize(originBytes);
 
             Convert.ToHexString(result).Should().BeEquivalentTo(hexString);
         }

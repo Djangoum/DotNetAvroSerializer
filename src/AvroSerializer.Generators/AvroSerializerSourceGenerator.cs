@@ -42,6 +42,7 @@ namespace AvroSerializer.Generators
                     SourceText.From(
 $@"using AvroSerializer.Primitives;
 using AvroSerializer.LogicalTypes;
+using AvroSerializer.Exceptions;
 using System.Linq;
 
 namespace {GetNamespace(serializer)}
@@ -88,21 +89,48 @@ namespace {GetNamespace(serializer)}
                     break;
 
                 case EnumSchema enumSchema:
-                    // Handle EnumSchema case
+                    GenerateSerializationSourceForEnum(enumSchema, code, context, originTypeName, sourceAccesor);
                     break;
 
                 case FixedSchema fixedSchema:
-                    // Handle FixedSchema case
+                    GenerateSerializationSourceForFixed(fixedSchema, code, context, originTypeName, sourceAccesor);
                     break;
 
                 case UnionSchema unionSchema:
-                    // Handle Union case
+                    GenerateSerializationSourceForUnion(unionSchema, code, context, originTypeName, sourceAccesor);
                     break;
 
                 case PrimitiveSchema primitiveSchema:
                     GenerateSerializationSourceForPrimitive(primitiveSchema, code, originTypeName, sourceAccesor);
                     break;
             }
+        }
+
+        private void GenerateSerializationSourceForEnum(EnumSchema schema, StringBuilder code, GeneratorExecutionContext context, string originTypeName, string sourceAccesor)
+        {
+            var symbol = context.Compilation.GetSymbolsWithName(originTypeName).First() as ITypeSymbol;
+
+            if (symbol.TypeKind != TypeKind.Enum)
+                throw new Exception($"Required type was not satisfied to serialize {schema.Name}");
+
+            code.AppendLine($@"var enumValues = new string[] {{ ""{string.Join(@""",""", schema.Symbols)}"" }};
+var indexOfEnumValue = Array.IndexOf(enumValues, {sourceAccesor}.ToString());
+if (indexOfEnumValue < 0) throw new AvroSerializationException($""Enum value provided {{{sourceAccesor}}} not found in symbols for enum {schema.Name}"");
+IntSchema.Write(outputStream, indexOfEnumValue);");
+        }
+
+        private void GenerateSerializationSourceForFixed(FixedSchema schema, StringBuilder code, GeneratorExecutionContext context, string originTypeName, string sourceAccesor)
+        {
+            if (!originTypeName.Equals("byte[]", StringComparison.InvariantCultureIgnoreCase))
+                throw new Exception($"Required type was not satisfied to serialize {schema.Name}");
+
+            code.AppendLine(@$"if ({sourceAccesor}.Length != {schema.Size}) throw new AvroSerializationException(""Byte array {sourceAccesor} has to be of a fixed length of {schema.Size} but found {{{sourceAccesor}.Length}}"");");
+            code.AppendLine($@"BytesSchema.Write(outputStream, {sourceAccesor});");
+        }
+
+        private void GenerateSerializationSourceForUnion(UnionSchema schema, StringBuilder code, GeneratorExecutionContext context, string originTypeName, string sourceAccesor)
+        {
+
         }
 
         private void GenerateSerializationSourceForLogicalType(LogicalSchema logicalSchema, StringBuilder code, string originTypeName, string sourceAccesor)
@@ -112,11 +140,11 @@ namespace {GetNamespace(serializer)}
                 "date" when originTypeName.Equals("DateTime", StringComparison.InvariantCultureIgnoreCase)
                            || originTypeName.Equals("DateOnly", StringComparison.InvariantCultureIgnoreCase) => $"DateSchema.Write(outputStream, {sourceAccesor});",
                 "uuid" when originTypeName.Equals("Guid", StringComparison.InvariantCultureIgnoreCase) => $"UuidSchema.Write(outputStream, {sourceAccesor});",
-                "time-millis" when originTypeName.Equals("TimeOnly", StringComparison.InvariantCultureIgnoreCase) => $"TimeMillis.Write(outputStream, {sourceAccesor});",
+                "time-millis" when originTypeName.Equals("TimeOnly", StringComparison.InvariantCultureIgnoreCase) => $"TimeMillisSchema.Write(outputStream, {sourceAccesor});",
                 "timestamp-millis" when originTypeName.Equals("DateTime", StringComparison.InvariantCultureIgnoreCase) => $"TimestampMilisSchema.Write(outputStream, {sourceAccesor});",
                 "local-timestamp-milis" when originTypeName.Equals("DateTime", StringComparison.InvariantCultureIgnoreCase) => $"TimestampMilisSchema.Write(outputStream, {sourceAccesor});",
 
-                _ => throw new Exception()
+                _ => throw new Exception($"Required type was not satisfied to serialize {logicalSchema.LogicalTypeName}")
             };
 
             code.AppendLine(serializerCallCode);
@@ -179,7 +207,7 @@ namespace {GetNamespace(serializer)}
                 "double" when originTypeName.Equals("double", StringComparison.InvariantCultureIgnoreCase) => $"DoubleSchema.Write(outputStream, {sourceAccesor});",
                 "float" when originTypeName.Equals("float", StringComparison.InvariantCultureIgnoreCase) => $"FloatSchema.Write(outputStream, {sourceAccesor});",
 
-                _ => throw new Exception()
+                _ => throw new Exception($"Required type was not satisfied to serialize {primitiveSchema.Name}")
             };
 
             code.AppendLine(serializerCallCode);

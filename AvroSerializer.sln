@@ -11,7 +11,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AvroSerializer", "src\AvroS
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ConsoleApp16", "src\ConsoleApp16\ConsoleApp16.csproj", "{EEB0CBE8-03E8-4C67-A50B-EA33F8B69199}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AvroSerializer.Write.Tests", "AvroSerializer.Tests\AvroSerializer.Write.Tests.csproj", "{EE53F9D3-1435-4B1F-8185-999C92908D0C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AvroSerializer.Write.Tests", "AvroSerializer.Tests\AvroSerializer.Write.Tests.csproj", "{EE53F9D3-1435-4B1F-8185-999C92908D0C}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{1D44F55D-A7EB-4C5A-9E06-AEAC301B1454}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -43,6 +45,7 @@ Global
 		{539B8084-E539-4852-B072-9CF93AF72AE8} = {889A8BF9-4712-4207-B972-585A3B939828}
 		{44B1CAA0-3F6B-414A-96FC-B1F49559E37A} = {889A8BF9-4712-4207-B972-585A3B939828}
 		{EEB0CBE8-03E8-4C67-A50B-EA33F8B69199} = {889A8BF9-4712-4207-B972-585A3B939828}
+		{EE53F9D3-1435-4B1F-8185-999C92908D0C} = {1D44F55D-A7EB-4C5A-9E06-AEAC301B1454}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {22F6DE55-AE4C-45DA-A7E2-DAECBF43E0C6}

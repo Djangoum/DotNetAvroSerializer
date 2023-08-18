@@ -1,10 +1,10 @@
 ﻿using Avro;
+using AvroSerializer.Generators.Helpers;
+using AvroSerializer.Generators.SerializationGenerators;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Text;
-using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Text;
 
@@ -36,16 +36,19 @@ namespace AvroSerializer.Generators
 
                 var schema = Schema.Parse(schemaString);
 
-                var serializeCode = SerializationCodeGeneratorLoop(schema, context, originType.ToString());
+                var nameTypeSymbol = context.Compilation.GetSemanticModel(serializer.SyntaxTree).GetSymbolInfo(originType);
+
+                var serializeCode = SerializationCodeGeneratorLoop(schema, context, nameTypeSymbol.Symbol);
 
                 context.AddSource($"{serializer.Identifier}.g.cs",
                     SourceText.From(
 $@"using AvroSerializer.Primitives;
 using AvroSerializer.LogicalTypes;
 using AvroSerializer.Exceptions;
+using AvroSerializer.ComplexTypes;
 using System.Linq;
 
-namespace {GetNamespace(serializer)}
+namespace {Namespaces.GetNamespace(serializer)}
 {{
     public partial class {serializer.Identifier}
     {{
@@ -60,157 +63,13 @@ namespace {GetNamespace(serializer)}
             }
         }
 
-        private string SerializationCodeGeneratorLoop(Schema schema, GeneratorExecutionContext context, string originTypeName, string sourceAccesor = "source")
+        private string SerializationCodeGeneratorLoop(Schema schema, GeneratorExecutionContext context, ISymbol originTypeSymbol, string sourceAccesor = "source")
         {
             var code = new StringBuilder();
 
-            GenerateSerializatonSourceForSchema(schema, code, context, originTypeName, sourceAccesor);
+            SerializationGenerator.GenerateSerializatonSourceForSchema(schema, code, context, originTypeSymbol, sourceAccesor);
 
             return code.ToString();
-        }
-
-        private void GenerateSerializatonSourceForSchema(Schema schema, StringBuilder code, GeneratorExecutionContext context, string originTypeName, string sourceAccesor)
-        {
-            switch (schema)
-            {
-                case RecordSchema recordSchema:
-                    foreach (var field in recordSchema.Fields)
-                    {
-                        GenerateSerializationSourceForRecordField(field, code, context, originTypeName, sourceAccesor);
-                    }
-                    break;
-
-                case LogicalSchema logicalSchema:
-                    GenerateSerializationSourceForLogicalType(logicalSchema, code, originTypeName, sourceAccesor);
-                    break;
-
-                case ArraySchema arraySchema:
-                    GenerateSerializationSourceForArray(arraySchema, code, context, originTypeName, sourceAccesor);
-                    break;
-
-                case EnumSchema enumSchema:
-                    GenerateSerializationSourceForEnum(enumSchema, code, context, originTypeName, sourceAccesor);
-                    break;
-
-                case FixedSchema fixedSchema:
-                    GenerateSerializationSourceForFixed(fixedSchema, code, context, originTypeName, sourceAccesor);
-                    break;
-
-                case UnionSchema unionSchema:
-                    GenerateSerializationSourceForUnion(unionSchema, code, context, originTypeName, sourceAccesor);
-                    break;
-
-                case PrimitiveSchema primitiveSchema:
-                    GenerateSerializationSourceForPrimitive(primitiveSchema, code, originTypeName, sourceAccesor);
-                    break;
-            }
-        }
-
-        private void GenerateSerializationSourceForEnum(EnumSchema schema, StringBuilder code, GeneratorExecutionContext context, string originTypeName, string sourceAccesor)
-        {
-            var symbol = context.Compilation.GetSymbolsWithName(originTypeName).First() as ITypeSymbol;
-
-            if (symbol.TypeKind != TypeKind.Enum)
-                throw new Exception($"Required type was not satisfied to serialize {schema.Name}");
-
-            code.AppendLine($@"var enumValues = new string[] {{ ""{string.Join(@""",""", schema.Symbols)}"" }};
-var indexOfEnumValue = Array.IndexOf(enumValues, {sourceAccesor}.ToString());
-if (indexOfEnumValue < 0) throw new AvroSerializationException($""Enum value provided {{{sourceAccesor}}} not found in symbols for enum {schema.Name}"");
-IntSchema.Write(outputStream, indexOfEnumValue);");
-        }
-
-        private void GenerateSerializationSourceForFixed(FixedSchema schema, StringBuilder code, GeneratorExecutionContext context, string originTypeName, string sourceAccesor)
-        {
-            if (!originTypeName.Equals("byte[]", StringComparison.InvariantCultureIgnoreCase))
-                throw new Exception($"Required type was not satisfied to serialize {schema.Name}");
-
-            code.AppendLine(@$"if ({sourceAccesor}.Length != {schema.Size}) throw new AvroSerializationException(""Byte array {sourceAccesor} has to be of a fixed length of {schema.Size} but found {{{sourceAccesor}.Length}}"");");
-            code.AppendLine($@"BytesSchema.Write(outputStream, {sourceAccesor});");
-        }
-
-        private void GenerateSerializationSourceForUnion(UnionSchema schema, StringBuilder code, GeneratorExecutionContext context, string originTypeName, string sourceAccesor)
-        {
-
-        }
-
-        private void GenerateSerializationSourceForLogicalType(LogicalSchema logicalSchema, StringBuilder code, string originTypeName, string sourceAccesor)
-        {
-            var serializerCallCode = logicalSchema.LogicalType.Name switch
-            {
-                "date" when originTypeName.Equals("DateTime", StringComparison.InvariantCultureIgnoreCase)
-                           || originTypeName.Equals("DateOnly", StringComparison.InvariantCultureIgnoreCase) => $"DateSchema.Write(outputStream, {sourceAccesor});",
-                "uuid" when originTypeName.Equals("Guid", StringComparison.InvariantCultureIgnoreCase) => $"UuidSchema.Write(outputStream, {sourceAccesor});",
-                "time-millis" when originTypeName.Equals("TimeOnly", StringComparison.InvariantCultureIgnoreCase) => $"TimeMillisSchema.Write(outputStream, {sourceAccesor});",
-                "timestamp-millis" when originTypeName.Equals("DateTime", StringComparison.InvariantCultureIgnoreCase) => $"TimestampMilisSchema.Write(outputStream, {sourceAccesor});",
-                "local-timestamp-milis" when originTypeName.Equals("DateTime", StringComparison.InvariantCultureIgnoreCase) => $"TimestampMilisSchema.Write(outputStream, {sourceAccesor});",
-
-                _ => throw new Exception($"Required type was not satisfied to serialize {logicalSchema.LogicalTypeName}")
-            };
-
-            code.AppendLine(serializerCallCode);
-        }
-
-        private void GenerateSerializationSourceForArray(ArraySchema schema, StringBuilder code, GeneratorExecutionContext context, string originTypeName, string sourceAccesor)
-        {
-            code.AppendLine(@$"LongSchema.Write(outputStream, (long){sourceAccesor}.Count());");
-            code.AppendLine($@"foreach(var item in {sourceAccesor})");
-            code.AppendLine("{");
-
-            GenerateSerializatonSourceForSchema(schema.ItemSchema, code, context, originTypeName, "item");
-
-            code.AppendLine("}");
-            code.AppendLine(@$"LongSchema.Write(outputStream, 0L);");
-        }
-
-        private void GenerateSerializationSourceForRecordField(Field field, StringBuilder code, GeneratorExecutionContext context, string originTypeName, string sourceAccesor) 
-        {
-            var classSymbol = context.Compilation.GetTypeByMetadataName(originTypeName);
-
-            var property = classSymbol.GetMembers().FirstOrDefault(s => s.Kind is SymbolKind.Property && s.Name.Equals(field.Name, StringComparison.InvariantCultureIgnoreCase)) as IPropertySymbol;
-
-            string typeName;
-
-            if (property.Type.AllInterfaces.Any(i => i.Name.Contains("IEnumerable")) && !property.Type.Name.Equals("string", StringComparison.InvariantCultureIgnoreCase))
-            {
-                if (property.Type is INamedTypeSymbol namedTypeSymbol)
-                {
-                    typeName = namedTypeSymbol.TypeArguments.First().Name;
-                }
-                else if(property.Type is IArrayTypeSymbol arrayTypeSymbol)
-                {
-                    typeName = arrayTypeSymbol.ElementType.Name;
-                }
-                else
-                {
-                    typeName = property.Type.Name;
-                }
-            }
-            else
-            {
-                typeName = property.Type.Name;
-            }
-
-            GenerateSerializatonSourceForSchema(field.Schema, code, context, typeName, $"{sourceAccesor}.{property.Name}");
-        }
-
-        private void GenerateSerializationSourceForPrimitive(PrimitiveSchema primitiveSchema, StringBuilder code, string originTypeName, string sourceAccesor = "source")
-        {
-            var serializerCallCode = primitiveSchema.Name switch
-            {
-                "boolean" when originTypeName.Equals("bool", StringComparison.InvariantCultureIgnoreCase) => $"BooleanSchema.Write(outputStream, {sourceAccesor});",
-                "int" when originTypeName.Equals("int", StringComparison.InvariantCultureIgnoreCase)
-                           || originTypeName.Equals("Int32", StringComparison.InvariantCultureIgnoreCase) => $"IntSchema.Write(outputStream, {sourceAccesor});",
-                "long" when originTypeName.Equals("long", StringComparison.InvariantCultureIgnoreCase)
-                            || originTypeName.Equals("Int64", StringComparison.InvariantCultureIgnoreCase) => $"LongSchema.Write(outputStream, {sourceAccesor});",
-                "string" when originTypeName.Equals("string", StringComparison.InvariantCultureIgnoreCase) => $"StringSchema.Write(outputStream, {sourceAccesor});",
-                "bytes" when originTypeName.Equals("byte[]", StringComparison.InvariantCultureIgnoreCase) => $"BytesSchema.Write(outputStream, {sourceAccesor});",
-                "double" when originTypeName.Equals("double", StringComparison.InvariantCultureIgnoreCase) => $"DoubleSchema.Write(outputStream, {sourceAccesor});",
-                "float" when originTypeName.Equals("float", StringComparison.InvariantCultureIgnoreCase) => $"FloatSchema.Write(outputStream, {sourceAccesor});",
-
-                _ => throw new Exception($"Required type was not satisfied to serialize {primitiveSchema.Name}")
-            };
-
-            code.AppendLine(serializerCallCode);
         }
 
         public void Initialize(GeneratorInitializationContext context)
@@ -230,51 +89,6 @@ IntSchema.Write(outputStream, indexOfEnumValue);");
                     AvroSerializers.Add(c);
                 }
             }
-        }
-
-        // determine the namespace the class/enum/struct is declared in, if any
-        static string GetNamespace(BaseTypeDeclarationSyntax syntax)
-        {
-            // If we don't have a namespace at all we'll return an empty string
-            // This accounts for the "default namespace" case
-            string nameSpace = string.Empty;
-
-            // Get the containing syntax node for the type declaration
-            // (could be a nested type, for example)
-            SyntaxNode potentialNamespaceParent = syntax.Parent;
-
-            // Keep moving "out" of nested classes etc until we get to a namespace
-            // or until we run out of parents
-            while (potentialNamespaceParent != null &&
-                    potentialNamespaceParent is not NamespaceDeclarationSyntax
-                    && potentialNamespaceParent is not FileScopedNamespaceDeclarationSyntax)
-            {
-                potentialNamespaceParent = potentialNamespaceParent.Parent;
-            }
-
-            // Build up the final namespace by looping until we no longer have a namespace declaration
-            if (potentialNamespaceParent is BaseNamespaceDeclarationSyntax namespaceParent)
-            {
-                // We have a namespace. Use that as the type
-                nameSpace = namespaceParent.Name.ToString();
-
-                // Keep moving "out" of the namespace declarations until we 
-                // run out of nested namespace declarations
-                while (true)
-                {
-                    if (namespaceParent.Parent is not NamespaceDeclarationSyntax parent)
-                    {
-                        break;
-                    }
-
-                    // Add the outer namespace as a prefix to the final namespace
-                    nameSpace = $"{namespaceParent.Name}.{nameSpace}";
-                    namespaceParent = parent;
-                }
-            }
-
-            // return the final namespace
-            return nameSpace;
         }
     }
 }

@@ -1,9 +1,4 @@
 ﻿using FluentAssertions;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace AvroSerializer.Write.Tests
 {
@@ -69,7 +64,7 @@ namespace AvroSerializer.Write.Tests
         Value1,
         Value
     }
-    
+
     [AvroSchema(@"{ ""type"": ""int"", ""logicalType"": ""date"" }")]
     public partial class DateSerializer : AvroSerializer<DateOnly>
     {
@@ -87,7 +82,7 @@ namespace AvroSerializer.Write.Tests
     {
 
     }
-    
+
     [AvroSchema(@"{ ""type"": ""string"", ""logicalType"": ""uuid"" }")]
     public partial class UuidSerializer : AvroSerializer<Guid>
     {

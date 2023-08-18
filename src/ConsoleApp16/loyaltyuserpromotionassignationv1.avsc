@@ -34,7 +34,9 @@
     {
       "name": "ClientId",
       "type": {
-        "type": "string"
+        "logicalType": "regex-string",
+        "type": "string",
+        "regex": ".+"
       }
     },
     {
@@ -47,13 +49,17 @@
     {
       "name": "InternalPromotionId",
       "type": {
-        "type": "string"
+        "logicalType": "regex-string",
+        "type": "string",
+        "regex": ".+"
       }
     },
     {
       "name": "AssignationMethod",
       "type": {
-        "type": "string"
+        "logicalType": "regex-string",
+        "type": "string",
+        "regex": ".+"
       }
     },
     {
@@ -78,6 +84,14 @@
       }
     },
     {
+      "name": "PersonalDiscount",
+      "type": [
+        "null",
+        "double"
+      ],
+      "default": null
+    },
+    {
       "name": "External",
       "type": {
         "type": "record",
@@ -85,9 +99,19 @@
         "namespace": "eu.scrm.dp.schemas.UserPromotionLoyaltyAssignation",
         "fields": [
           {
+            "name": "CampaignId",
+            "type": [
+              "null",
+              "string"
+            ],
+            "default": null
+          },
+          {
             "name": "AppName",
             "type": {
-              "type": "string"
+              "logicalType": "regex-string",
+              "type": "string",
+              "regex": ".+"
             }
           }
         ]

@@ -28,4 +28,8 @@
     <ProjectReference Include="..\src\AvroSerializer.Generators\AvroSerializer.Generators.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="NewFolder\" />
+  </ItemGroup>
+
 </Project>

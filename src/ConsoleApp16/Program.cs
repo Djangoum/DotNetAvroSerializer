@@ -138,7 +138,7 @@ var sut = new UserPromotionAssignationDataEventApiV2
 };
 
 var serialization1 = new UserPromotionAssigantionDataeventApiV2Serializer().Serialize(sut);
-var serialization2 = AvroConvert.SerializeHeadless(sut, schema);
+var serialization2 = AvroConvert.SerializeHeadless(new int[] { 1, 2, 3, 4 }, typeof(int[]));
 
 Console.WriteLine(Convert.ToHexString(serialization1));
 Console.WriteLine(Convert.ToHexString(serialization2));

@@ -5,6 +5,7 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Text;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 
@@ -33,7 +34,7 @@ namespace AvroSerializer.Generators
                     .GetSemanticModel(serializer.SyntaxTree)
                     .GetConstantValue(attributeSchemaText)
                     .ToString();
-
+                if (!Debugger.IsAttached)Debugger.Launch();
                 var schema = Schema.Parse(schemaString);
 
                 var nameTypeSymbol = context.Compilation.GetSemanticModel(serializer.SyntaxTree).GetSymbolInfo(originType);

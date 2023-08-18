@@ -9,7 +9,7 @@ namespace AvroSerializer.Write.Tests
     public class ComplexTypesTests
     {
         [Fact]
-        public void SerializeObjectWithPlaneProperties()
+        public void SerializeArrayOfInts()
         {
 
         }

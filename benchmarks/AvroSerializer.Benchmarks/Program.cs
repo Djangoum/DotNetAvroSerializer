@@ -1,7 +1,6 @@
 ﻿using AvroSerializer.Benchmarks.Serializers;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Running;
-using SolTechnology.Avro;
 
 BenchmarkRunner.Run<AvroSerializersBenchmarks>();
 
@@ -14,11 +13,5 @@ public class AvroSerializersBenchmarks
     public byte[] AvroSerializerStringSerialization()
     {
         return new StringSerializer().Serialize(sut);
-    }
-
-    [Benchmark]
-    public byte[] AvroConvertStringSerialization()
-    {
-        return AvroConvert.SerializeHeadless(sut, @"{ ""type"": ""string"" }");
     }
 }

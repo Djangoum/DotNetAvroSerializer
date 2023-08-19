@@ -1,4 +1,5 @@
 ﻿using Avro;
+using AvroSerializer.Generators.Helpers;
 using Microsoft.CodeAnalysis;
 using System;
 using System.Linq;
@@ -8,7 +9,7 @@ namespace AvroSerializer.Generators.SerializationGenerators
 {
     public static class UnionGenerator
     {
-        public static void GenerateSerializationSourceForUnion(UnionSchema unionSchema, StringBuilder code, GeneratorExecutionContext context, ISymbol originTypeSymbol, string sourceAccesor)
+        public static void GenerateSerializationSourceForUnion(UnionSchema unionSchema, StringBuilder serializationCode, PrivateFieldsCode privateFieldsCode, GeneratorExecutionContext context, ISymbol originTypeSymbol, string sourceAccesor)
         {
             foreach (var schema in unionSchema.Schemas)
             {
@@ -43,13 +44,13 @@ namespace AvroSerializer.Generators.SerializationGenerators
 
                 if (unionSchema.Schemas.IndexOf(schema) == 0)
                 {
-                    code.AppendLine($@"if ({canSerializedCheck}) {{");
+                    serializationCode.AppendLine($@"if ({canSerializedCheck}) {{");
                 }
                 else
                 {
-                    code.AppendLine($@"else if ({canSerializedCheck}) {{");
+                    serializationCode.AppendLine($@"else if ({canSerializedCheck}) {{");
                 }
-                code.AppendLine($"IntSchema.Write(outputStream, {unionSchema.Schemas.IndexOf(schema)});");
+                serializationCode.AppendLine($"IntSchema.Write(outputStream, {unionSchema.Schemas.IndexOf(schema)});");
 
                 var newSymbol = originTypeSymbol.Name switch
                 {
@@ -57,9 +58,9 @@ namespace AvroSerializer.Generators.SerializationGenerators
                     _ => originTypeSymbol
                 };
 
-                SerializationGenerator.GenerateSerializatonSourceForSchema(schema, code, context, newSymbol, sourceAccesor);
+                SerializationGenerator.GenerateSerializatonSourceForSchema(schema, serializationCode, privateFieldsCode, context, newSymbol, sourceAccesor);
 
-                code.AppendLine("}");
+                serializationCode.AppendLine("}");
             }
         }
     }

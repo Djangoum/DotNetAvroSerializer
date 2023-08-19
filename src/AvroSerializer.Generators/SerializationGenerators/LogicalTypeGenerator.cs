@@ -1,4 +1,5 @@
 ﻿using Avro;
+using AvroSerializer.Generators.Helpers;
 using Microsoft.CodeAnalysis;
 using System;
 using System.Text;
@@ -7,7 +8,7 @@ namespace AvroSerializer.Generators.SerializationGenerators
 {
     public static class LogicalTypeGenerator
     {
-        public static void GenerateSerializationSourceForLogicalType(LogicalSchema logicalSchema, StringBuilder code, GeneratorExecutionContext context, ISymbol originTypeSymbol, string sourceAccesor)
+        public static void GenerateSerializationSourceForLogicalType(LogicalSchema logicalSchema, StringBuilder serializationCode, PrivateFieldsCode privateFieldsCode, GeneratorExecutionContext context, ISymbol originTypeSymbol, string sourceAccesor)
         {
             var serializerCallCode = logicalSchema.LogicalType.Name switch
             {
@@ -23,12 +24,12 @@ namespace AvroSerializer.Generators.SerializationGenerators
 
             if (serializerCallCode is not null)
             {   // known logical type
-                code.AppendLine(serializerCallCode);
+                serializationCode.AppendLine(serializerCallCode);
             }
             else
             {
                 // unknown logical type serialize base schema
-                SerializationGenerator.GenerateSerializatonSourceForSchema(logicalSchema.BaseSchema, code, context, originTypeSymbol, sourceAccesor);
+                SerializationGenerator.GenerateSerializatonSourceForSchema(logicalSchema.BaseSchema, serializationCode, privateFieldsCode, context, originTypeSymbol, sourceAccesor);
             }
         }
     }

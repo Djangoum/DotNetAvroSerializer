@@ -25,11 +25,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\benchmarks\AvroSerializer.Benchmarks\AvroSerializer.Benchmarks.csproj" />
-    <ProjectReference Include="..\..\src\AvroSerializer.Generators\AvroSerializer.Generators.csproj"  OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="NewFolder\" />
+    <ProjectReference Include="..\..\src\AvroSerializer.Generators\AvroSerializer.Generators.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
   </ItemGroup>
 
 </Project>

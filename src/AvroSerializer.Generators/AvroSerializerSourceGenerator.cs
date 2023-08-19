@@ -39,7 +39,7 @@ namespace AvroSerializer.Generators
 
                 var nameTypeSymbol = context.Compilation.GetSemanticModel(serializer.SyntaxTree).GetSymbolInfo(originType);
 
-                var serializeCode = SerializationCodeGeneratorLoop(schema, context, nameTypeSymbol.Symbol);
+                var (serializationCode, privateFieldsCode) = SerializationCodeGeneratorLoop(schema, context, nameTypeSymbol.Symbol);
 
                 context.AddSource($"{serializer.Identifier}.g.cs",
                     CSharpSyntaxTree.ParseText(SourceText.From(
@@ -53,10 +53,12 @@ namespace {Namespaces.GetNamespace(serializer)}
 {{
     public partial class {serializer.Identifier}
     {{
+        {privateFieldsCode}
+
         public byte[] Serialize({originType} source)
         {{
             var outputStream = new MemoryStream();
-{serializeCode}
+{serializationCode}
             return outputStream.ToArray();
         }}
     }}
@@ -64,13 +66,14 @@ namespace {Namespaces.GetNamespace(serializer)}
             }
         }
 
-        private string SerializationCodeGeneratorLoop(Schema schema, GeneratorExecutionContext context, ISymbol originTypeSymbol, string sourceAccesor = "source")
+        private (string serializationCode, string privateFieldsCode) SerializationCodeGeneratorLoop(Schema schema, GeneratorExecutionContext context, ISymbol originTypeSymbol, string sourceAccesor = "source")
         {
-            var code = new StringBuilder();
+            var serializatonCode = new StringBuilder();
+            var privateFieldsCode = new PrivateFieldsCode();
 
-            SerializationGenerator.GenerateSerializatonSourceForSchema(schema, code, context, originTypeSymbol, sourceAccesor);
+            SerializationGenerator.GenerateSerializatonSourceForSchema(schema, serializatonCode, privateFieldsCode, context, originTypeSymbol, sourceAccesor);
 
-            return code.ToString();
+            return (serializatonCode.ToString(), privateFieldsCode.ToString());
         }
 
         public void Initialize(GeneratorInitializationContext context)

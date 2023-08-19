@@ -25,6 +25,27 @@ namespace AvroSerializer.Write.Tests
 
             Convert.ToHexString(result).Should().BeEquivalentTo("04");
         }
+
+        [Fact]
+        public void SerializeMapOfInts()
+        {
+            MapSerializer serializer = new MapSerializer();
+
+            var result = serializer.Serialize(new Dictionary<string, int>()
+            {
+                { "item1", 1 },
+                { "item2", 2 },
+                { "item3", 3 }
+            });
+
+            Convert.ToHexString(result).Should().BeEquivalentTo("060A6974656D31020A6974656D32040A6974656D330600");
+        }
+    }
+
+    [AvroSchema(@"{ ""type"" : ""map"", ""values"": ""int"" }")]
+    public partial class MapSerializer : AvroSerializer<IDictionary<string, int>>
+    {
+
     }
 
     [AvroSchema(@"{ ""type"" : ""array"", ""items"": ""int"" }")]

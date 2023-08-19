@@ -1,4 +1,5 @@
 ﻿using Avro;
+using AvroSerializer.Generators.Helpers;
 using Microsoft.CodeAnalysis;
 using System;
 using System.Linq;
@@ -8,7 +9,7 @@ namespace AvroSerializer.Generators.SerializationGenerators
 {
     public static class RecordGenerator
     {
-        public static void GenerateSerializationSourceForRecordField(Field field, StringBuilder code, GeneratorExecutionContext context, ISymbol originTypeSymbol, string sourceAccesor)
+        public static void GenerateSerializationSourceForRecordField(Field field, StringBuilder serializationCode, PrivateFieldsCode privateFieldsCode, GeneratorExecutionContext context, ISymbol originTypeSymbol, string sourceAccesor)
         {
             var classSymbol = originTypeSymbol as INamedTypeSymbol;
 
@@ -36,7 +37,7 @@ namespace AvroSerializer.Generators.SerializationGenerators
                 typeName = property.Type;
             }
 
-            SerializationGenerator.GenerateSerializatonSourceForSchema(field.Schema, code, context, typeName, $"{sourceAccesor}.{property.Name}");
+            SerializationGenerator.GenerateSerializatonSourceForSchema(field.Schema, serializationCode, privateFieldsCode, context, typeName, $"{sourceAccesor}.{property.Name}");
         }
     }
 }

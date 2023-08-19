@@ -18,6 +18,6 @@ I'll add a list of missing features to complete a first usable (not production r
 
 Known issues : 
 
-- [ ] Do not support for more than one usage of the same enum per schema
+- [x] Do not support for more than one usage of the same enum per schema
 
 Everything is pending for deserialization :) 

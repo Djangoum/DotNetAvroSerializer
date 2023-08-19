@@ -16,7 +16,7 @@ namespace AvroSerializer.Generators.SerializationGenerators
             if (!dictionarySymbol.TypeArguments.First().Name.Equals("string", StringComparison.InvariantCultureIgnoreCase))
                 throw new Exception("Map keys have to be strings");
 
-            code.AppendLine($@"LongSchema.Write(outputStream, {sourceAccesor}.Count());");
+            code.AppendLine($@"if ({sourceAccesor}.Count() > 0) LongSchema.Write(outputStream, {sourceAccesor}.Count());");
             code.AppendLine($@"foreach(var item in {sourceAccesor})");
             code.AppendLine("{");
 

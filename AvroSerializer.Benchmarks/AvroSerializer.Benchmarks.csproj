@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
@@ -8,14 +8,14 @@
   </PropertyGroup>
 
 	<ItemGroup>
+		<PackageReference Include="AvroConvert" Version="3.3.7" />
 		<PackageReference Include="BenchmarkDotNet" Version="0.13.6" />
 		<PackageReference Include="BenchmarkDotNet.Annotations" Version="0.13.6" />
 	</ItemGroup>
 
 	<ItemGroup>
 	  <ProjectReference Include="..\src\AvroSerializer.Abstractions\AvroSerializer.csproj" />
-	  <ProjectReference Include="..\src\AvroSerializer.Generators\AvroSerializer.Generators.csproj" />
-	  <ProjectReference Include="..\src\ConsoleApp16\ConsoleApp16.csproj" />
+	  <ProjectReference Include="..\src\AvroSerializer.Generators\AvroSerializer.Generators.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
 	</ItemGroup>
 
 </Project>

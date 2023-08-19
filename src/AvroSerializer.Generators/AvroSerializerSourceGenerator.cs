@@ -2,10 +2,10 @@
 using AvroSerializer.Generators.Helpers;
 using AvroSerializer.Generators.SerializationGenerators;
 using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Text;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Text;
 
@@ -34,7 +34,7 @@ namespace AvroSerializer.Generators
                     .GetSemanticModel(serializer.SyntaxTree)
                     .GetConstantValue(attributeSchemaText)
                     .ToString();
-                if (!Debugger.IsAttached)Debugger.Launch();
+
                 var schema = Schema.Parse(schemaString);
 
                 var nameTypeSymbol = context.Compilation.GetSemanticModel(serializer.SyntaxTree).GetSymbolInfo(originType);
@@ -42,7 +42,7 @@ namespace AvroSerializer.Generators
                 var serializeCode = SerializationCodeGeneratorLoop(schema, context, nameTypeSymbol.Symbol);
 
                 context.AddSource($"{serializer.Identifier}.g.cs",
-                    SourceText.From(
+                    CSharpSyntaxTree.ParseText(SourceText.From(
 $@"using AvroSerializer.Primitives;
 using AvroSerializer.LogicalTypes;
 using AvroSerializer.Exceptions;
@@ -60,7 +60,7 @@ namespace {Namespaces.GetNamespace(serializer)}
             return outputStream.ToArray();
         }}
     }}
-}}", Encoding.UTF8));
+}}", Encoding.UTF8)).GetRoot().NormalizeWhitespace().SyntaxTree.GetText());
             }
         }
 

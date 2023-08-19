@@ -8,8 +8,8 @@
       </PropertyGroup>
 
       <ItemGroup>
+        <PackageReference Include="AvroConvert" Version="3.3.7" />
         <PackageReference Include="FluentAssertions" Version="6.11.0" />
-        <PackageReference Include="PromotionEngine.AvroConvert" Version="0.1.4" />
       </ItemGroup>
 
     <ItemGroup>

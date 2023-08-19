@@ -7,9 +7,9 @@ namespace AvroSerializer.Generators.SerializationGenerators
 {
     public class FixedGenerator
     {
-        public static void GenerateSerializationSourceForFixed(FixedSchema schema, StringBuilder code, ISymbol originTypeName, string sourceAccesor)
+        public static void GenerateSerializationSourceForFixed(FixedSchema schema, StringBuilder code, IArrayTypeSymbol byteArrayTypeSymbol, string sourceAccesor)
         {
-            if (!originTypeName.Name.Equals("byte[]", StringComparison.InvariantCultureIgnoreCase))
+            if (!byteArrayTypeSymbol.ElementType.Name.Equals("byte", StringComparison.InvariantCultureIgnoreCase))
                 throw new Exception($"Required type was not satisfied to serialize {schema.Name}");
 
             code.AppendLine(@$"if ({sourceAccesor}.Length != {schema.Size}) throw new AvroSerializationException(""Byte array {sourceAccesor} has to be of a fixed length of {schema.Size} but found {{{sourceAccesor}.Length}}"");");

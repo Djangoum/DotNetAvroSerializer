@@ -23,10 +23,6 @@ namespace AvroSerializer.Generators.SerializationGenerators
                 {
                     typeName = namedTypeSymbol.TypeArguments.First();
                 }
-                else if (property.Type is IArrayTypeSymbol arrayTypeSymbol)
-                {
-                    typeName = arrayTypeSymbol.ElementType;
-                }
                 else
                 {
                     typeName = property.Type;

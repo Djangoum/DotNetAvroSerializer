@@ -32,7 +32,7 @@ namespace AvroSerializer.Generators.SerializationGenerators
                     break;
 
                 case FixedSchema fixedSchema:
-                    FixedGenerator.GenerateSerializationSourceForFixed(fixedSchema, serializationCode, originTypeSymbol, sourceAccesor);
+                    FixedGenerator.GenerateSerializationSourceForFixed(fixedSchema, serializationCode, originTypeSymbol as IArrayTypeSymbol, sourceAccesor);
                     break;
 
                 case UnionSchema unionSchema:

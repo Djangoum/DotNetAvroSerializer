@@ -55,11 +55,18 @@ namespace {Namespaces.GetNamespace(serializer)}
     {{
         {privateFieldsCode}
 
-        public byte[] Serialize({originType} source)
+        public byte[] Serialize({context.Compilation.GetSemanticModel(originType.SyntaxTree).GetTypeInfo(originType).Type.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat)} source)
         {{
             var outputStream = new MemoryStream();
-{serializationCode}
+            
+            SerializeToStream(outputStream, source);
+
             return outputStream.ToArray();
+        }}
+
+        public void SerializeToStream(Stream outputStream, {context.Compilation.GetSemanticModel(originType.SyntaxTree).GetTypeInfo(originType).Type.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat)} source)
+        {{
+{serializationCode}
         }}
     }}
 }}", Encoding.UTF8)).GetRoot().NormalizeWhitespace().SyntaxTree.GetText());

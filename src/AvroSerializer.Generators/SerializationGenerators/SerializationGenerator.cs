@@ -1,22 +1,12 @@
 ﻿using Avro;
 using Microsoft.CodeAnalysis;
-using System;
-using System.Collections.Generic;
+using System.Diagnostics;
 using System.Text;
 
 namespace AvroSerializer.Generators.SerializationGenerators
 {
     public static class SerializationGenerator
     {
-        public static string SerializationCodeGeneratorLoop(Schema schema, GeneratorExecutionContext context, ISymbol originTypeSymbol, string sourceAccesor = "source")
-        {
-            var code = new StringBuilder();
-
-            GenerateSerializatonSourceForSchema(schema, code, context, originTypeSymbol, sourceAccesor);
-
-            return code.ToString();
-        }
-
         public static void GenerateSerializatonSourceForSchema(Schema schema, StringBuilder code, GeneratorExecutionContext context, ISymbol originTypeSymbol, string sourceAccesor)
         {
             switch (schema)

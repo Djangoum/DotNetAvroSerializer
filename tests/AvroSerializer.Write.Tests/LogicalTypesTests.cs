@@ -53,18 +53,6 @@ namespace AvroSerializer.Write.Tests
         }
     }
 
-    [AvroSchema(@"{ ""type"": ""enum"", ""name"": ""Foo"", ""symbols"": [""Value1"", ""Value""] }")]
-    public partial class EnumSerializer : AvroSerializer<EnumerationValues>
-    {
-
-    }
-
-    public enum EnumerationValues
-    {
-        Value1,
-        Value
-    }
-
     [AvroSchema(@"{ ""type"": ""int"", ""logicalType"": ""date"" }")]
     public partial class DateSerializer : AvroSerializer<DateOnly>
     {

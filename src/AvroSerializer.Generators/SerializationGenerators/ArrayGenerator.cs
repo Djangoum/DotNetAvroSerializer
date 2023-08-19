@@ -1,5 +1,6 @@
 ﻿using Avro;
 using Microsoft.CodeAnalysis;
+using System.Diagnostics;
 using System.Text;
 
 namespace AvroSerializer.Generators.SerializationGenerators

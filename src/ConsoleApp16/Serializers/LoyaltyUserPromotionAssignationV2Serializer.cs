@@ -128,8 +128,22 @@ namespace ConsoleApp16.Serializers
     //}
 
     [AvroSchema(@"{ ""type"": ""array"", ""items"": ""int"" }")]
-    public partial class IntArraySerializer : AvroSerializer<string>
+    public partial class IntArraySerializer : AvroSerializer<int[]>
     {
 
+    }
+
+
+    [AvroSchema(@"{ ""type"": ""enum"", ""name"": ""foo"", ""symbols"": [ ""Value1"", ""Value2"", ""Value3"" ]}")]
+    public partial class EnumSerializer : AvroSerializer<TestEnum>
+    {
+
+    }
+
+    public enum TestEnum
+    {
+        Value1,
+        Value2,
+        Value3
     }
 }

@@ -20,6 +20,7 @@ namespace AvroSerializer.Generators.SerializationGenerators
             code.AppendLine($@"foreach(var item in {sourceAccesor})");
             code.AppendLine("{");
 
+            code.AppendLine($@"StringSchema.Write(outputStream, item.Key);");
             SerializationGenerator.GenerateSerializatonSourceForSchema(schema.ValueSchema, code, context, dictionarySymbol.TypeArguments.ElementAt(1), "item.Value");
 
             code.AppendLine("}");

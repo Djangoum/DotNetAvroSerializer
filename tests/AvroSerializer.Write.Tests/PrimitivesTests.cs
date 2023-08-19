@@ -1,6 +1,6 @@
 using FluentAssertions;
 
-namespace AvroSerializer.Tests;
+namespace AvroSerializer.Write.Tests;
 
 public class PrimitivesTests
 {
@@ -132,12 +132,6 @@ public partial class FloatSerializer : AvroSerializer<float>
 
 [AvroSchema(@"{ ""type"": ""array"", ""items"": ""long"" }")]
 public partial class ArraySerializer : AvroSerializer<long[]>
-{
-
-}
-
-[AvroSchema(@"{ ""type"": ""map"", ""values"": ""long"" }")]
-public partial class MapSerializer : AvroSerializer<IDictionary<string, long>>
 {
 
 }

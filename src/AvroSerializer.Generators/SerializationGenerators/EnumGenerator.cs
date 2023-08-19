@@ -14,8 +14,8 @@ namespace AvroSerializer.Generators.SerializationGenerators
             if (symbol.TypeKind != TypeKind.Enum)
                 throw new Exception($"Required type was not satisfied to serialize {schema.Name}");
 
-            code.AppendLine($@"var enumValues = new string[] {{ ""{string.Join(@""",""", schema.Symbols)}"" }};
-var indexOfEnumValue = Array.IndexOf(enumValues, {sourceAccesor}.ToString());
+            code.AppendLine($@"var {schema.Name}Values = new string[] {{ ""{string.Join(@""",""", schema.Symbols)}"" }};
+var indexOfEnumValue = Array.IndexOf({schema.Name}Values, {sourceAccesor}.ToString());
 if (indexOfEnumValue < 0) throw new AvroSerializationException($""Enum value provided {{{sourceAccesor}}} not found in symbols for enum {schema.Name}"");
 IntSchema.Write(outputStream, indexOfEnumValue);");
         }

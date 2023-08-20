@@ -15,8 +15,7 @@ Currently Dotnet Avro Serializer creates a couple of methods:
 - **Serialize** : Takes an instance of the generic parameter provided to **AvroSerializer<>** and returns an array of bytes containing avro binary serialized data.
 - **SerializeToStream** : Takes a **Stream** and an instance of the generic parameter provided to **AvroSerializer<>**. Writes binary serialized data to the stream. 
 
-Serialization of simple types: 
-This serializer specifies a schema for an int.
+Simplest example of avro serializer would be serializing a primitive type like an int
 ```csharp
 [AvroSchema(@"{ ""type"": ""int"" }")]
 public partial class IntSerializer : AvroSerializer<int>

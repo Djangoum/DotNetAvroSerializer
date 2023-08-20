@@ -1,6 +1,7 @@
+using DotNetAvroSerializer;
 using FluentAssertions;
 
-namespace AvroSerializer.Write.Tests;
+namespace DotNetAvroSerializer.Write.Tests;
 
 public class PrimitivesTests
 {

@@ -1,12 +1,12 @@
 ﻿using Avro;
 using AvroSerializer.Generators.Exceptions;
-using AvroSerializer.Generators.Helpers;
+using DotNetAvroSerializer.Generators.Helpers;
 using Microsoft.CodeAnalysis;
 using System;
 using System.Linq;
 using System.Text;
 
-namespace AvroSerializer.Generators.SerializationGenerators
+namespace DotNetAvroSerializer.Generators.SerializationGenerators
 {
     public static class MapGenerator
     {

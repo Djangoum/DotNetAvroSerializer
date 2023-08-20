@@ -1,9 +1,9 @@
 ﻿using AvroSerializer.Exceptions;
-using AvroSerializer.Primitives;
+using DotNetAvroSerializer.Primitives;
 using System;
 using System.IO;
 
-namespace AvroSerializer.LogicalTypes
+namespace DotNetAvroSerializer.LogicalTypes
 {
     public static class UuidSchema
     {

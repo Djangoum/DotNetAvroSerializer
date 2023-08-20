@@ -1,7 +1,7 @@
 ﻿using AvroSerializer.Exceptions;
 using System.IO;
 
-namespace AvroSerializer.Primitives
+namespace DotNetAvroSerializer.Primitives
 {
     public class BytesSchema
     {
@@ -9,7 +9,7 @@ namespace AvroSerializer.Primitives
 
         public static void Write(Stream outputStream, byte[] value)
         {
-            LongSchema.Write(outputStream, (long)value.Length);
+            LongSchema.Write(outputStream, value.Length);
             outputStream.Write(value, 0, value.Length);
         }
     }

@@ -4,7 +4,7 @@ using Microsoft.CodeAnalysis;
 using System;
 using System.Text;
 
-namespace AvroSerializer.Generators.SerializationGenerators
+namespace DotNetAvroSerializer.Generators.SerializationGenerators
 {
     public static class PrimitiveTypesGenerator
     {
@@ -18,11 +18,11 @@ namespace AvroSerializer.Generators.SerializationGenerators
                            || originTypeSymbol.Name.Equals("Int32", StringComparison.InvariantCultureIgnoreCase) => $"IntSchema.Write(outputStream, {sourceAccesor});",
                 "long" when originTypeSymbol.Name.Equals("long", StringComparison.InvariantCultureIgnoreCase)
                             || originTypeSymbol.Name.Equals("Int64", StringComparison.InvariantCultureIgnoreCase) => $"LongSchema.Write(outputStream, {sourceAccesor});",
-                "string" when originTypeSymbol.Name.Equals("string", StringComparison.InvariantCultureIgnoreCase)=> $"StringSchema.Write(outputStream, {sourceAccesor});",
+                "string" when originTypeSymbol.Name.Equals("string", StringComparison.InvariantCultureIgnoreCase) => $"StringSchema.Write(outputStream, {sourceAccesor});",
                 "bytes" when originTypeSymbol is IArrayTypeSymbol arrayTypeSymbol
                             && arrayTypeSymbol.ElementType.Name.Equals("byte", StringComparison.InvariantCultureIgnoreCase) => $"BytesSchema.Write(outputStream, {sourceAccesor});",
                 "double" when originTypeSymbol.Name.Equals("double", StringComparison.InvariantCultureIgnoreCase) => $"DoubleSchema.Write(outputStream, {sourceAccesor});",
-                "float" when originTypeSymbol.Name.Equals("single", StringComparison.InvariantCultureIgnoreCase)=> $"FloatSchema.Write(outputStream, {sourceAccesor});",
+                "float" when originTypeSymbol.Name.Equals("single", StringComparison.InvariantCultureIgnoreCase) => $"FloatSchema.Write(outputStream, {sourceAccesor});",
                 "null" => $"NullSchema.Write(outputStream, {sourceAccesor});",
                 _ => throw new AvroGeneratorException($"Required type was not satisfied to serialize {primitiveSchema.Name}")
             };

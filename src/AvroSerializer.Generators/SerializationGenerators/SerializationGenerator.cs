@@ -1,11 +1,11 @@
 ﻿using Avro;
 using Avro.File;
-using AvroSerializer.Generators.Helpers;
+using DotNetAvroSerializer.Generators.Helpers;
 using Microsoft.CodeAnalysis;
 using System.Diagnostics;
 using System.Text;
 
-namespace AvroSerializer.Generators.SerializationGenerators
+namespace DotNetAvroSerializer.Generators.SerializationGenerators
 {
     public static class SerializationGenerator
     {

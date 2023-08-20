@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Text;
 
-namespace AvroSerializer.Generators.Helpers
+namespace DotNetAvroSerializer.Generators.Helpers
 {
     public class PrivateFieldsCode
     {

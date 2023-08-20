@@ -1,4 +1,4 @@
-﻿namespace AvroSerializer.ComplexTypes
+﻿namespace DotNetAvroSerializer.ComplexTypes
 {
     public static class RecordSchema
     {

@@ -4,7 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace AvroSerializer.Generators.Helpers
+namespace DotNetAvroSerializer.Generators.Helpers
 {
     internal class Namespaces
     {

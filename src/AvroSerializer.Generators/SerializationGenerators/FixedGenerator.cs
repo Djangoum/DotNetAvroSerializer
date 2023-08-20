@@ -4,7 +4,7 @@ using Microsoft.CodeAnalysis;
 using System;
 using System.Text;
 
-namespace AvroSerializer.Generators.SerializationGenerators
+namespace DotNetAvroSerializer.Generators.SerializationGenerators
 {
     public class FixedGenerator
     {

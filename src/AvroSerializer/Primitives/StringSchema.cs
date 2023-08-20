@@ -1,7 +1,7 @@
 ﻿using System.IO;
 using System.Text;
 
-namespace AvroSerializer.Primitives
+namespace DotNetAvroSerializer.Primitives
 {
     public class StringSchema
     {

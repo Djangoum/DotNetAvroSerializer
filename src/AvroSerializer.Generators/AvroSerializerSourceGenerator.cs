@@ -1,6 +1,6 @@
 ﻿using Avro;
-using AvroSerializer.Generators.Helpers;
-using AvroSerializer.Generators.SerializationGenerators;
+using DotNetAvroSerializer.Generators.Helpers;
+using DotNetAvroSerializer.Generators.SerializationGenerators;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -10,7 +10,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 
-namespace AvroSerializer.Generators
+namespace DotNetAvroSerializer.Generators
 {
     [Generator]
     partial class AvroSerializerSourceGenerator : ISourceGenerator

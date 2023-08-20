@@ -2,7 +2,7 @@
 using System;
 using System.IO;
 
-namespace AvroSerializer.Primitives
+namespace DotNetAvroSerializer.Primitives
 {
     public class DoubleSchema
     {

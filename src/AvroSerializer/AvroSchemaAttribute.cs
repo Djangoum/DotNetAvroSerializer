@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace AvroSerializer
+namespace DotNetAvroSerializer
 {
     public class AvroSchemaAttribute : Attribute
     {

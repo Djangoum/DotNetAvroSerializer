@@ -1,6 +1,6 @@
 ﻿using System.Collections;
 
-namespace AvroSerializer.ComplexTypes
+namespace DotNetAvroSerializer.ComplexTypes
 {
     public static class MapSchema
     {

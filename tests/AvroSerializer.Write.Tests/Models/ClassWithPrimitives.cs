@@ -1,4 +1,4 @@
-﻿namespace AvroSerializer.Write.Tests.Models
+﻿namespace DotNetAvroSerializer.Write.Tests.Models
 {
     public class ClassWithPrimitives
     {

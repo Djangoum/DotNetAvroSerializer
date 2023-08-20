@@ -2,7 +2,7 @@
 using System;
 using System.IO;
 
-namespace AvroSerializer.Primitives
+namespace DotNetAvroSerializer.Primitives
 {
     public static class FloatSchema
     {
@@ -16,7 +16,7 @@ namespace AvroSerializer.Primitives
             Write(outputStream, value.Value);
         }
 
-        public static void Write(Stream outputStream,  float value)
+        public static void Write(Stream outputStream, float value)
         {
             var bytes = BitConverter.GetBytes(value);
             if (!BitConverter.IsLittleEndian)

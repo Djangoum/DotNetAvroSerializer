@@ -1,7 +1,8 @@
-﻿using AvroSerializer.Write.Tests.Models;
+﻿using DotNetAvroSerializer;
+using DotNetAvroSerializer.Write.Tests.Models;
 using FluentAssertions;
 
-namespace AvroSerializer.Write.Tests
+namespace DotNetAvroSerializer.Write.Tests
 {
     public class ComplexTypesTests
     {

@@ -83,7 +83,7 @@ namespace AvroSerializer.Write.Tests
                     Field1 = "teststring",
                     Field2 = 124
                 },
-                Doubles = new[] { 1.2d, 3.4d, 12.6d },
+                Doubles = new List<double> { 1.2d, 3.4d, 12.6d },
                 InnerRecords = new[]
                 {
                     new InnerRecord

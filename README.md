@@ -193,7 +193,6 @@ There are some rules that Dotnet Avro Serializer source generators expect in ord
 - Record fields must match class **properties** names
 - Nullable types are not suitable to serialize primitives or any type unless they are marked as **unions** between "null" and the C# nullable type we want to serialize in the avro schema.
 
-
 I'll add a list of missing features to complete a first usable (not production ready) version of the write part. 
 
 - [x] Decimal Logical Type
@@ -201,13 +200,12 @@ I'll add a list of missing features to complete a first usable (not production r
 - [x] Maps
 - [x] Fixed
 - [x] Enum
-- [ ] Time (micro) Logical Type
-- [ ] Timestamp (micro) Logical Type
-- [ ] Local timestamp (micro) Logical Type
+- [x] Time (micro) Logical Type
+- [x] Timestamp (micro) Logical Type
+- [x] Local timestamp (micro) Logical Type
 - [ ] Custom logical types (?)
 
 Known issues : 
-
 - [x] Do not support for more than one usage of the same enum per schema
 
 Everything is pending for deserialization :) 

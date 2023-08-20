@@ -6,4 +6,8 @@
 	<TreatWarningsAsErrors>true</TreatWarningsAsErrors>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\AvroSerializer.Generators\AvroSerializer.Generators.csproj" />
+  </ItemGroup>
+
 </Project>

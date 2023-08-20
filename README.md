@@ -206,5 +206,17 @@ I'll add a list of missing features to complete a first usable (not production r
 - [x] Local timestamp (micro) Logical Type
 - [ ] Custom logical types (?)
 
+## Benchmarks 
+
+Find some benchmarks results here. 
+
+```
+|                               Method |     Mean |   Error |  StdDev |   Gen0 | Allocated |
+|------------------------------------- |---------:|--------:|--------:|-------:|----------:|
+|    AvroSerializerStringSerialization | 144.5 ns | 1.75 ns | 1.37 ns | 0.1004 |     840 B |
+|   AvroSerializerRecordWithPrimitives | 158.7 ns | 2.91 ns | 2.72 ns | 0.0753 |     632 B |
+| AvroSerializerRecordWithComplexTypes | 723.1 ns | 7.88 ns | 6.58 ns | 0.1869 |    1568 B |
+```
+
 ## Important note 
 As of now, the library exclusively offers serialization capabilities and does not support deserialization. We are actively working on expanding its functionality to cover deserialization as well.

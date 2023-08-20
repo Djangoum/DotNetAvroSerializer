@@ -1,12 +1,12 @@
 # Dotnet Avro Serializer
 
-Dotnet AvroSerializer is a source generator based avro serialization library for .NET. This Library is **Under construction**. This is not yet published and is also an experimentation exercice for the author (me :D) to learn about avro and source generators.
+Dotnet AvroSerializer
 
-The library currently only supports serialization (not deserialization)
+Dotnet AvroSerializer is a cutting-edge Avro serialization library for .NET, driven by the power of source generators. Please note that this library is currently under active development and is not yet published.
 
-## Examples 
+## How Dotnet Avro Serializer Works
 
-Dotnet Avro Serializer produces serializers from an avro schema and a C# type as serializable data.
+Dotnet Avro Serializer is a powerful tool that automates the creation of serializers from Avro schemas and C# types. It streamlines the process of converting your C# objects into Avro binary serialized data effortlessly.
 
 Whenever avro serializer finds a **public partial class** inheriting **AvroSerializer<>** and have an **AvroSchema** attribute with a valid and corresponding avro schema it will generate serialization code. 
 
@@ -186,11 +186,11 @@ Key feature of Dotnet Avro Serializer is mainly performance improvement over oth
 There are some rules that Dotnet Avro Serializer source generators expect in order to generate serialization code. 
 
 - Serialization code will be generated only once per serializer class (multiple **AvroSchema** attributes will be ignored and only the first one will be taken) 
-- Avro arrays must be C# arrays or implement IEnumerable and have a generic argument. List<T>, IEnumerable<T>, ICollection<T> -> all of these would work.
+- Avro arrays must be C# arrays or implement IEnumerable and have a generic argument. List\<T>, IEnumerable\<T>, ICollection\<T> -> all of these would work.
 - Maps must implement IDictionary
 - Enums must be C# enums
 - Fixed must be byte[] 
-- Record fields must match class **properties** names
+- Record fields must match class **properties** names (class names and namespaces can differ from schema specification)
 - Nullable types are not suitable to serialize primitives or any type unless they are marked as **unions** between "null" and the C# nullable type we want to serialize in the avro schema.
 
 I'll add a list of missing features to complete a first usable (not production ready) version of the write part. 
@@ -208,4 +208,5 @@ I'll add a list of missing features to complete a first usable (not production r
 Known issues : 
 - [x] Do not support for more than one usage of the same enum per schema
 
-Everything is pending for deserialization :) 
+## Important note 
+As of now, the library exclusively offers serialization capabilities and does not support deserialization. We are actively working on expanding its functionality to cover deserialization as well.

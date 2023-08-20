@@ -206,8 +206,5 @@ I'll add a list of missing features to complete a first usable (not production r
 - [x] Local timestamp (micro) Logical Type
 - [ ] Custom logical types (?)
 
-Known issues : 
-- [x] Do not support for more than one usage of the same enum per schema
-
 ## Important note 
 As of now, the library exclusively offers serialization capabilities and does not support deserialization. We are actively working on expanding its functionality to cover deserialization as well.

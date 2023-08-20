@@ -1,6 +1,7 @@
 ﻿using DotNetAvroSerializer.Benchmarks.Serializers;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Running;
+using DotNetAvroSerializer.Benchmarks.Models;
 
 BenchmarkRunner.Run<AvroSerializersBenchmarks>();
 
@@ -13,5 +14,68 @@ public class AvroSerializersBenchmarks
     public byte[] AvroSerializerStringSerialization()
     {
         return new StringSerializer().Serialize(sut);
+    }
+
+    [Benchmark]
+    public byte[] AvroSerializerRecordWithPrimitives()
+    {
+        return new ClassWithPrimitivesSerializer().Serialize(new ClassWithPrimitives
+        {
+            BoolField = true,
+            BytesField = new byte[] { 1, 2, 3, 4 },
+            DoubleField = 12.5d,
+            FloatField = 15.6f,
+            IntegerField = 42,
+            LongField = 1234346567567563454,
+            StringField = "test text"
+        });
+    }
+
+
+    [Benchmark]
+    public byte[] AvroSerializerRecordWithComplexTypes()
+    {
+        return new RecordWithComplexTypesSerializer().Serialize(new RecordWithComplexTypes
+        {
+            InnerRecord = new InnerRecord
+            {
+                Field1 = "teststring",
+                Field2 = 124
+            },
+            Doubles = new List<double> { 1.2d, 3.4d, 12.6d },
+            InnerRecords = new[]
+                {
+                    new InnerRecord
+                    {
+                        Field1 = "teststring",
+                        Field2 = 124
+                    },
+                    new InnerRecord
+                    {
+                        Field1 = "teststring",
+                        Field2 = 124
+                    }
+                },
+            NullableFloat = 12.6f,
+            MapField = new Dictionary<string, InnerRecord>
+                {
+                    {
+                        "key1",
+                        new InnerRecord
+                        {
+                            Field1 = "teststring",
+                            Field2 = 124
+                        }
+                    },
+                    {
+                        "key2",
+                        new InnerRecord
+                        {
+                            Field1 = "teststring",
+                            Field2 = 124
+                        }
+                    }
+                }
+        });
     }
 }

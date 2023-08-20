@@ -2,10 +2,10 @@
 
 	<PropertyGroup>
 		<PackageId>DotnetAvroSerializer</PackageId>
-		<TargetFramework>net7.0</TargetFramework>
+		<TargetFrameworks>net7.0;net6.0</TargetFrameworks>
 		<Nullable>enable</Nullable>
 		<Authors>Ariel Amor García</Authors>
-		<Version>0.0.2</Version>
+		<Version>0.0.3</Version>
 		<Description>
 			Dotnet AvroSerializer is a cutting-edge Avro serialization library for .NET, driven by the power of source generators. Please note that this library is currently under active development and is not yet published.
 		</Description>

@@ -14,7 +14,13 @@
 		<TreatWarningsAsErrors>true</TreatWarningsAsErrors>
 		<PackageProjectUrl>https://github.com/Djangoum/DotNetAvroSerializer</PackageProjectUrl>
 		<EnablePackageValidation>true</EnablePackageValidation>
-		
 	</PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="DotNet.ReproducibleBuilds" Version="1.1.1">
+		<PrivateAssets>all</PrivateAssets>
+		<IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
+		</PackageReference>
+	</ItemGroup>
 
 </Project>

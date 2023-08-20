@@ -15,23 +15,7 @@ namespace AvroSerializer.Generators.SerializationGenerators
 
             var property = classSymbol.GetMembers().FirstOrDefault(s => s.Kind is SymbolKind.Property && s.Name.Equals(field.Name, StringComparison.InvariantCultureIgnoreCase)) as IPropertySymbol;
 
-            ITypeSymbol typeName;
-
-            if (property.Type.AllInterfaces.Any(i => i.Name.Contains("IEnumerable")) && !property.Type.Name.Equals("string", StringComparison.InvariantCultureIgnoreCase))
-            {
-                if (property.Type is INamedTypeSymbol namedTypeSymbol)
-                {
-                    typeName = namedTypeSymbol.TypeArguments.First();
-                }
-                else
-                {
-                    typeName = property.Type;
-                }
-            }
-            else
-            {
-                typeName = property.Type;
-            }
+            ITypeSymbol typeName = property.Type;
 
             SerializationGenerator.GenerateSerializatonSourceForSchema(field.Schema, serializationCode, privateFieldsCode, context, typeName, $"{sourceAccesor}.{property.Name}");
         }

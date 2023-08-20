@@ -25,7 +25,7 @@ namespace AvroSerializer.Generators.SerializationGenerators
                     break;
 
                 case ArraySchema arraySchema:
-                    ArrayGenerator.GenerateSerializationSourceForArray(arraySchema, serializationCode, privateFieldsCode, context, originTypeSymbol as IArrayTypeSymbol, sourceAccesor);
+                    ArrayGenerator.GenerateSerializationSourceForArray(arraySchema, serializationCode, privateFieldsCode, context, originTypeSymbol, sourceAccesor);
                     break;
 
                 case EnumSchema enumSchema:

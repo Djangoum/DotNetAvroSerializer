@@ -186,7 +186,7 @@ Key feature of Dotnet Avro Serializer is mainly performance improvement over oth
 There are some rules that Dotnet Avro Serializer source generators expect in order to generate serialization code. 
 
 - Serialization code will be generated only once per serializer class (multiple **AvroSchema** attributes will be ignored and only the first one will be taken) 
-- Avro arrays must be C# arrays (not working with IEnumerables's for example)
+- Avro arrays must be C# arrays or implement IEnumerable and have a generic argument. List<T>, IEnumerable<T>, ICollection<T> -> all of these would work.
 - Maps must implement IDictionary
 - Enums must be C# enums
 - Fixed must be byte[] 

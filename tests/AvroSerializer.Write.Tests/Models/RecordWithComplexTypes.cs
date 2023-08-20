@@ -3,8 +3,8 @@
     public class RecordWithComplexTypes
     {
         public required InnerRecord InnerRecord { get; set; }
-        public required InnerRecord[] InnerRecords { get; set; }
-        public required double[] Doubles { get; set; }
+        public required IEnumerable<InnerRecord> InnerRecords { get; set; }
+        public required IEnumerable<double> Doubles { get; set; }
         public float? NullableFloat { get; set; }
         public required IDictionary<string, InnerRecord> MapField { get; set; }
     }

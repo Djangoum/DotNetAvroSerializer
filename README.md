@@ -1,3 +1,4 @@
+[![publish](https://github.com/Djangoum/DotNetAvroSerializer/actions/workflows/publish.yml/badge.svg?branch=main)](https://github.com/Djangoum/DotNetAvroSerializer/actions/workflows/publish.yml)
 # Dotnet Avro Serializer
 
 Dotnet AvroSerializer

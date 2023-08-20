@@ -4,23 +4,15 @@
 		<PackageId>DotnetAvroSerializer</PackageId>
 		<TargetFramework>net7.0</TargetFramework>
 		<Nullable>enable</Nullable>
-		<TreatWarningsAsErrors>true</TreatWarningsAsErrors>
 		<Authors>Ariel Amor García</Authors>
-		<Version>1.0.0</Version>
+		<Version>0.0.1</Version>
 		<Description>
 			Dotnet AvroSerializer is a cutting-edge Avro serialization library for .NET, driven by the power of source generators. Please note that this library is currently under active development and is not yet published.
 		</Description>
 		<PackageTags>Avro,Serializer</PackageTags>
 		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+		<TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+		<PackageProjectUrl>https://github.com/Djangoum/DotNetAvroSerializer</PackageProjectUrl>
 	</PropertyGroup>
-
-	<ItemGroup>
-		<ProjectReference Include="..\AvroSerializer.Generators\AvroSerializer.Generators.csproj" />
-	</ItemGroup>
-
-	<ItemGroup>
-		<None Remove="$(OutputPath)/$(AssemblyName).Generators.dll" />
-		<None Include="$(OutputPath)/$(AssemblyName).Generators.dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
-	</ItemGroup>
 
 </Project>

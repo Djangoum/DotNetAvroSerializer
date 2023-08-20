@@ -24,4 +24,13 @@
 		</PackageReference>
 	</ItemGroup>
 
+	<PropertyGroup>
+		<PackageReadmeFile>README.md</PackageReadmeFile>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<!-- Add a README.md next to the csproj -->
+		<None Include="../../README.md" Pack="true" PackagePath="" />
+	</ItemGroup>
+	
 </Project>

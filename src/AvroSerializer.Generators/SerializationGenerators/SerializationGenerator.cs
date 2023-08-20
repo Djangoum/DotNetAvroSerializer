@@ -1,8 +1,6 @@
 ﻿using Avro;
-using Avro.File;
 using DotNetAvroSerializer.Generators.Helpers;
 using Microsoft.CodeAnalysis;
-using System.Diagnostics;
 using System.Text;
 
 namespace DotNetAvroSerializer.Generators.SerializationGenerators

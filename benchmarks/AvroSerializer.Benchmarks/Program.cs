@@ -1,4 +1,4 @@
-﻿using AvroSerializer.Benchmarks.Serializers;
+﻿using DotNetAvroSerializer.Benchmarks.Serializers;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Running;
 

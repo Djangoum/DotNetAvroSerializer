@@ -1,4 +1,4 @@
-﻿using AvroSerializer.Exceptions;
+﻿using DotNetAvroSerializer.Exceptions;
 using System.IO;
 
 namespace DotNetAvroSerializer.Primitives

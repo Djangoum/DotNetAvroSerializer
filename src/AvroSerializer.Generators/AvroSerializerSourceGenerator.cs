@@ -44,10 +44,10 @@ namespace DotNetAvroSerializer.Generators
 
                 context.AddSource($"{serializer.Identifier}.g.cs",
                     CSharpSyntaxTree.ParseText(SourceText.From(
-$@"using AvroSerializer.Primitives;
-using AvroSerializer.LogicalTypes;
-using AvroSerializer.Exceptions;
-using AvroSerializer.ComplexTypes;
+$@"using DotNetAvroSerializer.Primitives;
+using DotNetAvroSerializer.LogicalTypes;
+using DotNetAvroSerializer.Exceptions;
+using DotNetAvroSerializer.ComplexTypes;
 using System.Linq;
 
 namespace {Namespaces.GetNamespace(serializer)}

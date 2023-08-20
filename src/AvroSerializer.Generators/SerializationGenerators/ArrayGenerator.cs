@@ -1,5 +1,5 @@
 ﻿using Avro;
-using AvroSerializer.Generators.Exceptions;
+using DotNetAvroSerializer.Generators.Exceptions;
 using DotNetAvroSerializer.Generators.Helpers;
 using Microsoft.CodeAnalysis;
 using System.Linq;

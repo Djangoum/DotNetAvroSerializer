@@ -14,6 +14,7 @@
 		<TreatWarningsAsErrors>true</TreatWarningsAsErrors>
 		<PackageProjectUrl>https://github.com/Djangoum/DotNetAvroSerializer</PackageProjectUrl>
 		<EnablePackageValidation>true</EnablePackageValidation>
+		<PackageLicenseExpression>MIT</PackageLicenseExpression>
 	</PropertyGroup>
 
 	<ItemGroup>

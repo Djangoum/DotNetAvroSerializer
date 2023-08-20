@@ -1,4 +1,5 @@
 ﻿using Avro;
+using AvroSerializer.Generators.Exceptions;
 using Microsoft.CodeAnalysis;
 using System;
 using System.Text;
@@ -29,7 +30,7 @@ namespace AvroSerializer.Generators.SerializationGenerators
                 "float" when originTypeSymbol.Name.Equals("single", StringComparison.InvariantCultureIgnoreCase)
                             || originTypeSymbol.Name.Equals("single?", StringComparison.InvariantCultureIgnoreCase) => $"FloatSchema.Write(outputStream, {sourceAccesor});",
                 "null" => $"NullSchema.Write(outputStream, {sourceAccesor});",
-                _ => throw new Exception($"Required type was not satisfied to serialize {primitiveSchema.Name}")
+                _ => throw new AvroGeneratorException($"Required type was not satisfied to serialize {primitiveSchema.Name}")
             };
 
             code.AppendLine(serializerCallCode);

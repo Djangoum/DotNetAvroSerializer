@@ -1,4 +1,5 @@
 ﻿using Avro;
+using Avro.File;
 using AvroSerializer.Generators.Helpers;
 using Microsoft.CodeAnalysis;
 using System.Diagnostics;

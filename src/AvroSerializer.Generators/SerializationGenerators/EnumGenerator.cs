@@ -1,4 +1,5 @@
 ﻿using Avro;
+using AvroSerializer.Generators.Exceptions;
 using AvroSerializer.Generators.Helpers;
 using Microsoft.CodeAnalysis;
 using System;
@@ -13,7 +14,7 @@ namespace AvroSerializer.Generators.SerializationGenerators
             var symbol = originTypeSymbol as ITypeSymbol;
 
             if (symbol.TypeKind != TypeKind.Enum)
-                throw new Exception($"Required type was not satisfied to serialize {schema.Name}");
+                throw new AvroGeneratorException($"Enum type was not satisfied to serialize {schema.Name}");
 
             privateFieldsCode.AppendLine(schema.Name, $"private readonly string[] {schema.Name}Values = new string[] {{ \"{string.Join(@""",""", schema.Symbols)}\" }};");
 

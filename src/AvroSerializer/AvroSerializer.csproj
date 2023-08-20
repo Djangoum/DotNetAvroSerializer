@@ -13,6 +13,7 @@
 		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
 		<TreatWarningsAsErrors>true</TreatWarningsAsErrors>
 		<PackageProjectUrl>https://github.com/Djangoum/DotNetAvroSerializer</PackageProjectUrl>
+		<EnablePackageValidation>true</EnablePackageValidation>
 	</PropertyGroup>
 
 </Project>

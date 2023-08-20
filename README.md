@@ -179,7 +179,7 @@ public partial class RecordWithComplexTypesSerializer
 }
 ```
 
-Key feature of Dotnet Avro Serializer is mainly performance improvement over other libraries out there. As it's using source generators does not have any runtime reflection and directly serializes. 
+Key feature of Dotnet Avro Serializer is mainly performance improvement over other libraries out there. As it's using source generators does not have any runtime reflection and directly serializes to output stream or byte array.
 
 ## Rules and limitations :
 

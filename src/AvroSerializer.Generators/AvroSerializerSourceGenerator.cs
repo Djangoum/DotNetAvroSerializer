@@ -49,6 +49,7 @@ using DotNetAvroSerializer.LogicalTypes;
 using DotNetAvroSerializer.Exceptions;
 using DotNetAvroSerializer.ComplexTypes;
 using System.Linq;
+using System.IO;
 
 namespace {Namespaces.GetNamespace(serializer)}
 {{

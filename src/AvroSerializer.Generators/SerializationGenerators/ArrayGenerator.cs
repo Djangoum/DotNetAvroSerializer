@@ -27,18 +27,13 @@ namespace DotNetAvroSerializer.Generators.SerializationGenerators
                 throw new AvroGeneratorException($"Array type for {schema.Name} is not satisfied {originTypeSymbol.Name} provided");
 
             serializationCode.AppendLine(@$"if ({sourceAccesor}.Count() > 0) LongSchema.Write(outputStream, (long){sourceAccesor}.Count());");
-            serializationCode.AppendLine($@"foreach(var item{RemoveSpecialCharacters(sourceAccesor)} in {sourceAccesor})");
+            serializationCode.AppendLine($@"foreach(var item{VariableNamesHelpers.RemoveSpecialCharacters(sourceAccesor)} in {sourceAccesor})");
             serializationCode.AppendLine("{");
 
-            SerializationGenerator.GenerateSerializatonSourceForSchema(schema.ItemSchema, serializationCode, privateFieldsCode, context, arrayContentTypeSymbol, $"item{RemoveSpecialCharacters(sourceAccesor)}");
+            SerializationGenerator.GenerateSerializatonSourceForSchema(schema.ItemSchema, serializationCode, privateFieldsCode, context, arrayContentTypeSymbol, $"item{VariableNamesHelpers.RemoveSpecialCharacters(sourceAccesor)}");
 
             serializationCode.AppendLine("}");
             serializationCode.AppendLine(@$"LongSchema.Write(outputStream, 0L);");
-        }
-
-        private static string RemoveSpecialCharacters(string str)
-        {
-            return Regex.Replace(str, "[^a-zA-Z0-9]+", "", RegexOptions.Compiled);
         }
     }
 }

@@ -20,19 +20,14 @@ namespace DotNetAvroSerializer.Generators.SerializationGenerators
                 throw new AvroGeneratorException("Map keys have to be strings");
 
             serializationCode.AppendLine($@"if ({sourceAccesor}.Count() > 0) LongSchema.Write(outputStream, {sourceAccesor}.Count());");
-            serializationCode.AppendLine($@"foreach(var item{RemoveSpecialCharacters(sourceAccesor)} in {sourceAccesor})");
+            serializationCode.AppendLine($@"foreach(var item{VariableNamesHelpers.RemoveSpecialCharacters(sourceAccesor)} in {sourceAccesor})");
             serializationCode.AppendLine("{");
 
-            serializationCode.AppendLine($@"StringSchema.Write(outputStream, item{RemoveSpecialCharacters(sourceAccesor)}.Key);");
-            SerializationGenerator.GenerateSerializatonSourceForSchema(schema.ValueSchema, serializationCode, privateFieldsCode, context, dictionarySymbol.TypeArguments.ElementAt(1), $"item{RemoveSpecialCharacters(sourceAccesor)}.Value");
+            serializationCode.AppendLine($@"StringSchema.Write(outputStream, item{VariableNamesHelpers.RemoveSpecialCharacters(sourceAccesor)}.Key);");
+            SerializationGenerator.GenerateSerializatonSourceForSchema(schema.ValueSchema, serializationCode, privateFieldsCode, context, dictionarySymbol.TypeArguments.ElementAt(1), $"item{VariableNamesHelpers.RemoveSpecialCharacters(sourceAccesor)}.Value");
 
             serializationCode.AppendLine("}");
             serializationCode.AppendLine("LongSchema.Write(outputStream, 0L);");
-        }
-
-        private static string RemoveSpecialCharacters(string str)
-        {
-            return Regex.Replace(str, "[^a-zA-Z0-9]+", "", RegexOptions.Compiled);
         }
     }
 }

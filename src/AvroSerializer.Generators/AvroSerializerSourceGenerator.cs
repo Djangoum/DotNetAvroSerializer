@@ -1,4 +1,5 @@
 ﻿using Avro;
+using DotNetAvroSerializer.Generators.Diagnostics;
 using DotNetAvroSerializer.Generators.Helpers;
 using DotNetAvroSerializer.Generators.SerializationGenerators;
 using Microsoft.CodeAnalysis;
@@ -6,6 +7,7 @@ using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Text;
 using System;
+using System.Collections.Immutable;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
@@ -19,13 +21,19 @@ namespace DotNetAvroSerializer.Generators
 
         public void Initialize(IncrementalGeneratorInitializationContext context)
         {
-            IncrementalValuesProvider<(ClassDeclarationSyntax serializer, Schema avroSchema, ISymbol serializableSymbol)> classDeclarations = context.SyntaxProvider
-                .ForAttributeWithMetadataName(
-                    "DotNetAvroSerializer.AvroSchemaAttribute",
+            IncrementalValuesProvider<(ClassDeclarationSyntax serializer, Schema avroSchema, ISymbol serializableSymbol, ImmutableArray<Diagnostic> errors)> classDeclarationsWithErrors = context.SyntaxProvider
+                .CreateSyntaxProvider(
                     predicate: static (s, _) => IsSyntaxTargetForGeneration(s),
                     transform: static (ctx, _) => GetSemanticTargetForGeneration(ctx))
-                .Where(static item => item is not null)
-                .Select(static (item, _) => item.Value);
+                .Select(static (item, _) => item);
+
+            context.RegisterSourceOutput(classDeclarationsWithErrors.SelectMany(static (values, _) => values.errors), (ctx, error) =>
+            {
+                ctx.ReportDiagnostic(error);
+            });
+
+            IncrementalValuesProvider<(ClassDeclarationSyntax serializer, Schema avroSchema, ISymbol serializableSymbol, ImmutableArray<Diagnostic> errors)> classDeclarations = classDeclarationsWithErrors
+                .Where(static (item) => item.errors.IsEmpty);
 
             context.RegisterSourceOutput(classDeclarations, (context, serializerData) =>
             {
@@ -64,9 +72,17 @@ namespace {Namespaces.GetNamespace(serializerData.serializer)}
             });
         }
 
-        private static (ClassDeclarationSyntax serializerClass, Schema schema, ISymbol serializableInput)? GetSemanticTargetForGeneration(GeneratorAttributeSyntaxContext ctx)
+        private static (ClassDeclarationSyntax serializerClass, Schema schema, ISymbol serializableInput, ImmutableArray<Diagnostic>) GetSemanticTargetForGeneration(GeneratorSyntaxContext ctx)
         {
-            var serializerSyntax = ctx.TargetNode as ClassDeclarationSyntax;
+            var diagnostics = ImmutableArray<Diagnostic>.Empty;
+            var serializerSyntax = ctx.Node as ClassDeclarationSyntax;
+
+            if (!(serializerSyntax.Modifiers.Any(m => m.IsKind(SyntaxKind.PartialKeyword))
+                && serializerSyntax.Modifiers.Any(m => m.IsKind(SyntaxKind.PublicKeyword))))
+            {
+                diagnostics = diagnostics.Add(Diagnostic.Create(DiagnosticsDescriptors.SerializersMustBePartialClassesDescriptor, serializerSyntax.GetLocation(), serializerSyntax.Identifier.ToString()));
+                return (serializerSyntax, null, null, diagnostics);
+            }
 
             var attribute = serializerSyntax
                 .AttributeLists
@@ -74,35 +90,43 @@ namespace {Namespaces.GetNamespace(serializerData.serializer)}
                 .Where(attr => attr.Name.ToString() == "AvroSchema")
                 .FirstOrDefault();
 
-            if (attribute is null) return null;
+            if (attribute is null)
+            {
+                diagnostics = diagnostics.Add(Diagnostic.Create(DiagnosticsDescriptors.MissingAvroSchemaDescriptor, serializerSyntax.GetLocation(), serializerSyntax.Identifier.ToString()));
+                return (serializerSyntax, null, null, diagnostics);
+            }
 
             var attributeSchemaText = attribute.ArgumentList.Arguments.First()?.Expression;
-
-            if (attributeSchemaText is null) return null;
 
             var schemaString = ctx
                 .SemanticModel
                 .GetConstantValue(attributeSchemaText)
                 .ToString();
 
-            Schema schema;
+            if (schemaString is null || attributeSchemaText is null)
+            {
+                diagnostics = diagnostics.Add(Diagnostic.Create(DiagnosticsDescriptors.MissingSchemaInAvroSchemaAttributeDescriptor, serializerSyntax.GetLocation(), serializerSyntax.Identifier.ToString()));
+                return (serializerSyntax, null, null, diagnostics);
+            }
+
+            Schema schema = default;
 
             try
             {
                 schema = Schema.Parse(schemaString);
-
             }
             catch (Exception)
             {
-                return null;
+                diagnostics = diagnostics.Add(Diagnostic.Create(DiagnosticsDescriptors.AvroSchemaIsNotValidDescriptor, serializerSyntax.GetLocation(), serializerSyntax.Identifier.ToString()));
+                return (serializerSyntax, null, null, diagnostics);
             }
 
             var serializableType = GetSerializableTypeSymbol(serializerSyntax, ctx);
 
-            return (serializerSyntax, schema, serializableType);
+            return (serializerSyntax, schema, serializableType, diagnostics);
         }
 
-        private static ISymbol GetSerializableTypeSymbol(ClassDeclarationSyntax serializerSyntax, GeneratorAttributeSyntaxContext ctx) => ctx.SemanticModel.GetSymbolInfo(((GenericNameSyntax)serializerSyntax.BaseList.Types.First().Type).TypeArgumentList.Arguments.First()).Symbol;
+        private static ISymbol GetSerializableTypeSymbol(ClassDeclarationSyntax serializerSyntax, GeneratorSyntaxContext ctx) => ctx.SemanticModel.GetSymbolInfo(((GenericNameSyntax)serializerSyntax.BaseList.Types.First().Type).TypeArgumentList.Arguments.First()).Symbol;
 
         private (string serializationCode, string privateFieldsCode) SerializationCodeGeneratorLoop(Schema schema, SourceProductionContext context, ISymbol originTypeSymbol, string sourceAccesor = "source")
         {

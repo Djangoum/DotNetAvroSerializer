@@ -10,8 +10,8 @@ Dotnet AvroSerializer is a cutting-edge Avro serialization library for .NET, dri
 Install both serializer and generator package.
 
 ```ps
-dotnet add package DotnetAvroSerializer --version 0.0.1
-dotnet add package DotnetAvroSerializer.Generators --version 0.0.1
+dotnet add package DotnetAvroSerializer --version x.x.x
+dotnet add package DotnetAvroSerializer.Generators --version x.x.x
 ```
 
 Dotnet Avro Serializer is a powerful tool that automates the creation of serializers from Avro schemas and C# types. It streamlines the process of converting your C# objects into Avro binary serialized data effortlessly.

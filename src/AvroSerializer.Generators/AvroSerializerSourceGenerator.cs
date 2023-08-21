@@ -8,7 +8,6 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Text;
 using System;
 using System.Collections.Immutable;
-using System.Diagnostics;
 using System.Linq;
 using System.Text;
 
@@ -17,14 +16,14 @@ namespace DotNetAvroSerializer.Generators
     [Generator]
     partial class AvroSerializerSourceGenerator : IIncrementalGenerator
     {
-        private static bool IsSyntaxTargetForGeneration(SyntaxNode node) => node is ClassDeclarationSyntax c && (c.BaseList?.Types.First().Type.ToString().Contains("AvroSerializer") ?? false);
+        private static bool IsSyntaxGenerationCandidate(SyntaxNode node) => node is ClassDeclarationSyntax c && (c.BaseList?.Types.First().Type.ToString().Contains("AvroSerializer") ?? false);
 
         public void Initialize(IncrementalGeneratorInitializationContext context)
         {
             IncrementalValuesProvider<(ClassDeclarationSyntax serializer, Schema avroSchema, ISymbol serializableSymbol, ImmutableArray<Diagnostic> errors)> classDeclarationsWithErrors = context.SyntaxProvider
                 .CreateSyntaxProvider(
-                    predicate: static (s, _) => IsSyntaxTargetForGeneration(s),
-                    transform: static (ctx, _) => GetSemanticTargetForGeneration(ctx))
+                    predicate: static (s, _) => IsSyntaxGenerationCandidate(s),
+                    transform: static (ctx, _) => GetTargetDataForGeneration(ctx))
                 .Select(static (item, _) => item);
 
             context.RegisterSourceOutput(classDeclarationsWithErrors.SelectMany(static (values, _) => values.errors), (ctx, error) =>
@@ -72,7 +71,7 @@ namespace {Namespaces.GetNamespace(serializerData.serializer)}
             });
         }
 
-        private static (ClassDeclarationSyntax serializerClass, Schema schema, ISymbol serializableInput, ImmutableArray<Diagnostic>) GetSemanticTargetForGeneration(GeneratorSyntaxContext ctx)
+        private static (ClassDeclarationSyntax serializerClass, Schema schema, ISymbol serializableInput, ImmutableArray<Diagnostic>) GetTargetDataForGeneration(GeneratorSyntaxContext ctx)
         {
             var diagnostics = ImmutableArray<Diagnostic>.Empty;
             var serializerSyntax = ctx.Node as ClassDeclarationSyntax;

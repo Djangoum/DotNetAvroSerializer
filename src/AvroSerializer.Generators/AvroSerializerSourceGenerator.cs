@@ -23,8 +23,7 @@ namespace DotNetAvroSerializer.Generators
             IncrementalValuesProvider<(ClassDeclarationSyntax serializer, Schema avroSchema, ISymbol serializableSymbol, ImmutableArray<Diagnostic> errors)> classDeclarationsWithErrors = context.SyntaxProvider
                 .CreateSyntaxProvider(
                     predicate: static (s, _) => IsSyntaxGenerationCandidate(s),
-                    transform: static (ctx, _) => GetTargetDataForGeneration(ctx))
-                .Select(static (item, _) => item);
+                    transform: static (ctx, _) => GetTargetDataForGeneration(ctx));
 
             context.RegisterSourceOutput(classDeclarationsWithErrors.SelectMany(static (values, _) => values.errors), (ctx, error) =>
             {

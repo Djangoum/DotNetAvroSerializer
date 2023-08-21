@@ -7,7 +7,7 @@ namespace DotNetAvroSerializer.Generators.SerializationGenerators
 {
     public static class SerializationGenerator
     {
-        public static void GenerateSerializatonSourceForSchema(Schema schema, StringBuilder serializationCode, PrivateFieldsCode privateFieldsCode, GeneratorExecutionContext context, ISymbol originTypeSymbol, string sourceAccesor)
+        public static void GenerateSerializatonSourceForSchema(Schema schema, StringBuilder serializationCode, PrivateFieldsCode privateFieldsCode, SourceProductionContext context, ISymbol originTypeSymbol, string sourceAccesor)
         {
             switch (schema)
             {

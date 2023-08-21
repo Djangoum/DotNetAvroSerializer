@@ -6,7 +6,7 @@ namespace DotNetAvroSerializer.Generators.Helpers
     {
         public static string RemoveSpecialCharacters(string str)
         {
-            return Regex.Replace(str, "[^a-zA-Z0-9]+", "", RegexOptions.Compiled);
+            return Regex.Replace(str, "[^a-zA-Z0-9]_+", "", RegexOptions.Compiled);
         }
     }
 }

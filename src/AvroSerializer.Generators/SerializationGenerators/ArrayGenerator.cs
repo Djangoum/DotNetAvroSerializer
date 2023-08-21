@@ -11,7 +11,7 @@ namespace DotNetAvroSerializer.Generators.SerializationGenerators
 {
     public static class ArrayGenerator
     {
-        public static void GenerateSerializationSourceForArray(ArraySchema schema, StringBuilder serializationCode, PrivateFieldsCode privateFieldsCode, GeneratorExecutionContext context, ISymbol originTypeSymbol, string sourceAccesor)
+        public static void GenerateSerializationSourceForArray(ArraySchema schema, StringBuilder serializationCode, PrivateFieldsCode privateFieldsCode, SourceProductionContext context, ISymbol originTypeSymbol, string sourceAccesor)
         {
             ITypeSymbol arrayContentTypeSymbol;
 

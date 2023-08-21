@@ -9,7 +9,7 @@ namespace DotNetAvroSerializer.Generators.SerializationGenerators
 {
     public static class UnionGenerator
     {
-        public static void GenerateSerializationSourceForUnion(UnionSchema unionSchema, StringBuilder serializationCode, PrivateFieldsCode privateFieldsCode, GeneratorExecutionContext context, ISymbol originTypeSymbol, string sourceAccesor)
+        public static void GenerateSerializationSourceForUnion(UnionSchema unionSchema, StringBuilder serializationCode, PrivateFieldsCode privateFieldsCode, SourceProductionContext context, ISymbol originTypeSymbol, string sourceAccesor)
         {
             foreach (var schema in unionSchema.Schemas)
             {

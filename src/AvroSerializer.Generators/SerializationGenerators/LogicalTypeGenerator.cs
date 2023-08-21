@@ -8,7 +8,7 @@ namespace DotNetAvroSerializer.Generators.SerializationGenerators
 {
     public static class LogicalTypeGenerator
     {
-        public static void GenerateSerializationSourceForLogicalType(LogicalSchema logicalSchema, StringBuilder serializationCode, PrivateFieldsCode privateFieldsCode, GeneratorExecutionContext context, ISymbol originTypeSymbol, string sourceAccesor)
+        public static void GenerateSerializationSourceForLogicalType(LogicalSchema logicalSchema, StringBuilder serializationCode, PrivateFieldsCode privateFieldsCode, SourceProductionContext context, ISymbol originTypeSymbol, string sourceAccesor)
         {
             var serializerCallCode = logicalSchema.LogicalType.Name switch
             {

@@ -9,7 +9,7 @@ namespace DotNetAvroSerializer.Generators.SerializationGenerators
 {
     public static class RecordGenerator
     {
-        public static void GenerateSerializationSourceForRecordField(Field field, StringBuilder serializationCode, PrivateFieldsCode privateFieldsCode, GeneratorExecutionContext context, ISymbol originTypeSymbol, string sourceAccesor)
+        public static void GenerateSerializationSourceForRecordField(Field field, StringBuilder serializationCode, PrivateFieldsCode privateFieldsCode, SourceProductionContext context, ISymbol originTypeSymbol, string sourceAccesor)
         {
             var classSymbol = originTypeSymbol as INamedTypeSymbol;
 

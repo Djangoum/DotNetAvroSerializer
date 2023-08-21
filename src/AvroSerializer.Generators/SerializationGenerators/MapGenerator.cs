@@ -11,7 +11,7 @@ namespace DotNetAvroSerializer.Generators.SerializationGenerators
 {
     public static class MapGenerator
     {
-        public static void GenerateSerializationSourceFoMap(MapSchema schema, StringBuilder serializationCode, PrivateFieldsCode privateFieldsCode, GeneratorExecutionContext context, INamedTypeSymbol dictionarySymbol, string sourceAccesor)
+        public static void GenerateSerializationSourceFoMap(MapSchema schema, StringBuilder serializationCode, PrivateFieldsCode privateFieldsCode, SourceProductionContext context, INamedTypeSymbol dictionarySymbol, string sourceAccesor)
         {
             if (!(dictionarySymbol.AllInterfaces.Any(i => i.Name.Contains("Dictionary")) || dictionarySymbol.Name.Contains("Dictionary")))
                 throw new AvroGeneratorException("Type for map schema is not satisfied");

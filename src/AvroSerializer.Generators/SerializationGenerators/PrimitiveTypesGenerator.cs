@@ -24,7 +24,7 @@ namespace DotNetAvroSerializer.Generators.SerializationGenerators
                 "double" when originTypeSymbol.Name.Equals("double", StringComparison.InvariantCultureIgnoreCase) => $"DoubleSchema.Write(outputStream, {sourceAccesor});",
                 "float" when originTypeSymbol.Name.Equals("single", StringComparison.InvariantCultureIgnoreCase) => $"FloatSchema.Write(outputStream, {sourceAccesor});",
                 "null" => $"NullSchema.Write(outputStream, {sourceAccesor});",
-                _ => throw new AvroGeneratorException($"Required type was not satisfied to serialize {primitiveSchema.Name}")
+                _ => throw new AvroGeneratorException($"Required type was not satisfied to serialize {primitiveSchema.Name} {originTypeSymbol.Name} found")
             };
 
             code.AppendLine(serializerCallCode);

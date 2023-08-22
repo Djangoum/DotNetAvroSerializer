@@ -5,19 +5,18 @@ using Microsoft.CodeAnalysis;
 using System;
 using System.Linq;
 using System.Text;
-using System.Text.RegularExpressions;
 
 namespace DotNetAvroSerializer.Generators.SerializationGenerators
 {
     public static class MapGenerator
     {
-        public static void GenerateSerializationSourceFoMap(MapSchema schema, StringBuilder serializationCode, PrivateFieldsCode privateFieldsCode, GeneratorExecutionContext context, INamedTypeSymbol dictionarySymbol, string sourceAccesor)
+        public static void GenerateSerializationSourceFoMap(MapSchema schema, StringBuilder serializationCode, PrivateFieldsCode privateFieldsCode, SourceProductionContext context, INamedTypeSymbol dictionarySymbol, string sourceAccesor)
         {
             if (!(dictionarySymbol.AllInterfaces.Any(i => i.Name.Contains("Dictionary")) || dictionarySymbol.Name.Contains("Dictionary")))
-                throw new AvroGeneratorException("Type for map schema is not satisfied");
+                throw new AvroGeneratorException($"Type for map schema was not satisfied. Maps must implement IDictionary but {dictionarySymbol.Name} found");
 
             if (!dictionarySymbol.TypeArguments.First().Name.Equals("string", StringComparison.InvariantCultureIgnoreCase))
-                throw new AvroGeneratorException("Map keys have to be strings");
+                throw new AvroGeneratorException($"Map keys have to be strings but {dictionarySymbol.TypeArguments.First().Name}");
 
             serializationCode.AppendLine($@"if ({sourceAccesor}.Count() > 0) LongSchema.Write(outputStream, {sourceAccesor}.Count());");
             serializationCode.AppendLine($@"foreach(var item{VariableNamesHelpers.RemoveSpecialCharacters(sourceAccesor)} in {sourceAccesor})");

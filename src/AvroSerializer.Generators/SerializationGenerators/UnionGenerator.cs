@@ -1,4 +1,5 @@
 ﻿using Avro;
+using DotNetAvroSerializer.Generators.Exceptions;
 using DotNetAvroSerializer.Generators.Helpers;
 using Microsoft.CodeAnalysis;
 using System;
@@ -9,7 +10,7 @@ namespace DotNetAvroSerializer.Generators.SerializationGenerators
 {
     public static class UnionGenerator
     {
-        public static void GenerateSerializationSourceForUnion(UnionSchema unionSchema, StringBuilder serializationCode, PrivateFieldsCode privateFieldsCode, GeneratorExecutionContext context, ISymbol originTypeSymbol, string sourceAccesor)
+        public static void GenerateSerializationSourceForUnion(UnionSchema unionSchema, StringBuilder serializationCode, PrivateFieldsCode privateFieldsCode, SourceProductionContext context, ISymbol originTypeSymbol, string sourceAccesor)
         {
             foreach (var schema in unionSchema.Schemas)
             {
@@ -38,7 +39,7 @@ namespace DotNetAvroSerializer.Generators.SerializationGenerators
                         _ => throw new Exception($"Required type was not satisfied to serialize {primitiveSchema.Name}")
                     },
                     RecordSchema recordSchema => $"RecordSchema.CanSerialize({sourceAccesor})",
-                    UnionSchema => throw new Exception("Unions cannot hold directly unions"),
+                    UnionSchema => throw new AvroGeneratorException("Unions cannot hold directly unions"),
                     _ => null
                 };
 

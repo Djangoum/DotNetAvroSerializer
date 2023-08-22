@@ -11,7 +11,7 @@ namespace DotNetAvroSerializer.Generators.SerializationGenerators
 {
     public static class ArrayGenerator
     {
-        public static void GenerateSerializationSourceForArray(ArraySchema schema, StringBuilder serializationCode, PrivateFieldsCode privateFieldsCode, GeneratorExecutionContext context, ISymbol originTypeSymbol, string sourceAccesor)
+        public static void GenerateSerializationSourceForArray(ArraySchema schema, StringBuilder serializationCode, PrivateFieldsCode privateFieldsCode, SourceProductionContext context, ISymbol originTypeSymbol, string sourceAccesor)
         {
             ITypeSymbol arrayContentTypeSymbol;
 
@@ -24,7 +24,7 @@ namespace DotNetAvroSerializer.Generators.SerializationGenerators
                 arrayContentTypeSymbol = namedTypeSymbol.TypeArguments.First();
             }
             else
-                throw new AvroGeneratorException($"Array type for {schema.Name} is not satisfied {originTypeSymbol.Name} provided");
+                throw new AvroGeneratorException($"Array type for {schema.Name} is not satisfied {originTypeSymbol.Name} provided, arrays must be arrays or anything that implements IEnumerable");
 
             serializationCode.AppendLine(@$"if ({sourceAccesor}.Count() > 0) LongSchema.Write(outputStream, (long){sourceAccesor}.Count());");
             serializationCode.AppendLine($@"foreach(var item{VariableNamesHelpers.RemoveSpecialCharacters(sourceAccesor)} in {sourceAccesor})");

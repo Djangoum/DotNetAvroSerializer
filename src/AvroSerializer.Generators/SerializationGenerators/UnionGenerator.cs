@@ -1,4 +1,5 @@
 ﻿using Avro;
+using DotNetAvroSerializer.Generators.Exceptions;
 using DotNetAvroSerializer.Generators.Helpers;
 using Microsoft.CodeAnalysis;
 using System;
@@ -38,7 +39,7 @@ namespace DotNetAvroSerializer.Generators.SerializationGenerators
                         _ => throw new Exception($"Required type was not satisfied to serialize {primitiveSchema.Name}")
                     },
                     RecordSchema recordSchema => $"RecordSchema.CanSerialize({sourceAccesor})",
-                    UnionSchema => throw new Exception("Unions cannot hold directly unions"),
+                    UnionSchema => throw new AvroGeneratorException("Unions cannot hold directly unions"),
                     _ => null
                 };
 

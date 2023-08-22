@@ -1,5 +1,6 @@
 ﻿using Avro;
 using DotNetAvroSerializer.Generators.Diagnostics;
+using DotNetAvroSerializer.Generators.Exceptions;
 using DotNetAvroSerializer.Generators.Helpers;
 using DotNetAvroSerializer.Generators.SerializationGenerators;
 using Microsoft.CodeAnalysis;
@@ -8,6 +9,7 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Text;
 using System;
 using System.Collections.Immutable;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 
@@ -35,9 +37,15 @@ namespace DotNetAvroSerializer.Generators
 
             context.RegisterSourceOutput(classDeclarations, (context, serializerData) =>
             {
-                var (serializationCode, privateFieldsCode) = SerializationCodeGeneratorLoop(serializerData.avroSchema, context, serializerData.serializableSymbol);
+                var (serializationCode, privateFieldsCode, diagnostic) = SerializationCodeGeneratorLoop(serializerData.serializer, serializerData.avroSchema, context, serializerData.serializableSymbol);
 
-                context.AddSource($"{serializerData.serializer.Identifier}.g.cs",
+                if (diagnostic is not null)
+                {
+                    context.ReportDiagnostic(diagnostic);
+                }
+                else
+                {
+                    context.AddSource($"{serializerData.serializer.Identifier}.g.cs",
                     CSharpSyntaxTree.ParseText(SourceText.From(
 $@"using DotNetAvroSerializer.Primitives;
 using DotNetAvroSerializer.LogicalTypes;
@@ -67,6 +75,7 @@ namespace {Namespaces.GetNamespace(serializerData.serializer)}
         }}
     }}
 }}", Encoding.UTF8)).GetRoot().NormalizeWhitespace().SyntaxTree.GetText());
+                }
             });
         }
 
@@ -126,14 +135,22 @@ namespace {Namespaces.GetNamespace(serializerData.serializer)}
 
         private static ISymbol GetSerializableTypeSymbol(ClassDeclarationSyntax serializerSyntax, GeneratorSyntaxContext ctx) => ctx.SemanticModel.GetSymbolInfo(((GenericNameSyntax)serializerSyntax.BaseList.Types.First().Type).TypeArgumentList.Arguments.First()).Symbol;
 
-        private (string serializationCode, string privateFieldsCode) SerializationCodeGeneratorLoop(Schema schema, SourceProductionContext context, ISymbol originTypeSymbol, string sourceAccesor = "source")
+        private (string serializationCode, string privateFieldsCode, Diagnostic diagnostic) SerializationCodeGeneratorLoop(ClassDeclarationSyntax serializerSyntax, Schema schema, SourceProductionContext context, ISymbol serializableTypeSymbol, string sourceAccesor = "source")
         {
-            var serializatonCode = new StringBuilder();
-            var privateFieldsCode = new PrivateFieldsCode();
+            try
+            {
+                var serializatonCode = new StringBuilder();
+                var privateFieldsCode = new PrivateFieldsCode();
 
-            SerializationGenerator.GenerateSerializatonSourceForSchema(schema, serializatonCode, privateFieldsCode, context, originTypeSymbol, sourceAccesor);
+                SerializationGenerator.GenerateSerializatonSourceForSchema(schema, serializatonCode, privateFieldsCode, context, serializableTypeSymbol, sourceAccesor);
 
-            return (serializatonCode.ToString(), privateFieldsCode.ToString());
+                return (serializatonCode.ToString(), privateFieldsCode.ToString(), null);
+            }
+            catch (AvroGeneratorException ex)
+            {
+                return (string.Empty, string.Empty, Diagnostic.Create(DiagnosticsDescriptors.SerializableTypeMissMatchDescriptor, serializerSyntax.GetLocation(), ex.Message));
+            }
+
         }
     }
 }

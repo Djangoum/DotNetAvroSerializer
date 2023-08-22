@@ -39,5 +39,14 @@ namespace DotNetAvroSerializer.Generators.Diagnostics
             defaultSeverity: DiagnosticSeverity.Error,
             isEnabledByDefault: true,
             description: $"AvroSerializers must be public partial classes");
+
+        public static DiagnosticDescriptor SerializableTypeMissMatchDescriptor => new DiagnosticDescriptor(
+            id: "AVRO00005",
+            title: "Serializable type does has some conflict with schema",
+            messageFormat: $"{{0}}",
+            category: typeof(AvroSerializerSourceGenerator).FullName,
+            defaultSeverity: DiagnosticSeverity.Error,
+            isEnabledByDefault: true,
+            description: $"Serializable type has some conflict with schema");
     }
 }

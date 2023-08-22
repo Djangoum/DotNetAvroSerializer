@@ -1,4 +1,5 @@
 ﻿using Avro;
+using DotNetAvroSerializer.Generators.Exceptions;
 using DotNetAvroSerializer.Generators.Helpers;
 using Microsoft.CodeAnalysis;
 using System;
@@ -16,7 +17,7 @@ namespace DotNetAvroSerializer.Generators.SerializationGenerators
             var property = classSymbol.GetMembers().FirstOrDefault(s => s.Kind is SymbolKind.Property && s.Name.Equals(field.Name, StringComparison.InvariantCultureIgnoreCase)) as IPropertySymbol;
 
             if (property is null)
-                throw new Exception($"Property {field.Name} not found in {originTypeSymbol.Name}");
+                throw new AvroGeneratorException($"Property {field.Name} not found in {originTypeSymbol.Name}");
 
             ITypeSymbol typeName = property.Type;
 

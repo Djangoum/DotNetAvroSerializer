@@ -42,11 +42,20 @@ namespace DotNetAvroSerializer.Generators.Diagnostics
 
         public static DiagnosticDescriptor SerializableTypeMissMatchDescriptor => new DiagnosticDescriptor(
             id: "AVRO00005",
-            title: "Serializable type does has some conflict with schema",
+            title: "Serializable type has some conflict with schema",
             messageFormat: $"{{0}}",
             category: typeof(AvroSerializerSourceGenerator).FullName,
             defaultSeverity: DiagnosticSeverity.Error,
             isEnabledByDefault: true,
             description: $"Serializable type has some conflict with schema");
+
+        public static DiagnosticDescriptor SerializableTypeIsNotAllowedDescriptor => new DiagnosticDescriptor(
+            id: "AVRO00006",
+            title: "Serializable type is not allowed",
+            messageFormat: $"{{0}}",
+            category: typeof(AvroSerializerSourceGenerator).FullName,
+            defaultSeverity: DiagnosticSeverity.Error,
+            isEnabledByDefault: true,
+            description: $"Serializable type is not allowed");
     }
 }

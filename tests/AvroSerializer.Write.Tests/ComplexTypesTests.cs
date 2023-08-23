@@ -244,6 +244,21 @@ namespace DotNetAvroSerializer.Write.Tests
     }
 
     [AvroSchema(@"{
+        ""type"": ""record"",
+        ""name"" : ""recordWithOverridenNames"",
+        ""fields"": [
+            {
+                ""name"": ""matching_name"",
+                ""type"": ""string""
+            }
+        ]
+    }")]
+    public partial class RecordWitOverridenFieldNamesSerializer : AvroSerializer<RecordWithOverridenNames>
+    {
+
+    }
+
+    [AvroSchema(@"{
         ""type"": ""array"",
         ""items"": {
             ""type"": ""record"",

@@ -13,7 +13,7 @@ namespace DotNetAvroSerializer.Generators.Models
                     .GetMembers()
                     .Where(s => s.Kind is SymbolKind.Property)
                     .Cast<IPropertySymbol>()
-                    .Select(t => new FieldSerializableTypeMetadata(From(t.Type), t.Type, t.Name));
+                    .Select(t => new FieldSerializableTypeMetadata(From(t.Type), t, t.Name));
         }
 
         internal override SerializableTypeKind Kind => SerializableTypeKind.Record;

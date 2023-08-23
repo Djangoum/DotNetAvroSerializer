@@ -13,7 +13,10 @@ namespace DotNetAvroSerializer.Generators.SerializationGenerators
     {
         internal static void GenerateSerializationSourceForRecordField(Field field, StringBuilder serializationCode, PrivateFieldsCode privateFieldsCode, RecordSerializableTypeMetadata recordTypeMetadata, string sourceAccesor)
         {
-            var property = recordTypeMetadata.Fields.FirstOrDefault(f => f.Name.Equals(field.Name, StringComparison.InvariantCultureIgnoreCase));
+            var property = recordTypeMetadata.Fields.FirstOrDefault(f => 
+                f.Name.Equals(field.Name, StringComparison.InvariantCultureIgnoreCase)
+                || f.Names.Contains(field.Name)
+            );
 
             if (property is null)
                 throw new AvroGeneratorException($"Property {field.Name} not found in {recordTypeMetadata}");

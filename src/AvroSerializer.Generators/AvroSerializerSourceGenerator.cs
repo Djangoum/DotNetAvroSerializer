@@ -27,7 +27,7 @@ namespace DotNetAvroSerializer.Generators
             IncrementalValuesProvider<(SerializerMetadata serializerMetadata, EquatableArray<Diagnostic> errors)> classDeclarationsWithErrors = context.SyntaxProvider
                 .CreateSyntaxProvider(
                     predicate: static (s, _) => IsSyntaxGenerationCandidate(s),
-                    transform: static (ctx, ct) => GetTargetDataForGeneration(ctx, ct));
+                    transform: static (ctx, ct) => GetTargetDataForGeneration(ctx));
 
             context.RegisterSourceOutput(classDeclarationsWithErrors.SelectMany(static (values, _) => values.errors), (ctx, error) =>
             {
@@ -47,38 +47,14 @@ namespace DotNetAvroSerializer.Generators
                 }
                 else
                 {
-                    context.AddSource($"{serializerData.serializerMetadata.SerializerClassName}.g.cs",
-                    CSharpSyntaxTree.ParseText(SourceText.From(
-$@"using DotNetAvroSerializer.Primitives;
-                    using DotNetAvroSerializer.LogicalTypes;
-                    using DotNetAvroSerializer.Exceptions;
-                    using DotNetAvroSerializer.ComplexTypes;
-                    using System.Linq;
-                    using System.IO;
-
-                    namespace {serializerData.serializerMetadata.SerializerNamespace}
-                    {{
-                        public partial class {serializerData.serializerMetadata.SerializerClassName}
-                        {{
-                            {privateFieldsCode}
-
-                            public byte[] Serialize({serializerData.serializerMetadata.SerializableTypeMetadata.FullNameDisplay} source)
-                            {{
-                                var outputStream = new MemoryStream();
-
-                                SerializeToStream(outputStream, source);
-
-                                return outputStream.ToArray();
-                            }}
-
-                            public void SerializeToStream(Stream outputStream, {serializerData.serializerMetadata.SerializableTypeMetadata.FullNameDisplay} source)
-                            {{
-                    {serializationCode}
-                            }}
-                        }}
-                    }}", Encoding.UTF8)).GetRoot().NormalizeWhitespace().SyntaxTree.GetText());
+                    context.AddSource($"{serializerData.serializerMetadata.SerializerClassName}.g.cs", 
+                        GetGeneratedSerializationSource(
+                            serializerData.serializerMetadata.SerializerNamespace, 
+                            serializerData.serializerMetadata.SerializerClassName,
+                            serializerData.serializerMetadata.SerializableTypeMetadata.FullNameDisplay,
+                            serializationCode,
+                            privateFieldsCode));
                 }
-
             });
         }
 
@@ -119,8 +95,6 @@ $@"using DotNetAvroSerializer.Primitives;
                 return (null, diagnostics);
             }
 
-            cancellation.ThrowIfCancellationRequested();
-
             Schema schema = default;
 
             try
@@ -132,8 +106,6 @@ $@"using DotNetAvroSerializer.Primitives;
                 diagnostics = diagnostics.Add(Diagnostic.Create(DiagnosticsDescriptors.AvroSchemaIsNotValidDescriptor, serializerSyntax.GetLocation(), serializerSyntax.Identifier.ToString()));
                 return (null, diagnostics);
             }
-
-            cancellation.ThrowIfCancellationRequested();
 
             var serializableType = GetSerializableTypeSymbol(serializerSyntax, ctx);
 

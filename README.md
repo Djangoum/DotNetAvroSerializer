@@ -187,7 +187,38 @@ public partial class RecordWithComplexTypesSerializer
 }
 ```
 
-Key feature of Dotnet Avro Serializer is mainly performance improvement over other libraries out there. As it's using source generators does not have any runtime reflection and directly serializes to output stream or byte array.
+In some cases, field records may not precisely correspond to class properties. DotNetAvroSerializer consistently employs a case-insensitive approach when searching for field names. However, there are instances where Avro schemas may incorporate names that deviate from typical C# syntax. The following example illustrates how you can customize and override a field name to address such scenarios.
+
+```csharp
+[AvroSchema(@"{
+    ""name"": ""InnerRecord"",
+    ""type"": ""record"",
+    ""fields"": [
+        {
+            ""name"": ""field_name_1"",
+            ""type"": ""string""
+        },
+        {
+            ""name"": ""field_name_2"",
+            ""type"": ""int""
+        }
+    ]
+}")]
+public partial class RecordWithComplexTypesSerializer : AvroSerializer<InnerRecord>
+{
+
+}
+
+public class InnerRecord
+{
+    [AvroField("field_name_1")]
+    public required string Field1 { get; set; }
+    [AvroField("field_name_2")]
+    public int Field2 { get; set; }
+}
+```
+
+One of the standout features of the Dotnet Avro Serializer is its significant performance enhancement compared to other available libraries. This improvement is primarily attributed to its utilization of source generators, eliminating the need for any runtime reflection. Instead, it efficiently carries out serialization directly to an output stream or byte array.
 
 ## Rules and limitations :
 

@@ -13,11 +13,12 @@ using System.Collections.Immutable;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
+using System.Threading;
 
 namespace DotNetAvroSerializer.Generators
 {
     [Generator]
-    partial class AvroSerializerSourceGenerator : IIncrementalGenerator
+    public partial class AvroSerializerSourceGenerator : IIncrementalGenerator
     {
         private static bool IsSyntaxGenerationCandidate(SyntaxNode node) => node is ClassDeclarationSyntax c && (c.BaseList?.Types.First().Type.ToString().Contains("AvroSerializer") ?? false);
 
@@ -26,7 +27,7 @@ namespace DotNetAvroSerializer.Generators
             IncrementalValuesProvider<(SerializerMetadata serializerMetadata, EquatableArray<Diagnostic> errors)> classDeclarationsWithErrors = context.SyntaxProvider
                 .CreateSyntaxProvider(
                     predicate: static (s, _) => IsSyntaxGenerationCandidate(s),
-                    transform: static (ctx, _) => GetTargetDataForGeneration(ctx));
+                    transform: static (ctx, ct) => GetTargetDataForGeneration(ctx));
 
             context.RegisterSourceOutput(classDeclarationsWithErrors.SelectMany(static (values, _) => values.errors), (ctx, error) =>
             {
@@ -46,38 +47,14 @@ namespace DotNetAvroSerializer.Generators
                 }
                 else
                 {
-                    context.AddSource($"{serializerData.serializerMetadata.SerializerClassName}.g.cs",
-                    CSharpSyntaxTree.ParseText(SourceText.From(
-$@"using DotNetAvroSerializer.Primitives;
-                    using DotNetAvroSerializer.LogicalTypes;
-                    using DotNetAvroSerializer.Exceptions;
-                    using DotNetAvroSerializer.ComplexTypes;
-                    using System.Linq;
-                    using System.IO;
-
-                    namespace {serializerData.serializerMetadata.SerializerNamespace}
-                    {{
-                        public partial class {serializerData.serializerMetadata.SerializerClassName}
-                        {{
-                            {privateFieldsCode}
-
-                            public byte[] Serialize({serializerData.serializerMetadata.SerializableTypeMetadata.FullNameDisplay} source)
-                            {{
-                                var outputStream = new MemoryStream();
-
-                                SerializeToStream(outputStream, source);
-
-                                return outputStream.ToArray();
-                            }}
-
-                            public void SerializeToStream(Stream outputStream, {serializerData.serializerMetadata.SerializableTypeMetadata.FullNameDisplay} source)
-                            {{
-                    {serializationCode}
-                            }}
-                        }}
-                    }}", Encoding.UTF8)).GetRoot().NormalizeWhitespace().SyntaxTree.GetText());
+                    context.AddSource($"{serializerData.serializerMetadata.SerializerClassName}.g.cs", 
+                        GetGeneratedSerializationSource(
+                            serializerData.serializerMetadata.SerializerNamespace, 
+                            serializerData.serializerMetadata.SerializerClassName,
+                            serializerData.serializerMetadata.SerializableTypeMetadata.FullNameDisplay,
+                            serializationCode,
+                            privateFieldsCode));
                 }
-
             });
         }
 

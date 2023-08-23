@@ -35,7 +35,7 @@ namespace DotNetAvroSerializer.Generators.Helpers
         /// <summary>
         /// The underlying <typeparamref name="T"/> array.
         /// </summary>
-        private readonly T[]? array;
+        private readonly T[] array;
 
         /// <summary>
         /// Creates a new <see cref="EquatableArray{T}"/> instance.
@@ -43,7 +43,7 @@ namespace DotNetAvroSerializer.Generators.Helpers
         /// <param name="array">The input <see cref="ImmutableArray{T}"/> to wrap.</param>
         public EquatableArray(ImmutableArray<T> array)
         {
-            this.array = Unsafe.As<ImmutableArray<T>, T[]?>(ref array);
+            this.array = Unsafe.As<ImmutableArray<T>, T[]>(ref array);
         }
 
         /// <summary>

@@ -55,7 +55,6 @@ namespace DotNetAvroSerializer.Generators
                                                 Token(SyntaxKind.PartialKeyword)}))
                                     .WithMembers(
                                         List(GetMemberDeclarations(serializableFullyQualifiedTypeName, serializeCode, privateMembersCode)))))))
-                    .NormalizeWhitespace()
                     .ToFullString())
                 .GetRoot().NormalizeWhitespace().GetText(Encoding.UTF8);
         }

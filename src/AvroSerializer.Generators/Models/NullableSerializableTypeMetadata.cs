@@ -23,5 +23,12 @@ namespace DotNetAvroSerializer.Generators.Models
 
             return namedTypeSymbol.TypeArguments.First();
         }
+
+        public override bool Equals(SerializableTypeMetadata other)
+        {
+            return base.Equals(other)
+                && other is NullableSerializableTypeMetadata nullableSerializableType
+                && nullableSerializableType.InnerNullableTypeSymbol.Equals(nullableSerializableType.InnerNullableTypeSymbol);
+        }
     }
 }

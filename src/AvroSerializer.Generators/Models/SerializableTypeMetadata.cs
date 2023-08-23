@@ -20,17 +20,34 @@ namespace DotNetAvroSerializer.Generators.Models
         {
             if (symbol.TypeKind is TypeKind.Class or TypeKind.Interface or TypeKind.Struct or TypeKind.Array or TypeKind.Enum)
             {
-                return symbol switch
+                if (PrimitiveSerializableTypeMetadata.IsAllowedPrimitiveType(symbol))
                 {
-                    _ when PrimitiveSerializableTypeMetadata.IsAllowedPrimitiveType(symbol) => new PrimitiveSerializableTypeMetadata(symbol),
-                    _ when LogicalTypeSerializableTypeMetadata.IsValidLogicalType(symbol) => new LogicalTypeSerializableTypeMetadata(symbol),
-                    _ when NullableSerializableTypeMetadata.IsNullableType(symbol) => new NullableSerializableTypeMetadata(From(NullableSerializableTypeMetadata.GetInnerNullableTypeSymbol(symbol)), symbol),
-                    _ when DictionarySerializableTypeMetadata.IsValidMapType(symbol) => new DictionarySerializableTypeMetadata(From(DictionarySerializableTypeMetadata.GetValuesTypeSymbol(symbol)), symbol),
-                    _ when IterableSerializableTypeMetadata.IsValidArrayType(symbol) => new IterableSerializableTypeMetadata(From(IterableSerializableTypeMetadata.GetIterableItemsTypeSymbol(symbol)), symbol),
-                    _ when EnumSerializableTypeMetadata.IsEnumType(symbol) => new EnumSerializableTypeMetadata(symbol),
-
-                    _ => new RecordSerializableTypeMetadata(symbol),
-                };
+                    return new PrimitiveSerializableTypeMetadata(symbol);
+                }
+                else if (LogicalTypeSerializableTypeMetadata.IsValidLogicalType(symbol))
+                {
+                    return new LogicalTypeSerializableTypeMetadata(symbol);
+                }
+                else if (NullableSerializableTypeMetadata.IsNullableType(symbol))
+                {
+                    return new NullableSerializableTypeMetadata(From(NullableSerializableTypeMetadata.GetInnerNullableTypeSymbol(symbol)), symbol);
+                }
+                else if (DictionarySerializableTypeMetadata.IsValidMapType(symbol))
+                {
+                    return new DictionarySerializableTypeMetadata(From(DictionarySerializableTypeMetadata.GetValuesTypeSymbol(symbol)), symbol);
+                }
+                else if (IterableSerializableTypeMetadata.IsValidArrayType(symbol))
+                {
+                    return new IterableSerializableTypeMetadata(From(IterableSerializableTypeMetadata.GetIterableItemsTypeSymbol(symbol)), symbol);
+                }
+                else if (EnumSerializableTypeMetadata.IsEnumType(symbol))
+                {
+                    return new EnumSerializableTypeMetadata(symbol);
+                }
+                else
+                {
+                    return new RecordSerializableTypeMetadata(symbol);
+                }
             }
 
             return null;

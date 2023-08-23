@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using System.Text;
 using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 
-namespace DotNetAvroSerializer.Generators
+namespace DotNetAvroSerializer.Generators.Write
 {
     public partial class AvroSerializerSourceGenerator
     {

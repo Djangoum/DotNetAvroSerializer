@@ -15,7 +15,7 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 
-namespace DotNetAvroSerializer.Generators
+namespace DotNetAvroSerializer.Generators.Write
 {
     [Generator]
     public partial class AvroSerializerSourceGenerator : IIncrementalGenerator

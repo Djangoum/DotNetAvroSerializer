@@ -1,4 +1,5 @@
-﻿using Microsoft.CodeAnalysis;
+﻿using DotNetAvroSerializer.Generators.Write;
+using Microsoft.CodeAnalysis;
 
 namespace DotNetAvroSerializer.Generators.Diagnostics
 {

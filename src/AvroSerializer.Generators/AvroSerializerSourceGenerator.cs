@@ -11,11 +11,12 @@ using System;
 using System.Collections.Immutable;
 using System.Linq;
 using System.Text;
+using System.Threading;
 
 namespace DotNetAvroSerializer.Generators
 {
     [Generator]
-    partial class AvroSerializerSourceGenerator : IIncrementalGenerator
+    public partial class AvroSerializerSourceGenerator : IIncrementalGenerator
     {
         private static bool IsSyntaxGenerationCandidate(SyntaxNode node) => node is ClassDeclarationSyntax c && (c.BaseList?.Types.First().Type.ToString().Contains("AvroSerializer") ?? false);
 
@@ -24,7 +25,7 @@ namespace DotNetAvroSerializer.Generators
             IncrementalValuesProvider<(ClassDeclarationSyntax serializer, Schema avroSchema, ISymbol serializableSymbol, ImmutableArray<Diagnostic> errors)> classDeclarationsWithErrors = context.SyntaxProvider
                 .CreateSyntaxProvider(
                     predicate: static (s, _) => IsSyntaxGenerationCandidate(s),
-                    transform: static (ctx, _) => GetTargetDataForGeneration(ctx));
+                    transform: static (ctx, ct) => GetTargetDataForGeneration(ctx, ct));
 
             context.RegisterSourceOutput(classDeclarationsWithErrors.SelectMany(static (values, _) => values.errors), (ctx, error) =>
             {
@@ -115,6 +116,8 @@ namespace {Namespaces.GetNamespace(serializerData.serializer)}
                 return (serializerSyntax, null, null, diagnostics);
             }
 
+            cancellation.ThrowIfCancellationRequested();
+
             Schema schema = default;
 
             try
@@ -126,6 +129,8 @@ namespace {Namespaces.GetNamespace(serializerData.serializer)}
                 diagnostics = diagnostics.Add(Diagnostic.Create(DiagnosticsDescriptors.AvroSchemaIsNotValidDescriptor, serializerSyntax.GetLocation(), serializerSyntax.Identifier.ToString()));
                 return (serializerSyntax, null, null, diagnostics);
             }
+
+            cancellation.ThrowIfCancellationRequested();
 
             var serializableType = GetSerializableTypeSymbol(serializerSyntax, ctx);
 

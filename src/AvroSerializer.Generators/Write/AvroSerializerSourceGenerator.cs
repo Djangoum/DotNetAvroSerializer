@@ -46,7 +46,7 @@ namespace DotNetAvroSerializer.Generators.Write
                 }
                 else
                 {
-                    context.AddSource($"{serializerData.serializerMetadata.SerializerClassName}.g.cs", 
+                    context.AddSource($"{serializerData.serializerMetadata.SerializerClassName}.write.g.cs", 
                         GetGeneratedSerializationSource(
                             serializerData.serializerMetadata.SerializerNamespace, 
                             serializerData.serializerMetadata.SerializerClassName,

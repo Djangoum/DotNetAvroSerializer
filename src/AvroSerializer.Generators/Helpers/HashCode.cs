@@ -170,7 +170,7 @@ internal struct HashCode
     /// <inheritdoc/>
     [Obsolete("HashCode is a mutable struct and should not be compared with other HashCodes.", error: true)]
     [EditorBrowsable(EditorBrowsableState.Never)]
-    public override bool Equals(object? obj) => throw new NotSupportedException();
+    public override bool Equals(object obj) => throw new NotSupportedException();
 
     /// <summary>
     /// Rotates the specified value left by the specified number of bits.

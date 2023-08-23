@@ -1,6 +1,7 @@
 ﻿using Avro;
 using DotNetAvroSerializer.Generators.Exceptions;
 using DotNetAvroSerializer.Generators.Helpers;
+using DotNetAvroSerializer.Generators.Models;
 using Microsoft.CodeAnalysis;
 using System;
 using System.Linq;
@@ -8,9 +9,9 @@ using System.Text;
 
 namespace DotNetAvroSerializer.Generators.SerializationGenerators
 {
-    public static class UnionGenerator
+    internal static class UnionGenerator
     {
-        public static void GenerateSerializationSourceForUnion(UnionSchema unionSchema, StringBuilder serializationCode, PrivateFieldsCode privateFieldsCode, SourceProductionContext context, ISymbol originTypeSymbol, string sourceAccesor)
+        internal static void GenerateSerializationSourceForUnion(UnionSchema unionSchema, StringBuilder serializationCode, PrivateFieldsCode privateFieldsCode, SerializableTypeMetadata originTypeSymbol, string sourceAccesor)
         {
             foreach (var schema in unionSchema.Schemas)
             {
@@ -53,13 +54,13 @@ namespace DotNetAvroSerializer.Generators.SerializationGenerators
                 }
                 serializationCode.AppendLine($"IntSchema.Write(outputStream, {unionSchema.Schemas.IndexOf(schema)});");
 
-                var newSymbol = originTypeSymbol.Name switch
+                var newSymbol = originTypeSymbol switch
                 {
-                    "Nullable" when !schema.Name.Equals("null", StringComparison.InvariantCultureIgnoreCase) && originTypeSymbol is INamedTypeSymbol namedTypeSymbol => namedTypeSymbol.TypeArguments.First(),
+                    NullableSerializableTypeMetadata nullableSerializableType => nullableSerializableType.InnerNullableTypeSymbol,
                     _ => originTypeSymbol
                 };
 
-                SerializationGenerator.GenerateSerializatonSourceForSchema(schema, serializationCode, privateFieldsCode, context, newSymbol, sourceAccesor);
+                SerializationGenerator.GenerateSerializatonSourceForSchema(schema, serializationCode, privateFieldsCode, newSymbol, sourceAccesor);
 
                 serializationCode.AppendLine("}");
             }

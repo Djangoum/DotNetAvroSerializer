@@ -1,6 +1,7 @@
 ﻿using Avro;
 using DotNetAvroSerializer.Generators.Exceptions;
 using DotNetAvroSerializer.Generators.Helpers;
+using DotNetAvroSerializer.Generators.Models;
 using Microsoft.CodeAnalysis;
 using System;
 using System.Linq;
@@ -8,20 +9,16 @@ using System.Text;
 
 namespace DotNetAvroSerializer.Generators.SerializationGenerators
 {
-    public static class RecordGenerator
+    internal static class RecordGenerator
     {
-        public static void GenerateSerializationSourceForRecordField(Field field, StringBuilder serializationCode, PrivateFieldsCode privateFieldsCode, SourceProductionContext context, ISymbol originTypeSymbol, string sourceAccesor)
+        internal static void GenerateSerializationSourceForRecordField(Field field, StringBuilder serializationCode, PrivateFieldsCode privateFieldsCode, RecordSerializableTypeMetadata recordTypeMetadata, string sourceAccesor)
         {
-            var classSymbol = originTypeSymbol as INamedTypeSymbol;
-
-            var property = classSymbol.GetMembers().FirstOrDefault(s => s.Kind is SymbolKind.Property && s.Name.Equals(field.Name, StringComparison.InvariantCultureIgnoreCase)) as IPropertySymbol;
+            var property = recordTypeMetadata.Fields.FirstOrDefault(f => f.Name.Equals(field.Name, StringComparison.InvariantCultureIgnoreCase));
 
             if (property is null)
-                throw new AvroGeneratorException($"Property {field.Name} not found in {originTypeSymbol.Name}");
+                throw new AvroGeneratorException($"Property {field.Name} not found in {recordTypeMetadata.Name}");
 
-            ITypeSymbol typeName = property.Type;
-
-            SerializationGenerator.GenerateSerializatonSourceForSchema(field.Schema, serializationCode, privateFieldsCode, context, typeName, $"{sourceAccesor}.{property.Name}");
+            SerializationGenerator.GenerateSerializatonSourceForSchema(field.Schema, serializationCode, privateFieldsCode, property.InnerSerializableType, $"{sourceAccesor}.{property.Name}");
         }
     }
 }

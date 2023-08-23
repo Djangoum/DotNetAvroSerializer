@@ -1,18 +1,17 @@
 ﻿using Avro;
 using DotNetAvroSerializer.Generators.Exceptions;
 using DotNetAvroSerializer.Generators.Helpers;
+using DotNetAvroSerializer.Generators.Models;
 using Microsoft.CodeAnalysis;
 using System.Text;
 
 namespace DotNetAvroSerializer.Generators.SerializationGenerators
 {
-    public static class EnumGenerator
+    internal static class EnumGenerator
     {
-        public static void GenerateSerializationSourceForEnum(EnumSchema schema, StringBuilder serializationCode, PrivateFieldsCode privateFieldsCode, SourceProductionContext context, ISymbol originTypeSymbol, string sourceAccesor)
+        internal static void GenerateSerializationSourceForEnum(EnumSchema schema, StringBuilder serializationCode, PrivateFieldsCode privateFieldsCode, SerializableTypeMetadata originTypeSymbol, string sourceAccesor)
         {
-            var symbol = originTypeSymbol as ITypeSymbol;
-
-            if (symbol.TypeKind != TypeKind.Enum)
+            if (originTypeSymbol is null || originTypeSymbol is not EnumSerializableTypeMetadata)
                 throw new AvroGeneratorException($"Enum type was not satisfied to serialize {schema.Name}");
 
             privateFieldsCode.AppendLine(schema.Name, $"private readonly string[] {schema.Name}Values = new string[] {{ \"{string.Join(@""",""", schema.Symbols)}\" }};");

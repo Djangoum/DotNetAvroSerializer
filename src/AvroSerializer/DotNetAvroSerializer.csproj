@@ -25,5 +25,12 @@
 		<!-- Add a README.md next to the csproj -->
 		<None Include="../../README.md" Pack="true" PackagePath="" />
 	</ItemGroup>
+
+	<ItemGroup>
+	  <PackageReference Update="PolySharp" Version="1.13.2">
+	    <PrivateAssets>all</PrivateAssets>
+	    <IncludeAssets>build; analyzers</IncludeAssets>
+	  </PackageReference>
+	</ItemGroup>
 	
 </Project>

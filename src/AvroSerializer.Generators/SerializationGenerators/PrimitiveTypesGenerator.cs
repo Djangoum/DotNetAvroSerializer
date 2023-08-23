@@ -1,30 +1,40 @@
 ﻿using Avro;
 using DotNetAvroSerializer.Generators.Exceptions;
-using Microsoft.CodeAnalysis;
+using DotNetAvroSerializer.Generators.Models;
 using System;
 using System.Text;
 
 namespace DotNetAvroSerializer.Generators.SerializationGenerators
 {
-    public static class PrimitiveTypesGenerator
+    internal static class PrimitiveTypesGenerator
     {
-        public static void GenerateSerializationSourceForPrimitive(PrimitiveSchema primitiveSchema, StringBuilder code, ISymbol originTypeSymbol, string sourceAccesor = "source")
+        internal static void GenerateSerializationSourceForPrimitive(PrimitiveSchema primitiveSchema, StringBuilder code, SerializableTypeMetadata serializableTypeMetadata, string sourceAccesor = "source")
         {
+            if (serializableTypeMetadata is null)
+                throw new AvroGeneratorException($"Primitive type was not satisfied {serializableTypeMetadata}");
+
             var serializerCallCode = primitiveSchema.Name switch
             {
-                "boolean" when originTypeSymbol.Name.Equals("bool", StringComparison.InvariantCultureIgnoreCase)
-                           || originTypeSymbol.Name.Equals("Boolean", StringComparison.InvariantCultureIgnoreCase) => $"BooleanSchema.Write(outputStream, {sourceAccesor});",
-                "int" when originTypeSymbol.Name.Equals("int", StringComparison.InvariantCultureIgnoreCase)
-                           || originTypeSymbol.Name.Equals("Int32", StringComparison.InvariantCultureIgnoreCase) => $"IntSchema.Write(outputStream, {sourceAccesor});",
-                "long" when originTypeSymbol.Name.Equals("long", StringComparison.InvariantCultureIgnoreCase)
-                            || originTypeSymbol.Name.Equals("Int64", StringComparison.InvariantCultureIgnoreCase) => $"LongSchema.Write(outputStream, {sourceAccesor});",
-                "string" when originTypeSymbol.Name.Equals("string", StringComparison.InvariantCultureIgnoreCase) => $"StringSchema.Write(outputStream, {sourceAccesor});",
-                "bytes" when originTypeSymbol is IArrayTypeSymbol arrayTypeSymbol
-                            && arrayTypeSymbol.ElementType.Name.Equals("byte", StringComparison.InvariantCultureIgnoreCase) => $"BytesSchema.Write(outputStream, {sourceAccesor});",
-                "double" when originTypeSymbol.Name.Equals("double", StringComparison.InvariantCultureIgnoreCase) => $"DoubleSchema.Write(outputStream, {sourceAccesor});",
-                "float" when originTypeSymbol.Name.Equals("single", StringComparison.InvariantCultureIgnoreCase) => $"FloatSchema.Write(outputStream, {sourceAccesor});",
+                "boolean" when serializableTypeMetadata is PrimitiveSerializableTypeMetadata primitiveTypeMetadata 
+                            && (primitiveTypeMetadata.TypeName.Equals("bool", StringComparison.InvariantCultureIgnoreCase)
+                           || primitiveTypeMetadata.TypeName.Equals("Boolean", StringComparison.InvariantCultureIgnoreCase)) => $"BooleanSchema.Write(outputStream, {sourceAccesor});",
+                "int" when serializableTypeMetadata is PrimitiveSerializableTypeMetadata primitiveTypeMetadata
+                            && (primitiveTypeMetadata.TypeName.Equals("int", StringComparison.InvariantCultureIgnoreCase)
+                           || primitiveTypeMetadata.TypeName.Equals("Int32", StringComparison.InvariantCultureIgnoreCase)) => $"IntSchema.Write(outputStream, {sourceAccesor});",
+                "long" when serializableTypeMetadata is PrimitiveSerializableTypeMetadata primitiveTypeMetadata
+                            && (primitiveTypeMetadata.TypeName.Equals("long", StringComparison.InvariantCultureIgnoreCase)
+                            || primitiveTypeMetadata.TypeName.Equals("Int64", StringComparison.InvariantCultureIgnoreCase)) => $"LongSchema.Write(outputStream, {sourceAccesor});",
+                "string" when serializableTypeMetadata is PrimitiveSerializableTypeMetadata primitiveTypeMetadata
+                            && (primitiveTypeMetadata.TypeName.Equals("string", StringComparison.InvariantCultureIgnoreCase)) => $"StringSchema.Write(outputStream, {sourceAccesor});",
+                "bytes" when serializableTypeMetadata is IterableSerializableTypeMetadata iterableTypeMetadata
+                            && iterableTypeMetadata.ItemsTypeMetadata is PrimitiveSerializableTypeMetadata primitiveTypeMetadata 
+                            && primitiveTypeMetadata.TypeName.Equals("byte", StringComparison.InvariantCultureIgnoreCase) => $"BytesSchema.Write(outputStream, {sourceAccesor});",
+                "double" when serializableTypeMetadata is PrimitiveSerializableTypeMetadata primitiveTypeMetadata
+                            && primitiveTypeMetadata.TypeName.Equals("double", StringComparison.InvariantCultureIgnoreCase) => $"DoubleSchema.Write(outputStream, {sourceAccesor});",
+                "float" when serializableTypeMetadata is PrimitiveSerializableTypeMetadata primitiveTypeMetadata
+                            && primitiveTypeMetadata.TypeName.Equals("single", StringComparison.InvariantCultureIgnoreCase) => $"FloatSchema.Write(outputStream, {sourceAccesor});",
                 "null" => $"NullSchema.Write(outputStream, {sourceAccesor});",
-                _ => throw new AvroGeneratorException($"Required type was not satisfied to serialize {primitiveSchema.Name} {originTypeSymbol.Name} found")
+                _ => throw new AvroGeneratorException($"Required type was not satisfied to serialize {primitiveSchema.Name} {serializableTypeMetadata.ToString()} found")
             };
 
             code.AppendLine(serializerCallCode);

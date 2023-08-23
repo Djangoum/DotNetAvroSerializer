@@ -229,20 +229,9 @@ There are some rules that Dotnet Avro Serializer source generators expect in ord
 - Maps must implement IDictionary
 - Enums must be C# enums
 - Fixed must be byte[] 
-- Record fields must match class **properties** names (class names and namespaces can differ from schema specification)
+- Record fields must match class **properties** names (case insensitive) or decorate properties with **AvroField** attribute
+- Class names and namespaces can differ from schema specification
 - Nullable types are not suitable to serialize primitives or any type unless they are marked as **unions** between "null" and the C# nullable type we want to serialize in the avro schema.
-
-I'll add a list of missing features to complete a first usable (not production ready) version of the write part. 
-
-- [x] Decimal Logical Type
-- [x] Unions
-- [x] Maps
-- [x] Fixed
-- [x] Enum
-- [x] Time (micro) Logical Type
-- [x] Timestamp (micro) Logical Type
-- [x] Local timestamp (micro) Logical Type
-- [ ] Custom logical types (?)
 
 ## Benchmarks 
 

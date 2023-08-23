@@ -15,5 +15,12 @@ namespace DotNetAvroSerializer.Generators.Models
 
         internal string Name { get; set; }
         internal SerializableTypeMetadata InnerSerializableType { get; set; }
+
+        public override bool Equals(SerializableTypeMetadata other)
+        {
+            return base.Equals(other)
+                && other is FieldSerializableTypeMetadata fieldSerializableType
+                && InnerSerializableType.Equals(fieldSerializableType);
+        }
     }
 }

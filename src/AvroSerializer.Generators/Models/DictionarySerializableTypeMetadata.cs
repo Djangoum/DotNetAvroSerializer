@@ -32,6 +32,14 @@ namespace DotNetAvroSerializer.Generators.Models
                 return dictionaryTypeSymbol.TypeArguments.ElementAt(1);
 
             return null;
-        } 
+        }
+
+        public override bool Equals(SerializableTypeMetadata other)
+        {
+            return base.Equals(other)
+                && other is DictionarySerializableTypeMetadata dictionarySerializableType
+                && KeysTypeName.Equals(dictionarySerializableType.KeysTypeName, StringComparison.InvariantCultureIgnoreCase)
+                && ValuesMetadata.Equals(dictionarySerializableType.ValuesMetadata);
+        }
     }
 }

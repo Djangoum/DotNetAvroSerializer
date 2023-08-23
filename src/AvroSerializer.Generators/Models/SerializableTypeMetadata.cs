@@ -58,7 +58,7 @@ namespace DotNetAvroSerializer.Generators.Models
             return StringRepresentation;
         }
 
-        public bool Equals(SerializableTypeMetadata other)
+        public virtual bool Equals(SerializableTypeMetadata other)
         {
             return Kind == other.Kind && FullNameDisplay == other.FullNameDisplay;
         }

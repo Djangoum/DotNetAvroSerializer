@@ -7,10 +7,8 @@ using DotNetAvroSerializer.Generators.SerializationGenerators;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using Microsoft.CodeAnalysis.Text;
 using System;
 using System.Collections.Immutable;
-using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -27,7 +25,7 @@ namespace DotNetAvroSerializer.Generators.Write
             IncrementalValuesProvider<(SerializerMetadata serializerMetadata, EquatableArray<Diagnostic> errors)> classDeclarationsWithErrors = context.SyntaxProvider
                 .CreateSyntaxProvider(
                     predicate: static (s, _) => IsSyntaxGenerationCandidate(s),
-                    transform: static (ctx, ct) => GetTargetDataForGeneration(ctx));
+                    transform: static (ctx, ct) => GetTargetDataForGeneration(ctx, ct));
 
             context.RegisterSourceOutput(classDeclarationsWithErrors.SelectMany(static (values, _) => values.errors), (ctx, error) =>
             {
@@ -58,10 +56,12 @@ namespace DotNetAvroSerializer.Generators.Write
             });
         }
 
-        private static (SerializerMetadata serializerMetadata, EquatableArray<Diagnostic> errors) GetTargetDataForGeneration(GeneratorSyntaxContext ctx)
+        private static (SerializerMetadata serializerMetadata, EquatableArray<Diagnostic> errors) GetTargetDataForGeneration(GeneratorSyntaxContext ctx, CancellationToken ct)
         {
             var diagnostics = ImmutableArray<Diagnostic>.Empty;
             var serializerSyntax = ctx.Node as ClassDeclarationSyntax;
+
+            ct.ThrowIfCancellationRequested();
 
             if (!(serializerSyntax.Modifiers.Any(m => m.IsKind(SyntaxKind.PartialKeyword))
                 && serializerSyntax.Modifiers.Any(m => m.IsKind(SyntaxKind.PublicKeyword))))
@@ -89,6 +89,8 @@ namespace DotNetAvroSerializer.Generators.Write
                 .GetConstantValue(attributeSchemaText)
                 .ToString();
 
+            ct.ThrowIfCancellationRequested();
+
             if (schemaString is null || attributeSchemaText is null)
             {
                 diagnostics = diagnostics.Add(Diagnostic.Create(DiagnosticsDescriptors.MissingSchemaInAvroSchemaAttributeDescriptor, serializerSyntax.GetLocation(), serializerSyntax.Identifier.ToString()));
@@ -107,6 +109,8 @@ namespace DotNetAvroSerializer.Generators.Write
                 return (null, diagnostics);
             }
 
+            ct.ThrowIfCancellationRequested();
+
             var serializableType = GetSerializableTypeSymbol(serializerSyntax, ctx);
 
             var serializableTypeMetadata = SerializableTypeMetadata.From(serializableType);
@@ -115,6 +119,8 @@ namespace DotNetAvroSerializer.Generators.Write
             {
                 diagnostics = diagnostics.Add(Diagnostic.Create(DiagnosticsDescriptors.SerializableTypeIsNotAllowedDescriptor, serializerSyntax.GetLocation(), serializerSyntax.Identifier.ToString()));
             }
+
+            ct.ThrowIfCancellationRequested();
 
             return (new SerializerMetadata(serializerSyntax.Identifier.ToString(), Namespaces.GetNamespace(serializerSyntax), schema, serializableTypeMetadata), diagnostics);
         }
@@ -136,7 +142,6 @@ namespace DotNetAvroSerializer.Generators.Write
             {
                 return (string.Empty, string.Empty, Diagnostic.Create(DiagnosticsDescriptors.SerializableTypeMissMatchDescriptor, null, ex.Message));
             }
-
         }
     }
 }

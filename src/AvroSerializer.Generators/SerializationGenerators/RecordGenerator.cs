@@ -16,7 +16,7 @@ namespace DotNetAvroSerializer.Generators.SerializationGenerators
             var property = recordTypeMetadata.Fields.FirstOrDefault(f => f.Name.Equals(field.Name, StringComparison.InvariantCultureIgnoreCase));
 
             if (property is null)
-                throw new AvroGeneratorException($"Property {field.Name} not found in {recordTypeMetadata.Name}");
+                throw new AvroGeneratorException($"Property {field.Name} not found in {recordTypeMetadata}");
 
             SerializationGenerator.GenerateSerializatonSourceForSchema(field.Schema, serializationCode, privateFieldsCode, property.InnerSerializableType, $"{sourceAccesor}.{property.Name}");
         }

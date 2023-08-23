@@ -1,6 +1,5 @@
 ﻿using Microsoft.CodeAnalysis;
 using System.Collections.Generic;
-using System.Collections.Immutable;
 using System.Linq;
 
 namespace DotNetAvroSerializer.Generators.Models
@@ -21,5 +20,12 @@ namespace DotNetAvroSerializer.Generators.Models
         internal string Name { get; set; }
 
         internal IEnumerable<FieldSerializableTypeMetadata> Fields { get; }
+
+        public override bool Equals(SerializableTypeMetadata other)
+        {
+            return base.Equals(other)
+                && other is RecordSerializableTypeMetadata recordSerializableType 
+                && Fields.SequenceEqual(recordSerializableType.Fields);
+        }
     }
 }

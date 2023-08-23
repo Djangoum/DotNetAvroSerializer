@@ -27,5 +27,12 @@ namespace DotNetAvroSerializer.Generators.Models
 
                 _ => null
             };
+
+        public override bool Equals(SerializableTypeMetadata other)
+        {
+            return base.Equals(other)
+                && other is IterableSerializableTypeMetadata iterableSerializableType
+                && ItemsTypeMetadata.Equals(iterableSerializableType.ItemsTypeMetadata);
+        }
     }
 }

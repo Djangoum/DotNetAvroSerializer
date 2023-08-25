@@ -2,7 +2,7 @@
 
 namespace DotNetAvroSerializer.Write.Tests
 {
-    public class UnionTests
+    public class NullablePrimitivesTests
     {
         [Theory]
         [InlineData(326, "028C05")]

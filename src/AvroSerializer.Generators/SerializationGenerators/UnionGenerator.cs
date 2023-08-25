@@ -17,7 +17,7 @@ namespace DotNetAvroSerializer.Generators.SerializationGenerators
             {
                 var canSerializedCheck = schema switch
                 {
-                    LogicalSchema logicalSchema => logicalSchema.Name switch
+                    LogicalSchema logicalSchema => logicalSchema.LogicalTypeName switch
                     {
                         "date" => $"DateSchema.CanSerialize({sourceAccesor})",
                         "uuid" => $"UuidSchema.CanSerialize({sourceAccesor})",

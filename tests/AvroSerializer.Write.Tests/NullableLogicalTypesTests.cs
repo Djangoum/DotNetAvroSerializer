@@ -50,10 +50,10 @@ namespace DotNetAvroSerializer.Write.Tests
 
         [Theory]
         [InlineData(null, "00")]
-        [InlineData("2023-01-02T15:36:55Z", "02B0A787B2AE61")]
+        [InlineData("2023-01-02T15:36:55Z", "02B0E1BEB5AE61")]
         public void SerializeTiemstamp(string? dateString, string hexString)
         {
-            var parsed = DateTime.TryParse(dateString, CultureInfo.GetCultureInfo("en-US").DateTimeFormat, out var date);
+            var parsed = DateTime.TryParse(dateString, CultureInfo.InvariantCulture, out var date);
 
             var serializer = new NullableTimestampMillisSerializer();
 

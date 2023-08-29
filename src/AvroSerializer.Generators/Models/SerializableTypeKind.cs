@@ -9,6 +9,7 @@
         LogicalType,
         Field,
         Enum,
-        Nullable
+        Nullable,
+        Union
     }
 }

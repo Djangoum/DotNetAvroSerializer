@@ -2,9 +2,7 @@
 using DotNetAvroSerializer.Generators.Exceptions;
 using DotNetAvroSerializer.Generators.Helpers;
 using DotNetAvroSerializer.Generators.Models;
-using Microsoft.CodeAnalysis;
 using System;
-using System.Diagnostics;
 using System.Linq;
 using System.Text;
 
@@ -16,25 +14,42 @@ namespace DotNetAvroSerializer.Generators.SerializationGenerators
         {
             foreach (var schema in unionSchema.Schemas)
             {
-                var canSerializedCheck = GetCanSerializeCheck(schema, sourceAccesor);
+                var unionSchemaIndex = unionSchema.Schemas.IndexOf(schema);
 
-                if (unionSchema.Schemas.IndexOf(schema) == 0)
+                if (originTypeSymbol is UnionSerializableTypeMetadata unionSerializableTypeMetadata)
                 {
-                    serializationCode.AppendLine($@"if ({canSerializedCheck}) {{");
+                    var canSerializedCheck = GetCanSerializeCheck(schema, $"{sourceAccesor}.Value{unionSchemaIndex + 1}");
+
+                    if (unionSchemaIndex == 0)
+                    {
+                        serializationCode.AppendLine($@"if ({canSerializedCheck}) {{");
+                    }
+                    else
+                    {
+                        serializationCode.AppendLine($@"else if ({canSerializedCheck}) {{");
+                    }
+
+                    serializationCode.AppendLine($"IntSchema.Write(outputStream, {unionSchemaIndex});");
+
+                    SerializationGenerator.GenerateSerializatonSourceForSchema(schema, serializationCode, privateFieldsCode, unionSerializableTypeMetadata.UnionTypes.ElementAt(unionSchemaIndex), $"{sourceAccesor}.Value{unionSchemaIndex + 1}");
                 }
-                else
+                else if (originTypeSymbol is NullableSerializableTypeMetadata nullableSeralizableTypeMetadata)
                 {
-                    serializationCode.AppendLine($@"else if ({canSerializedCheck}) {{");
+                    var canSerializedCheck = GetCanSerializeCheck(schema, sourceAccesor);
+
+                    if (unionSchemaIndex == 0)
+                    {
+                        serializationCode.AppendLine($@"if ({canSerializedCheck}) {{");
+                    }
+                    else
+                    {
+                        serializationCode.AppendLine($@"else if ({canSerializedCheck}) {{");
+                    }
+
+                    serializationCode.AppendLine($"IntSchema.Write(outputStream, {unionSchemaIndex});");
+
+                    SerializationGenerator.GenerateSerializatonSourceForSchema(schema, serializationCode, privateFieldsCode, nullableSeralizableTypeMetadata.InnerNullableTypeSymbol, sourceAccesor);
                 }
-                serializationCode.AppendLine($"IntSchema.Write(outputStream, {unionSchema.Schemas.IndexOf(schema)});");
-
-                var newSymbol = originTypeSymbol switch
-                {
-                    NullableSerializableTypeMetadata nullableSerializableType => nullableSerializableType.InnerNullableTypeSymbol,
-                    _ => originTypeSymbol
-                };
-
-                SerializationGenerator.GenerateSerializatonSourceForSchema(schema, serializationCode, privateFieldsCode, newSymbol, sourceAccesor);
 
                 serializationCode.AppendLine("}");
             }

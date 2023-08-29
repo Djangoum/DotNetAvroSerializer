@@ -20,17 +20,17 @@ namespace DotNetAvroSerializer.Generators.Models
         {
             if (symbol.TypeKind is TypeKind.Class or TypeKind.Interface or TypeKind.Struct or TypeKind.Array or TypeKind.Enum)
             {
-                if (PrimitiveSerializableTypeMetadata.IsAllowedPrimitiveType(symbol))
-                {
-                    return new PrimitiveSerializableTypeMetadata(symbol);
-                }
-                else if (LogicalTypeSerializableTypeMetadata.IsValidLogicalType(symbol))
+                if (LogicalTypeSerializableTypeMetadata.IsValidLogicalType(symbol))
                 {
                     return new LogicalTypeSerializableTypeMetadata(symbol);
                 }
                 else if (NullableSerializableTypeMetadata.IsNullableType(symbol))
                 {
                     return new NullableSerializableTypeMetadata(From(NullableSerializableTypeMetadata.GetInnerNullableTypeSymbol(symbol)), symbol);
+                }
+                else if (UnionSerializableTypeMetadata.IsUnionType(symbol))
+                {
+                    return new UnionSerializableTypeMetadata(symbol, UnionSerializableTypeMetadata.GetInnerUnionTypeSymbols(symbol));
                 }
                 else if (DictionarySerializableTypeMetadata.IsValidMapType(symbol))
                 {
@@ -43,6 +43,10 @@ namespace DotNetAvroSerializer.Generators.Models
                 else if (EnumSerializableTypeMetadata.IsEnumType(symbol))
                 {
                     return new EnumSerializableTypeMetadata(symbol);
+                }
+                else if (PrimitiveSerializableTypeMetadata.IsAllowedPrimitiveType(symbol))
+                {
+                    return new PrimitiveSerializableTypeMetadata(symbol);
                 }
                 else
                 {

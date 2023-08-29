@@ -37,7 +37,7 @@ namespace DotNetAvroSerializer.Write.Tests
         [Theory]
         [InlineData(null, "00")]
         [InlineData("20:01:02", "02E0D0DC44")]
-        public void SerializeTime(string?  timeOnlyTuple, string hexString)
+        public void SerializeTime(string? timeOnlyTuple, string hexString)
         {
             var parsed = TimeOnly.TryParse(timeOnlyTuple, out var timeOnly);
 

@@ -50,13 +50,11 @@ namespace DotNetAvroSerializer.Write.Tests
 
         [Theory]
         [MemberData(nameof(SerializeTimestampData))]
-        public void SerializeTiemstamp(string? dateString, string hexString)
+        public void SerializeTiemstamp(DateTime? dateString, string hexString)
         {
-            var parsed = DateTime.TryParse(dateString, CultureInfo.InvariantCulture, DateTimeStyles.AssumeUniversal, out var date);
-
             var serializer = new NullableTimestampMillisSerializer();
 
-            var result = serializer.Serialize(parsed ? date : null);
+            var result = serializer.Serialize(dateString is not null ? dateString.Value : null);
 
             Convert.ToHexString(result).Should().BeEquivalentTo(hexString);
         }
@@ -65,7 +63,7 @@ namespace DotNetAvroSerializer.Write.Tests
             new List<object[]>
             {
                 new object[] { null!, "00" },
-                new object[] { new DateTime(2023, 01, 02, 15, 36, 55, DateTimeKind.Utc), "02B0E1BEB5AE61" }
+                new object[] { new DateTime(2023, 01, 02, 15, 36, 55, DateTimeKind.Utc), "02B0A787B2AE61" }
             };
     }
 

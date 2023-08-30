@@ -4,81 +4,142 @@ namespace DotNetAvroSerializer
 {
     public struct Union<T1, T2>
     {
-        private readonly T1? value1;
-        private readonly T2? value2;
+        private readonly object? value;
 
-        public Union(T1 val1)
+        public Union(object? val)
         {
-            ArgumentNullException.ThrowIfNull(val1, nameof(val1));
+            ArgumentNullException.ThrowIfNull(val, nameof(val));
 
-            value1 = val1;
-            value2 = default;
+            value = val;
         }
 
-        public Union(T2 val2)
+        public object? GetUnionValue()
         {
-            ArgumentNullException.ThrowIfNull(val2, nameof(val2));
-
-            value2 = val2;
-            value1 = default;
+            return value;
         }
 
-        public T1? Value1 => value1;
-
-        public T2? Value2 => value2;
-
-        public static implicit operator T1?(Union<T1, T2> union)
+        public static implicit operator Union<T1, T2>(T1 val)
         {
-            return union.value1;
+            return new Union<T1, T2>(val);
+        }
+
+        public static implicit operator Union<T1, T2>(T2 val)
+        {
+            return new Union<T1, T2>(val);
         }
 
         public static implicit operator T2?(Union<T1, T2> union)
         {
-            return union.value2;
+            return union.value is T2 ? (T2?)union.value : default(T2);
         }
 
-        public static Union<T1, T2> From(T1 val1)
-        { 
-            return new Union<T1, T2>(val1);
-        }
-
-        public static Union<T1, T2> From(T2 val2)
+        public static implicit operator T1?(Union<T1, T2> union)
         {
-            return new Union<T1,T2>(val2);
+            return union.value is T1 ? (T1?)union.value : default(T1);
         }
     }
 
-    public record struct Union<T1, T2, T3>
+    public struct Union<T1, T2, T3>
     {
-        public T1 Value1;
-        public T2 Value2;
-        public T3 Value3;
+        private readonly object? value;
+
+        public Union(object? val)
+        {
+            ArgumentNullException.ThrowIfNull(val, nameof(val));
+
+            value = val;
+        }
+
+        public object? GetUnionValue()
+        {
+            return value;
+        }
+
+        public static implicit operator Union<T1, T2, T3>(T1 val)
+        {
+            return new Union<T1, T2, T3>(val);
+        }
+
+        public static implicit operator Union<T1, T2, T3>(T2 val)
+        {
+            return new Union<T1, T2, T3>(val);
+        }
+
+        public static implicit operator Union<T1, T2, T3>(T3 val)
+        {
+            return new Union<T1, T2, T3>(val);
+        }
+
+        public static implicit operator T1?(Union<T1, T2, T3> union)
+        {
+            return union.value is T1 ? (T1?)union.value : default(T1);
+        }
+
+        public static implicit operator T2?(Union<T1, T2, T3> union)
+        {
+            return union.value is T2 ? (T2?)union.value : default(T2);
+        }
+
+        public static implicit operator T3?(Union<T1, T2, T3> union)
+        {
+            return union.value is T3 ? (T3?)union.value : default(T3);
+        }
     }
 
     public record struct Union<T1, T2, T3, T4>
     {
-        public T1 Value1;
-        public T2 Value2;
-        public T3 Value3;
-        public T4 Value4;
-    }
+        private readonly object? value;
 
-    public record struct Union<T1, T2, T3, T4, T5>
-    {
-        public T1 Value1;
-        public T2 Value2;
-        public T3 Value3;
-        public T4 Value4;
-        public T5 Value5;
-    }
+        public Union(object? val)
+        {
+            ArgumentNullException.ThrowIfNull(val, nameof(val));
 
-    public record struct Union<T1, T2, T3, T4, T5, T6>
-    {
-        public T1 Value1;
-        public T2 Value2;
-        public T3 Value3;
-        public T4 Value4;
-        public T5 Value5;
-        public T6 Value6;
+            value = val;
+        }
+
+        public object? GetUnionValue()
+        {
+            return value;
+        }
+
+        public static implicit operator Union<T1, T2, T3, T4>(T1 val)
+        {
+            return new Union<T1, T2, T3, T4>(val);
+        }
+
+        public static implicit operator Union<T1, T2, T3, T4>(T2 val)
+        {
+            return new Union<T1, T2, T3, T4>(val);
+        }
+
+        public static implicit operator Union<T1, T2, T3, T4>(T3 val)
+        {
+            return new Union<T1, T2, T3, T4>(val);
+        }
+
+        public static implicit operator Union<T1, T2, T3, T4>(T4 val)
+        {
+            return new Union<T1, T2, T3, T4>(val);
+        }
+
+        public static implicit operator T1?(Union<T1, T2, T3, T4> union)
+        {
+            return union.value is T1 ? (T1?)union.value : default(T1);
+        }
+
+        public static implicit operator T2?(Union<T1, T2, T3, T4> union)
+        {
+            return union.value is T2 ? (T2?)union.value : default(T2);
+        }
+
+        public static implicit operator T3?(Union<T1, T2, T3, T4> union)
+        {
+            return union.value is T3 ? (T3?)union.value : default(T3);
+        }
+
+        public static implicit operator T4?(Union<T1, T2, T3, T4> union)
+        {
+            return union.value is T4 ? (T4?)union.value : default(T4);
+        }
     }
 }

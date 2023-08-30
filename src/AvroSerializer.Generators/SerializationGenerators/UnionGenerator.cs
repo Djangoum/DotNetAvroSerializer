@@ -18,7 +18,7 @@ namespace DotNetAvroSerializer.Generators.SerializationGenerators
 
                 if (originTypeSymbol is UnionSerializableTypeMetadata unionSerializableTypeMetadata)
                 {
-                    var canSerializedCheck = GetCanSerializeCheck(schema, $"{sourceAccesor}.Value{unionSchemaIndex + 1}");
+                    var canSerializedCheck = GetCanSerializeCheck(schema, $"{sourceAccesor}.GetUnionValue()");
 
                     if (unionSchemaIndex == 0)
                     {
@@ -31,7 +31,7 @@ namespace DotNetAvroSerializer.Generators.SerializationGenerators
 
                     serializationCode.AppendLine($"IntSchema.Write(outputStream, {unionSchemaIndex});");
 
-                    SerializationGenerator.GenerateSerializatonSourceForSchema(schema, serializationCode, privateFieldsCode, unionSerializableTypeMetadata.UnionTypes.ElementAt(unionSchemaIndex), $"{sourceAccesor}.Value{unionSchemaIndex + 1}");
+                    SerializationGenerator.GenerateSerializatonSourceForSchema(schema, serializationCode, privateFieldsCode, unionSerializableTypeMetadata.UnionTypes.ElementAt(unionSchemaIndex), $"{sourceAccesor}");
                 }
                 else if (originTypeSymbol is NullableSerializableTypeMetadata nullableSeralizableTypeMetadata)
                 {

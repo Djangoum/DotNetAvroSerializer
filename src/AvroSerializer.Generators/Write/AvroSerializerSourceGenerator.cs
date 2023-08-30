@@ -104,9 +104,9 @@ namespace DotNetAvroSerializer.Generators.Write
             {
                 schema = Schema.Parse(schemaString);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                diagnostics = diagnostics.Add(Diagnostic.Create(DiagnosticsDescriptors.AvroSchemaIsNotValidDescriptor, serializerSyntax.GetLocation(), serializerSyntax.Identifier.ToString()));
+                diagnostics = diagnostics.Add(Diagnostic.Create(DiagnosticsDescriptors.AvroSchemaIsNotValidDescriptor, serializerSyntax.GetLocation(), serializerSyntax.Identifier.ToString(), ex.Message));
                 return (null, diagnostics);
             }
 

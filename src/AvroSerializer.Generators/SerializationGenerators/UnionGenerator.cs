@@ -18,7 +18,9 @@ namespace DotNetAvroSerializer.Generators.SerializationGenerators
 
                 if (originTypeSymbol is UnionSerializableTypeMetadata unionSerializableTypeMetadata)
                 {
-                    var canSerializedCheck = GetCanSerializeCheck(schema, $"{sourceAccesor}.GetUnionValue()");
+                    var unionTypeSerializableTypeMetadata = unionSerializableTypeMetadata.UnionTypes.ElementAt(unionSchemaIndex);
+
+                    var canSerializedCheck = GetCanSerializeCheck(schema, $"{sourceAccesor}.GetUnionValue()", unionTypeSerializableTypeMetadata.FullNameDisplay);
 
                     if (unionSchemaIndex == 0)
                     {
@@ -31,7 +33,7 @@ namespace DotNetAvroSerializer.Generators.SerializationGenerators
 
                     serializationCode.AppendLine($"IntSchema.Write(outputStream, {unionSchemaIndex});");
 
-                    SerializationGenerator.GenerateSerializatonSourceForSchema(schema, serializationCode, privateFieldsCode, unionSerializableTypeMetadata.UnionTypes.ElementAt(unionSchemaIndex), $"{sourceAccesor}");
+                    SerializationGenerator.GenerateSerializatonSourceForSchema(schema, serializationCode, privateFieldsCode, unionTypeSerializableTypeMetadata, $"(({unionTypeSerializableTypeMetadata.FullNameDisplay}){sourceAccesor})");
                 }
                 else if (originTypeSymbol is NullableSerializableTypeMetadata nullableSeralizableTypeMetadata)
                 {
@@ -55,7 +57,7 @@ namespace DotNetAvroSerializer.Generators.SerializationGenerators
             }
         }
 
-        private static string GetCanSerializeCheck(Schema schema, string sourceAccesor)
+        private static string GetCanSerializeCheck(Schema schema, string sourceAccesor, string typeFullName = null)
         {
             return schema switch
             {
@@ -84,7 +86,7 @@ namespace DotNetAvroSerializer.Generators.SerializationGenerators
 
                     _ => GetCanSerializeCheck(logicalSchema.BaseSchema, sourceAccesor)
                 },
-                RecordSchema => $"RecordSchema.CanSerialize({sourceAccesor})",
+                RecordSchema => $"RecordSchema.CanSerialize<{typeFullName}>({sourceAccesor})",
                 ArraySchema => $"ArraySchema.CanSerialize({sourceAccesor})",
                 FixedSchema => $"FixedSchema.CanSerialize({sourceAccesor})",
                 MapSchema => $"MapSchema.CanSerialize({sourceAccesor})",

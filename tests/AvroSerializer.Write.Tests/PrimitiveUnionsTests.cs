@@ -141,6 +141,39 @@ namespace DotNetAvroSerializer.Write.Tests
 
             Convert.ToHexString(result).Should().BeEquivalentTo(hexString);
         }
+
+        [Theory]
+        [InlineData(new byte[] { 123, 253, 100, 10 }, null, null, null, "00087BFD640A")]
+        [InlineData(null, "foo", null, null, "0206666F6F")]
+        [InlineData(null, null, 326, null, "048C05")]
+        [InlineData(null, null, null, 3263453453458L, "06A4F2DECFFABD01")]
+        public void SerializeBytesStringIntLong(byte[]? bytes, string? stringValue, int? integer, long? longValue, string hexString)
+        {
+            Union<byte[], string, int, long> union;
+
+            if (bytes is not null)
+            {
+                union = bytes!;
+            }
+            else if (stringValue is not null)
+            {
+                union = stringValue!;
+            }
+            else if (integer is not null)
+            {
+                union = integer!.Value;
+            }
+            else
+            {
+                union = longValue!.Value;
+            }
+
+            var serializer = new BytesStringIntLongSerializer();
+
+            var result = serializer.Serialize(union);
+
+            Convert.ToHexString(result).Should().BeEquivalentTo(hexString);
+        }
     }
 
     [AvroSchema(@"{ ""type"": [""int"", ""long""] }")]

@@ -49,8 +49,7 @@ namespace DotNetAvroSerializer.Write.Tests
         }
 
         [Theory]
-        [InlineData(null, "00")]
-        [InlineData("2023-01-02T15:36:55Z", "02B0E1BEB5AE61")]
+        [MemberData(nameof(SerializeTimestampData))]
         public void SerializeTiemstamp(string? dateString, string hexString)
         {
             var parsed = DateTime.TryParse(dateString, CultureInfo.InvariantCulture, DateTimeStyles.AssumeUniversal, out var date);
@@ -61,6 +60,13 @@ namespace DotNetAvroSerializer.Write.Tests
 
             Convert.ToHexString(result).Should().BeEquivalentTo(hexString);
         }
+
+        public static IEnumerable<object[]> SerializeTimestampData =>
+            new List<object[]>
+            {
+                new object[] { null!, "00" },
+                new object[] { new DateTime(2023, 01, 02, 15, 36, 55), "02B0E1BEB5AE61" }
+            };
     }
 
     [AvroSchema(@"{ ""type"": [ ""null"", { ""type"": ""int"", ""logicalType"": ""date"" } ] }")]

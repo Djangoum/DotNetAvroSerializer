@@ -33,7 +33,7 @@ namespace DotNetAvroSerializer.Generators.SerializationGenerators
                 case UnionSchema unionSchema:
                     UnionGenerator.GenerateSerializationSourceForUnion(unionSchema, serializationCode, privateFieldsCode, serializableTypeMetadata, sourceAccesor);
                     break;
-
+                     
                 case MapSchema mapSchema:
                     MapGenerator.GenerateSerializationSourceFoMap(mapSchema, serializationCode, privateFieldsCode, serializableTypeMetadata, sourceAccesor);
                     break;

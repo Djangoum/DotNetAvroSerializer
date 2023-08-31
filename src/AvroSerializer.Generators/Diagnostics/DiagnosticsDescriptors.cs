@@ -26,7 +26,7 @@ namespace DotNetAvroSerializer.Generators.Diagnostics
         public static DiagnosticDescriptor AvroSchemaIsNotValidDescriptor => new DiagnosticDescriptor(
             id: "AVRO00003",
             title: "AvroSchema is not valid",
-            messageFormat: $"AvroSchema provided for {{0}} is not valid errors text : {{0}}",
+            messageFormat: $"AvroSchema provided for {{0}} is not valid errors text : {{1}}",
             category: typeof(AvroSerializerSourceGenerator).FullName,
             defaultSeverity: DiagnosticSeverity.Error,
             isEnabledByDefault: true,

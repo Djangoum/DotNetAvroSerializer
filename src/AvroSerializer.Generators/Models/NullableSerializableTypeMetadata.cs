@@ -15,13 +15,27 @@ namespace DotNetAvroSerializer.Generators.Models
         internal SerializableTypeMetadata InnerNullableTypeSymbol { get; }
 
         internal static bool IsNullableType(ITypeSymbol typeSymbol)
-            => typeSymbol is INamedTypeSymbol namedTypeSymbol && namedTypeSymbol.Name == "Nullable";
+            => typeSymbol.NullableAnnotation is NullableAnnotation.Annotated || (typeSymbol is INamedTypeSymbol namedTypeSymbol && namedTypeSymbol.Name == "Nullable");
 
         internal static ITypeSymbol GetInnerNullableTypeSymbol(ITypeSymbol typeSymbol)
         {
-            var namedTypeSymbol = typeSymbol as INamedTypeSymbol;
+             if (typeSymbol is INamedTypeSymbol namedTypeSymbol)
+             {
+                if (namedTypeSymbol.TypeArguments.Any())
+                {
+                    return namedTypeSymbol.TypeArguments.First();
+                }
+                else
+                {
+                    return typeSymbol.WithNullableAnnotation(NullableAnnotation.None);
+                }
+            }
+            else if (typeSymbol is IArrayTypeSymbol arrayTypeSymbol)
+            {
+                return arrayTypeSymbol.WithNullableAnnotation(NullableAnnotation.None);
+            }
 
-            return namedTypeSymbol.TypeArguments.First();
+            return null;
         }
 
         public override bool Equals(SerializableTypeMetadata other)

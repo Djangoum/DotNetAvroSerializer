@@ -9,6 +9,7 @@ using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using System;
 using System.Collections.Immutable;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -103,9 +104,9 @@ namespace DotNetAvroSerializer.Generators.Write
             {
                 schema = Schema.Parse(schemaString);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                diagnostics = diagnostics.Add(Diagnostic.Create(DiagnosticsDescriptors.AvroSchemaIsNotValidDescriptor, serializerSyntax.GetLocation(), serializerSyntax.Identifier.ToString()));
+                diagnostics = diagnostics.Add(Diagnostic.Create(DiagnosticsDescriptors.AvroSchemaIsNotValidDescriptor, serializerSyntax.GetLocation(), serializerSyntax.Identifier.ToString(), ex.Message));
                 return (null, diagnostics);
             }
 
@@ -125,7 +126,19 @@ namespace DotNetAvroSerializer.Generators.Write
             return (new SerializerMetadata(serializerSyntax.Identifier.ToString(), Namespaces.GetNamespace(serializerSyntax), schema, serializableTypeMetadata), diagnostics);
         }
 
-        private static ITypeSymbol GetSerializableTypeSymbol(ClassDeclarationSyntax serializerSyntax, GeneratorSyntaxContext ctx) => ctx.SemanticModel.GetSymbolInfo(((GenericNameSyntax)serializerSyntax.BaseList.Types.First().Type).TypeArgumentList.Arguments.First()).Symbol as ITypeSymbol;
+        private static ITypeSymbol GetSerializableTypeSymbol(ClassDeclarationSyntax serializerSyntax, GeneratorSyntaxContext ctx)
+        {
+            var serializerGenericArgument = ((GenericNameSyntax)serializerSyntax.BaseList.Types.First().Type).TypeArgumentList.Arguments.First();
+
+            var symbol = ctx.SemanticModel.GetSymbolInfo(serializerGenericArgument).Symbol as ITypeSymbol;
+
+            if (serializerGenericArgument.Kind() == SyntaxKind.NullableType)
+            {
+                symbol = symbol.WithNullableAnnotation(NullableAnnotation.Annotated);
+            }
+
+            return symbol;
+        }
 
         private (string serializationCode, string privateFieldsCode, Diagnostic diagnostic) SerializationCodeGeneratorLoop(SerializerMetadata serializerMetadata, Schema schema, string sourceAccesor = "source")
         {

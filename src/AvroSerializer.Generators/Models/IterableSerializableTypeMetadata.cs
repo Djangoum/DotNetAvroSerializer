@@ -1,4 +1,5 @@
 ﻿using Microsoft.CodeAnalysis;
+using System;
 using System.Linq;
 
 namespace DotNetAvroSerializer.Generators.Models
@@ -17,13 +18,13 @@ namespace DotNetAvroSerializer.Generators.Models
 
         internal static bool IsValidArrayType(ITypeSymbol symbol)
             => symbol is IArrayTypeSymbol
-                || symbol is INamedTypeSymbol namedTypeSymbol && namedTypeSymbol.AllInterfaces.Any(i => i.Name.Contains("IEnumerable"));
+                || symbol is INamedTypeSymbol namedTypeSymbol && !namedTypeSymbol.Name.Equals("string", StringComparison.InvariantCultureIgnoreCase) &&  namedTypeSymbol.AllInterfaces.Any(i => i.Name.Contains("IEnumerable"));
 
         internal static ITypeSymbol GetIterableItemsTypeSymbol(ITypeSymbol iterableTypeSymbol)
             => iterableTypeSymbol switch
             {
                 IArrayTypeSymbol arrayTypeSymbol => arrayTypeSymbol.ElementType,
-                INamedTypeSymbol namedTypeSymbol when namedTypeSymbol.AllInterfaces.Any(i => i.Name.Contains("IEnumerable")) => namedTypeSymbol.TypeArguments.First(),
+                INamedTypeSymbol namedTypeSymbol when !namedTypeSymbol.Name.Equals("string", StringComparison.InvariantCultureIgnoreCase) && namedTypeSymbol.AllInterfaces.Any(i => i.Name.Contains("IEnumerable")) => namedTypeSymbol.TypeArguments.First(),
 
                 _ => null
             };

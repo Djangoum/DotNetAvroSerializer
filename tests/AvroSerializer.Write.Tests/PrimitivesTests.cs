@@ -130,9 +130,3 @@ public partial class FloatSerializer : AvroSerializer<float>
 {
 
 }
-
-[AvroSchema(@"{ ""type"": ""array"", ""items"": ""long"" }")]
-public partial class ArraySerializer : AvroSerializer<long[]>
-{
-
-}

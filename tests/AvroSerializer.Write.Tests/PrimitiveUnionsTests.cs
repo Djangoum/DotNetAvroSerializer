@@ -174,6 +174,34 @@ namespace DotNetAvroSerializer.Write.Tests
 
             Convert.ToHexString(result).Should().BeEquivalentTo(hexString);
         }
+
+        [Theory]
+        [InlineData(326, null, "008C05")]
+        [InlineData(null, 3263453453458L, "02A4F2DECFFABD01")]
+        [InlineData(null, null, "04")]
+        public void SerializeIntLongNull(int? integer, long? longValue, string hexString)
+        {
+            Union<int, long, Null> union;
+
+            if (integer is not null)
+            {
+                union = integer!.Value;
+            }
+            else if (longValue is not null)
+            {
+                union = longValue!.Value;
+            }
+            else
+            {
+                union = Null.Instance;
+            }
+
+            var serializer = new IntLongNullSerializer();
+
+            var result = serializer.Serialize(union);
+
+            Convert.ToHexString(result).Should().BeEquivalentTo(hexString);
+        }
     }
 
     [AvroSchema(@"{ ""type"": [""int"", ""long""] }")]
@@ -214,6 +242,12 @@ namespace DotNetAvroSerializer.Write.Tests
 
     [AvroSchema(@"{ ""type"": [ ""bytes"", ""string"", ""int"", ""long"" ] }")]
     public partial class BytesStringIntLongSerializer : AvroSerializer<Union<byte[], string, int, long>>
+    {
+
+    }
+
+    [AvroSchema(@"{ ""type"": [ ""int"", ""long"", ""null"" ] }")]
+    public partial class IntLongNullSerializer : AvroSerializer<Union<int, long, Null>>
     {
 
     }

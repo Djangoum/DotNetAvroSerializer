@@ -10,8 +10,8 @@ Dotnet AvroSerializer is a cutting-edge Avro serialization library for .NET, dri
 Install both serializer and generator package.
 
 ```ps
-dotnet add package DotnetAvroSerializer --version x.x.x
-dotnet add package DotnetAvroSerializer.Generators --version x.x.x
+dotnet add package DotnetAvroSerializer
+dotnet add package DotnetAvroSerializer.Generators
 ```
 
 Dotnet Avro Serializer is a powerful tool that automates the creation of serializers from Avro schemas and C# types. It streamlines the process of converting your C# objects into Avro binary serialized data effortlessly.
@@ -187,6 +187,8 @@ public partial class RecordWithComplexTypesSerializer
 }
 ```
 
+## Overriding field names in records
+
 In some cases, field records may not precisely correspond to class properties. DotNetAvroSerializer consistently employs a case-insensitive approach when searching for field names. However, there are instances where Avro schemas may incorporate names that deviate from typical C# syntax. The following example illustrates how you can customize and override a field name to address such scenarios.
 
 ```csharp
@@ -219,6 +221,50 @@ public class InnerRecord
 ```
 
 One of the standout features of the Dotnet Avro Serializer is its significant performance enhancement compared to other available libraries. This improvement is primarily attributed to its utilization of source generators, eliminating the need for any runtime reflection. Instead, it efficiently carries out serialization directly to an output stream or byte array.
+
+## Unions
+
+In the DotNetAvroSerializer library, unions are typically represented using the **Union** struct. Let's explore this concept with an example: 
+
+```csharp
+[AvroSchema(@"{ ""type"": [""int"", ""long""] }")]
+public partial class IntegerLongSerializer : AvroSerializer<Union<int, long>>
+{
+
+}
+```
+
+The **Union<>** struct is designed to simplify the handling of unions by providing implicit and explicit operators for its generic parameter types. This makes it easy to assign values to the union, as demonstrated in the following code: 
+
+```csharp
+Union<int, long, Null> union = 2L; // assigning long value to union.
+```
+
+Once assigned, a union becomes immutable and cannot be modified. To assign a new value, you need to create a new instance of the union.
+
+For unions consisting of an integer and a long, you must use the **Union<int, long>** struct. It's important to note that, as of now, DotNetAvroSerializer only supports unions with up to four elements.
+
+The example provided is the simplest form of a union. However, unions can become more complex, such as unions of integers, longs, and null values. To represent null values within unions, DotNetAvroSerializer utilizes the **Null** struct, like so:
+
+```csharp
+[AvroSchema(@"{ ""type"": [ ""int"", ""long"", ""null"" ] }")]
+public partial class IntLongNullSerializer : AvroSerializer<Union<int, long, Null>>
+{
+
+}
+```
+
+In special cases where unions involve only any type and null, you can use nullable types to represent these unions, eliminating the need for the **Union<>** struct. For example:
+
+```csharp
+[AvroSchema(@"{ ""type"": [ ""null"", ""boolean""] }")]
+public partial class NullableStringSerializer : AvroSerializer<bool?>
+{
+
+}
+```
+
+This approach simplifies the code when dealing with unions containing only any type and null values.
 
 ## Rules and limitations :
 

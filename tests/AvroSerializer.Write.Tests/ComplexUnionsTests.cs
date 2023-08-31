@@ -87,4 +87,60 @@ namespace DotNetAvroSerializer.Write.Tests
     {
 
     }
+
+    [AvroSchema(@"{
+        ""type"": [
+            {
+                ""type"": ""array"",
+                ""items"": ""int""
+            },
+            {
+                ""type"": ""record"",
+                ""name"" : ""unionSideOne"",
+                ""fields"": [
+                    {
+                        ""name"": ""id"",
+                        ""type"": ""int""
+                    },
+                    {
+                        ""name"": ""name"",
+                        ""type"": ""string""
+                    }
+                ]
+            }
+        ]
+    }")]
+    public partial class ArrayRecordUnionSerializer : AvroSerializer<Union<int[], UnionSideOne>>
+    {
+
+    }
+
+    [AvroSchema(@"{
+        ""type"": [
+            {
+                ""type"": ""array"",
+                ""items"": {
+                    ""type"": ""record"",
+                    ""name"": ""unionSideTwo"",
+                    ""fields"": [
+                        {
+                            ""name"": ""id"",
+                            ""type"": ""int""
+                        },
+                        {
+                            ""name"": ""name"",
+                            ""type"": ""string""
+                        }
+                    ]
+                }
+            },
+            {
+                ""type"": ""long""
+            }
+        ]
+    }")]
+    public partial class ArrayRecordArrayLong : AvroSerializer<Union<UnionSideOne[], long>>
+    {
+
+    }
 }

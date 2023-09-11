@@ -9,7 +9,6 @@ using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using System;
 using System.Collections.Immutable;
-using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -23,22 +22,23 @@ namespace DotNetAvroSerializer.Generators.Write
 
         public void Initialize(IncrementalGeneratorInitializationContext context)
         {
-            IncrementalValuesProvider<(SerializerMetadata serializerMetadata, EquatableArray<Diagnostic> errors)> classDeclarationsWithErrors = context.SyntaxProvider
+            IncrementalValuesProvider<(SerializerMetadata serializerMetadata, EquatableArray<Diagnostic> errors)> serializersMetadataWithErrors = context.SyntaxProvider
                 .CreateSyntaxProvider(
                     predicate: static (s, _) => IsSyntaxGenerationCandidate(s),
                     transform: static (ctx, ct) => GetTargetDataForGeneration(ctx, ct));
 
-            context.RegisterSourceOutput(classDeclarationsWithErrors.SelectMany(static (values, _) => values.errors), (ctx, error) =>
+            context.RegisterSourceOutput(serializersMetadataWithErrors.SelectMany(static (values, _) => values.errors), (ctx, error) =>
             {
                 ctx.ReportDiagnostic(error);
             });
 
-            IncrementalValuesProvider<(SerializerMetadata serializerMetadata, EquatableArray<Diagnostic> errors)> classDeclarations = classDeclarationsWithErrors
-                .Where(static (item) => item.errors.IsEmpty);
+            IncrementalValuesProvider<SerializerMetadata> validSerializers = serializersMetadataWithErrors
+                .Where(static (item) => item.errors.IsEmpty)
+                .Select(static (s, ct) => s.serializerMetadata);
 
-            context.RegisterSourceOutput(classDeclarations, (context, serializerData) =>
+            context.RegisterSourceOutput(validSerializers, (context, serializerData) =>
             {
-                var (serializationCode, privateFieldsCode, diagnostic) = SerializationCodeGeneratorLoop(serializerData.serializerMetadata, serializerData.serializerMetadata.AvroSchema);
+                var (serializationCode, privateFieldsCode, diagnostic) = SerializationCodeGeneratorLoop(serializerData, serializerData.AvroSchema);
 
                 if (diagnostic is not null)
                 {
@@ -46,11 +46,11 @@ namespace DotNetAvroSerializer.Generators.Write
                 }
                 else
                 {
-                    context.AddSource($"{serializerData.serializerMetadata.SerializerClassName}.write.g.cs", 
+                    context.AddSource($"{serializerData.SerializerClassName}.write.g.cs", 
                         GetGeneratedSerializationSource(
-                            serializerData.serializerMetadata.SerializerNamespace, 
-                            serializerData.serializerMetadata.SerializerClassName,
-                            serializerData.serializerMetadata.SerializableTypeMetadata.FullNameDisplay,
+                            serializerData.SerializerNamespace, 
+                            serializerData.SerializerClassName,
+                            serializerData.SerializableTypeMetadata.FullNameDisplay,
                             serializationCode,
                             privateFieldsCode));
                 }

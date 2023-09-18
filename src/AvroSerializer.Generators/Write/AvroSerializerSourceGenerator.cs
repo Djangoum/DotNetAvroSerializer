@@ -27,14 +27,17 @@ namespace DotNetAvroSerializer.Generators.Write
                     predicate: static (s, _) => IsSyntaxGenerationCandidate(s),
                     transform: static (ctx, ct) => GetTargetDataForGeneration(ctx, ct));
 
-            context.RegisterSourceOutput(serializersMetadataWithErrors.SelectMany(static (values, _) => values.errors), (ctx, error) =>
-            {
-                ctx.ReportDiagnostic(error);
-            });
-
+            IncrementalValuesProvider<Diagnostic> errors =
+                serializersMetadataWithErrors.SelectMany(static (values, _) => values.errors);
+            
             IncrementalValuesProvider<SerializerMetadata> validSerializers = serializersMetadataWithErrors
                 .Where(static (item) => item.errors.IsEmpty)
                 .Select(static (s, ct) => s.serializerMetadata);
+            
+            context.RegisterSourceOutput(errors, (ctx, error) =>
+            {
+                ctx.ReportDiagnostic(error);
+            });
 
             context.RegisterSourceOutput(validSerializers, (context, serializerData) =>
             {

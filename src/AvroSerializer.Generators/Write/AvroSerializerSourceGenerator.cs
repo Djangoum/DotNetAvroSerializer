@@ -77,8 +77,7 @@ namespace DotNetAvroSerializer.Generators.Write
             var attribute = serializerSyntax
                 .AttributeLists
                 .SelectMany(x => x.Attributes)
-                .Where(attr => attr.Name.ToString() == "AvroSchema")
-                .FirstOrDefault();
+                .FirstOrDefault(attr => attr.Name.ToString() == "AvroSchema");
 
             if (attribute is null)
             {
@@ -86,7 +85,7 @@ namespace DotNetAvroSerializer.Generators.Write
                 return (null, diagnostics);
             }
 
-            var attributeSchemaText = attribute.ArgumentList.Arguments.First()?.Expression;
+            var attributeSchemaText = attribute.ArgumentList?.Arguments.First()?.Expression;
 
             var schemaString = ctx
                 .SemanticModel
@@ -126,7 +125,9 @@ namespace DotNetAvroSerializer.Generators.Write
 
             ct.ThrowIfCancellationRequested();
 
-            return (new SerializerMetadata(serializerSyntax.Identifier.ToString(), Namespaces.GetNamespace(serializerSyntax), schema, serializableTypeMetadata), diagnostics);
+            return (
+                new SerializerMetadata(serializerSyntax.Identifier.ToString(),
+                    Namespaces.GetNamespace(serializerSyntax), schema, serializableTypeMetadata), diagnostics);
         }
 
         private static ITypeSymbol GetSerializableTypeSymbol(ClassDeclarationSyntax serializerSyntax, GeneratorSyntaxContext ctx)

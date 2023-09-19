@@ -9,9 +9,12 @@ using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using System;
 using System.Collections.Immutable;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading;
+using Avro.Util;
+using Microsoft.CodeAnalysis.Operations;
 
 namespace DotNetAvroSerializer.Generators.Write
 {
@@ -86,6 +89,18 @@ namespace DotNetAvroSerializer.Generators.Write
             }
 
             var attributeSchemaText = attribute.ArgumentList?.Arguments.First()?.Expression;
+            var customLogicalTypes = attribute.ArgumentList?.Arguments.Count > 1
+                ? attribute.ArgumentList.Arguments.ElementAt(1).Expression
+                : null;
+
+            var customLogicalTypesArray = ctx
+                .SemanticModel
+                .GetOperation(customLogicalTypes)
+                .ChildOperations
+                .FirstOrDefault(o => o.Kind == OperationKind.ArrayInitializer)
+                ?.ChildOperations
+                .Where(o => o.Kind == OperationKind.TypeOf)
+                .Select(o => (o as ITypeOfOperation).TypeOperand as INamedTypeSymbol);
 
             var schemaString = ctx
                 .SemanticModel
@@ -129,7 +144,7 @@ namespace DotNetAvroSerializer.Generators.Write
                 new SerializerMetadata(serializerSyntax.Identifier.ToString(),
                     Namespaces.GetNamespace(serializerSyntax), schema, serializableTypeMetadata), diagnostics);
         }
-
+        
         private static ITypeSymbol GetSerializableTypeSymbol(ClassDeclarationSyntax serializerSyntax, GeneratorSyntaxContext ctx)
         {
             var serializerGenericArgument = ((GenericNameSyntax)serializerSyntax.BaseList.Types.First().Type).TypeArgumentList.Arguments.First();

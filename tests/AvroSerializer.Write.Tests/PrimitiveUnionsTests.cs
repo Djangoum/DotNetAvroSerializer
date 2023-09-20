@@ -204,18 +204,22 @@ namespace DotNetAvroSerializer.Write.Tests
         //     }
         // }
 
-        [AvroSchema(@"{ ""type"": [""int"", ""long""] }", new[] { typeof(RegexStringLogicalType) })]
-        public partial class IntegerLongSerializer : AvroSerializer<Union<int, long>>
+        [AvroSchema(@"{
+		  ""logicalType"": ""regex-string"",
+		  ""type"": ""string"",
+		  ""regex"": "".+""
+		}", new[] { typeof(RegexStringLogicalType) })]
+        public partial class IntegerLongSerializer : AvroSerializer<string>
         {
 
         }
         
-        [LogicalType("regex-string")]
-        public class RegexStringLogicalType : LogicalType<string>
+        [LogicalTypeName("regex-string")]
+        public static class RegexStringLogicalType
         {
-            public override bool CanSerialize(object? value) => value is string;
+            public static bool CanSerialize(object? value) => value is string;
 
-            public override object ConvertToBaseType(string logicalTypeValue)
+            public static object ConvertToBaseSchemaType(string logicalTypeValue, [LogicalTypePropertyName("regex-string")]string regex)
             {
                 return logicalTypeValue;
             }

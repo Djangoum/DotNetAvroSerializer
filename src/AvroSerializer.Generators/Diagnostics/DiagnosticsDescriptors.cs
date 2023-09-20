@@ -58,5 +58,49 @@ namespace DotNetAvroSerializer.Generators.Diagnostics
             defaultSeverity: DiagnosticSeverity.Error,
             isEnabledByDefault: true,
             description: $"Serializable type is not allowed");
+        
+        public static DiagnosticDescriptor LogicalTypeIsNotStaticClass =>
+            new DiagnosticDescriptor(
+                id: "AVRO00007",
+                title: "Logical type is not a static class",
+                messageFormat: $"Logical type {{0}} is not a static type",
+                category: typeof(AvroSerializerSourceGenerator).FullName,
+                defaultSeverity: DiagnosticSeverity.Error,
+                isEnabledByDefault: true,
+                description: $"Logical types must be static classes."
+            );
+        
+        public static DiagnosticDescriptor LogicalTypeDoesNotHaveLogicalTypeNameAttribute =>
+            new DiagnosticDescriptor(
+                id: "AVRO00008",
+                title: "LogicalTypeName attribute not found",
+                messageFormat: $"No LogicalTypeName attribute provided in {{0}}",
+                category: typeof(AvroSerializerSourceGenerator).FullName,
+                defaultSeverity: DiagnosticSeverity.Error,
+                isEnabledByDefault: true,
+                description: $"LogicalTypeName attribute not found."
+            );
+        
+        public static DiagnosticDescriptor LogicalTypeDoesNotHaveCanSerializeMethod =>
+            new DiagnosticDescriptor(
+                id: "AVRO00009",
+                title: "Logical type must have CanSerialize method",
+                messageFormat: $"Logical type {{0}} has no CanSerialize method or that accepts object? and returns bool",
+                category: typeof(AvroSerializerSourceGenerator).FullName,
+                defaultSeverity: DiagnosticSeverity.Error,
+                isEnabledByDefault: true,
+                description: $"Logical types must have CanSerialize method that accepts object? and returns bool."
+            );
+        
+        public static DiagnosticDescriptor LogicalTypeDoesNotHaveConvertToBaseTypeMethod =>
+            new DiagnosticDescriptor(
+                id: "AVRO00010",
+                title: "Logical type must have ConvertToBaseType method",
+                messageFormat: $"Logical type {{0}} has no CanSerialize method",
+                category: typeof(AvroSerializerSourceGenerator).FullName,
+                defaultSeverity: DiagnosticSeverity.Error,
+                isEnabledByDefault: true,
+                description: $"Logical types must have CanSerialize method."
+            );
     }
 }

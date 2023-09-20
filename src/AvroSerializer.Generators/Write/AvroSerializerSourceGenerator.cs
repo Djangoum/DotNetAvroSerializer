@@ -8,6 +8,7 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using System;
+using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Diagnostics;
 using System.Linq;
@@ -93,23 +94,21 @@ namespace DotNetAvroSerializer.Generators.Write
                 ? attribute.ArgumentList.Arguments.ElementAt(1).Expression
                 : null;
 
-            var customLogicalTypesArray = ctx
-                .SemanticModel
-                .GetOperation(customLogicalTypes)
-                .ChildOperations
-                .FirstOrDefault(o => o.Kind == OperationKind.ArrayInitializer)
-                ?.ChildOperations
-                .Where(o => o.Kind == OperationKind.TypeOf)
-                .Select(o => (o as ITypeOfOperation).TypeOperand as INamedTypeSymbol);
+            var (customLogicalTypeNames, logicalTypesDiagnostics) = GetCustomLogicalTypesMetadata(customLogicalTypes, serializerSyntax, ctx);
+
+            if (logicalTypesDiagnostics.Any())
+            {
+                diagnostics = diagnostics.AddRange(logicalTypesDiagnostics);
+                return (null, diagnostics);
+            }
 
             var schemaString = ctx
                 .SemanticModel
-                .GetConstantValue(attributeSchemaText)
-                .ToString();
+                .GetConstantValue(attributeSchemaText);
 
             ct.ThrowIfCancellationRequested();
 
-            if (schemaString is null || attributeSchemaText is null)
+            if (!schemaString.HasValue)
             {
                 diagnostics = diagnostics.Add(Diagnostic.Create(DiagnosticsDescriptors.MissingSchemaInAvroSchemaAttributeDescriptor, serializerSyntax.GetLocation(), serializerSyntax.Identifier.ToString()));
                 return (null, diagnostics);
@@ -119,7 +118,7 @@ namespace DotNetAvroSerializer.Generators.Write
 
             try
             {
-                schema = Schema.Parse(schemaString);
+                schema = Schema.Parse(schemaString.ToString());
             }
             catch (Exception ex)
             {
@@ -142,7 +141,92 @@ namespace DotNetAvroSerializer.Generators.Write
 
             return (
                 new SerializerMetadata(serializerSyntax.Identifier.ToString(),
-                    Namespaces.GetNamespace(serializerSyntax), schema, serializableTypeMetadata), diagnostics);
+                    Namespaces.GetNamespace(serializerSyntax), schema, serializableTypeMetadata, customLogicalTypeNames), diagnostics);
+        }
+        
+        private static (IEnumerable<CustomLogicalTypeMetadata> fullyQualifiedLogicalTypes, IEnumerable<Diagnostic> diagnostics) GetCustomLogicalTypesMetadata(ExpressionSyntax customLogicalTypesDeclarationExpression, ClassDeclarationSyntax serializerSymbol, GeneratorSyntaxContext ctx)
+        {
+            var customLogicalTypesArray = ctx
+                .SemanticModel
+                .GetOperation(customLogicalTypesDeclarationExpression)!
+                .ChildOperations
+                .FirstOrDefault(o => o.Kind == OperationKind.ArrayInitializer)
+                ?.ChildOperations
+                .Where(o => o.Kind == OperationKind.TypeOf)
+                .Select(o => (o as ITypeOfOperation)!.TypeOperand as INamedTypeSymbol);
+            
+            var fullyQualifiedLogicalTypes = new List<CustomLogicalTypeMetadata>(customLogicalTypesArray.Count());
+            var diagnosticsProduced = new List<Diagnostic>();
+            
+            foreach (var customLogicalTypeSymbol in customLogicalTypesArray)
+            {
+                if (!customLogicalTypeSymbol.IsStatic)
+                {
+                    diagnosticsProduced.Add(Diagnostic.Create(DiagnosticsDescriptors.LogicalTypeIsNotStaticClass, customLogicalTypeSymbol.Locations.First(), customLogicalTypeSymbol.Name));
+                }
+                else if (!customLogicalTypeSymbol.GetAttributes().Any(a =>
+                        a.AttributeClass.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat).Equals("global::DotNetAvroSerializer.LogicalTypeNameAttribute",
+                            StringComparison.InvariantCultureIgnoreCase)))
+                {
+                    diagnosticsProduced.Add(Diagnostic.Create(DiagnosticsDescriptors.LogicalTypeDoesNotHaveLogicalTypeNameAttribute, customLogicalTypeSymbol.Locations.First(), customLogicalTypeSymbol.Name));
+                }
+                else if (!customLogicalTypeSymbol
+                             .GetMembers()
+                             .Where(m => m.Kind == SymbolKind.Method)
+                             .Cast<IMethodSymbol>()
+                             .Any(m => m.Name.Equals("CanSerialize") 
+                                       && m.ReturnType.Name.Equals("bool") 
+                                       && m.Parameters.Count() == 1 
+                                       && m.Parameters.First().Type.Name.Equals("object")))
+                {
+                    diagnosticsProduced.Add(Diagnostic.Create(DiagnosticsDescriptors.LogicalTypeDoesNotHaveCanSerializeMethod, customLogicalTypeSymbol.Locations.First(), customLogicalTypeSymbol.Name));
+                }
+                else if (!customLogicalTypeSymbol
+                             .GetMembers()
+                             .Where(m => m.Kind == SymbolKind.Method)
+                             .Cast<IMethodSymbol>()
+                             .Any(m => m.Name.Equals("ConvertToBaseSchemaType")
+                                       && m.ReturnType.Name.Equals("object")
+                                       && m.Parameters.Any()))
+                {
+                    diagnosticsProduced.Add(Diagnostic.Create(DiagnosticsDescriptors.LogicalTypeDoesNotHaveConvertToBaseTypeMethod, customLogicalTypeSymbol.Locations.First(), customLogicalTypeSymbol.Name));
+                }
+                else
+                {
+                    var convertToBaseTypeMethodParameters = customLogicalTypeSymbol.GetMembers()
+                        .Where(m => m.Kind == SymbolKind.Method)
+                        .Cast<IMethodSymbol>()
+                        .First(m => m.Name.Equals("ConvertToBaseSchemaType"))
+                        .Parameters
+                        .Skip(1);
+                    
+                    fullyQualifiedLogicalTypes.Add(new CustomLogicalTypeMetadata()
+                    {
+                        LogicalTypeFullyQualifiedName = customLogicalTypeSymbol.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat),
+                        OrderedSchemaProperties = convertToBaseTypeMethodParameters.Select(p =>
+                        { 
+                            var overridenName = p
+                                .GetAttributes()
+                                .FirstOrDefault(a => a
+                                    .AttributeClass.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat)
+                                    .Equals("global::DotNetAvroSerializer.LogicalTypePropertyNameAttribute"))
+                                .ConstructorArguments.First()
+                                .Value;
+
+                            return overridenName is not null ? overridenName.ToString() : p.Name;
+                        })
+                    });
+                    
+                    var logicalTypeName = customLogicalTypeSymbol.GetAttributes().First(a => a.AttributeClass
+                        .ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat).Equals(
+                            "global::DotNetAvroSerializer.LogicalTypeNameAttribute",
+                            StringComparison.InvariantCultureIgnoreCase)).ConstructorArguments.First().Value.ToString();
+                    
+                    LogicalTypeFactory.Instance.Register(new CustomLogicalType(logicalTypeName));
+                }
+            }
+            
+            return (fullyQualifiedLogicalTypes, diagnosticsProduced);
         }
         
         private static ITypeSymbol GetSerializableTypeSymbol(ClassDeclarationSyntax serializerSyntax, GeneratorSyntaxContext ctx)

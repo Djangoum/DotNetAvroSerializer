@@ -14,7 +14,7 @@ namespace DotNetAvroSerializer.Generators.SerializationGenerators
         {
             if (serializableTypeMetadata is null || serializableTypeMetadata is not LogicalTypeSerializableTypeMetadata logicalTypeSerializableTypeMetadata)
                 throw new AvroGeneratorException($"Logical type is not satisfied {serializableTypeMetadata}");
-
+            
             var serializerCallCode = logicalSchema.LogicalType.Name switch
             {
                 "date" when logicalTypeSerializableTypeMetadata.TypeName.Equals("DateTime", StringComparison.InvariantCultureIgnoreCase)
@@ -36,7 +36,7 @@ namespace DotNetAvroSerializer.Generators.SerializationGenerators
             }
             else
             {
-                // unknown logical type serialize base schema
+                // custom logical type serialize base schema
                 SerializationGenerator.GenerateSerializatonSourceForSchema(logicalSchema.BaseSchema, serializationCode, privateFieldsCode, serializableTypeMetadata, sourceAccesor);
             }
         }

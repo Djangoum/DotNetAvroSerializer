@@ -1,19 +1,24 @@
 using System;
-
+ 
 namespace DotNetAvroSerializer;
 
-public abstract class LogicalType<TLogicalType>
-{
-    public abstract bool CanSerialize(object? value);
-    public virtual bool Validate(TLogicalType logicalTypeValue) => true;
-    public abstract object ConvertToBaseType(TLogicalType logicalTypeValue);
-}
-
-public class LogicalTypeAttribute : Attribute
+[AttributeUsage(AttributeTargets.Class)]  
+public class LogicalTypeNameAttribute : Attribute
 {
     public string Name { get; }
 
-    public LogicalTypeAttribute(string name)
+    public LogicalTypeNameAttribute(string name)
+    {
+        Name = name;
+    }
+}
+
+[AttributeUsage(AttributeTargets.Parameter)]  
+public class LogicalTypePropertyNameAttribute : Attribute
+{
+    public string Name { get; }
+
+    public LogicalTypePropertyNameAttribute(string name)
     {
         Name = name;
     }

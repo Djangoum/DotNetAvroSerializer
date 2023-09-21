@@ -217,7 +217,7 @@ namespace DotNetAvroSerializer.Generators.Write
                                 .GetAttributes()
                                 .FirstOrDefault(a => a
                                     .AttributeClass.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat)
-                                    .Equals("global::DotNetAvroSerializer.LogicalTypePropertyNameAttribute"))
+                                    .Equals("global::DotNetAvroSerializer.LogicalTypePropertyNameAttribute"))?
                                 .ConstructorArguments.First()
                                 .Value;
 

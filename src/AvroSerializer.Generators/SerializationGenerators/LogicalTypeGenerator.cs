@@ -26,10 +26,10 @@ namespace DotNetAvroSerializer.Generators.SerializationGenerators
                     "uuid" when logicalTypeName.TypeName.Equals("Guid", StringComparison.InvariantCultureIgnoreCase) => $"UuidSchema.Write(outputStream, {sourceAccesor});",
                     "time-millis" when logicalTypeName.TypeName.Equals("TimeOnly", StringComparison.InvariantCultureIgnoreCase) => $"TimeMillisSchema.Write(outputStream, {sourceAccesor});",
                     "time-micros" when logicalTypeName.TypeName.Equals("TimeOnly", StringComparison.InvariantCultureIgnoreCase) => $"TimeMicrosSchema.Write(outputStream, {sourceAccesor});",
-                    "timestamp-millis" when logicalTypeName.TypeName.Equals("DateTime", StringComparison.InvariantCultureIgnoreCase) => $"TimestampMilisSchema.Write(outputStream, {sourceAccesor});",
+                    "timestamp-millis" when logicalTypeName.TypeName.Equals("DateTime", StringComparison.InvariantCultureIgnoreCase) => $"TimestampMillisSchema.Write(outputStream, {sourceAccesor});",
                     "timestamp-micros" when logicalTypeName.TypeName.Equals("DateTime", StringComparison.InvariantCultureIgnoreCase) => $"TimestampMicrosSchema.Write(outputStream, {sourceAccesor});",
-                    "local-timestamp-milis" when logicalTypeName.TypeName.Equals("DateTime", StringComparison.InvariantCultureIgnoreCase) => $"TimestampMilisSchema.Write(outputStream, {sourceAccesor});",
-                    "local-timestamp-mcros" when logicalTypeName.TypeName.Equals("DateTime", StringComparison.InvariantCultureIgnoreCase) => $"TimestampMiicrosSchema.Write(outputStream, {sourceAccesor});",
+                    "local-timestamp-millis" when logicalTypeName.TypeName.Equals("DateTime", StringComparison.InvariantCultureIgnoreCase) => $"TimestampMillisSchema.Write(outputStream, {sourceAccesor});",
+                    "local-timestamp-micros" when logicalTypeName.TypeName.Equals("DateTime", StringComparison.InvariantCultureIgnoreCase) => $"TimestampMicrosSchema.Write(outputStream, {sourceAccesor});",
 
                     _ => null
                 };
@@ -41,22 +41,21 @@ namespace DotNetAvroSerializer.Generators.SerializationGenerators
                 else
                 {
                     throw new AvroGeneratorException($"Logical type is not satisfied 2 {serializableTypeMetadata}");
-                    // custom logical type serialize base schema
                 }
             }
             else if (customLogicalTypes.Any(a => a.Name.Equals(logicalSchema.LogicalTypeName)))
             {
                 var customLogicalType = customLogicalTypes.First(c => c.Name.Equals(logicalSchema.LogicalTypeName));
 
-                var logicalTypesValues = customLogicalType.OrderedSchemaProperties.Select(p => logicalSchema.GetProperty(p));
-
+                var logicalTypesValues = customLogicalType.OrderedSchemaProperties.Select(logicalSchema.GetProperty);
+                
                 SerializationGenerator.GenerateSerializatonSourceForSchema(
                     logicalSchema.BaseSchema,
                     serializationCode, 
                     privateFieldsCode, 
                     serializableTypeMetadata, 
                     customLogicalTypes, 
-                    $"{customLogicalType.LogicalTypeFullyQualifiedName}.ConvertToBaseSchemaType({sourceAccesor},{string.Join(",", logicalTypesValues)})");
+                    $"{customLogicalType.LogicalTypeFullyQualifiedName}.ConvertToBaseSchemaType({sourceAccesor}{(logicalTypesValues.Any() ? "," + string.Join(",", logicalTypesValues) : "")})");
             }
             else
             {

@@ -79,11 +79,11 @@ namespace DotNetAvroSerializer.Generators.SerializationGenerators
                     "date" => $"DateSchema.CanSerialize({sourceAccesor})",
                     "uuid" => $"UuidSchema.CanSerialize({sourceAccesor})",
                     "time-millis" => $"TimeMillisSchema.CanSerialize({sourceAccesor})",
-                    "timestamp-millis" => $"TimestampMilisSchema.CanSerialize({sourceAccesor})",
-                    "local-timestamp-milis" => $"TimestampMilisSchema.CanSerialize({sourceAccesor})",
+                    "timestamp-millis" => $"TimestampMillisSchema.CanSerialize({sourceAccesor})",
+                    "local-timestamp-millis" => $"TimestampMillisSchema.CanSerialize({sourceAccesor})",
                     "time-micros" => $"TimeMillisSchema.CanSerialize({sourceAccesor})",
-                    "timestamp-micros" => $"TimestampMilisSchema.CanSerialize({sourceAccesor})",
-                    "local-timestamp-micros" => $"TimestampMilisSchema.CanSerialize({sourceAccesor})",
+                    "timestamp-micros" => $"TimestampMillisSchema.CanSerialize({sourceAccesor})",
+                    "local-timestamp-micros" => $"TimestampMillisSchema.CanSerialize({sourceAccesor})",
                     _ when customLogicalTypes.Any(l => l.Name.Equals(logicalSchema.LogicalTypeName)) 
                         => GetCustomLogicalTypeCanSerializeCheck(logicalSchema, customLogicalTypes.First(l => l.Name.Equals(logicalSchema.LogicalTypeName)), sourceAccesor),
                     _ => GetCanSerializeCheck(logicalSchema.BaseSchema, sourceAccesor, customLogicalTypes)

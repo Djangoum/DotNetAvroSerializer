@@ -98,9 +98,9 @@ public class RealTypesTests
     [LogicalTypeName("regex-string")]
     public static class RegexStringLogicalType
     {
-        public static bool CanSerialize(object? value, [LogicalTypePropertyName("regex")]string regex) => value is string;
+        public static bool CanSerialize(object? value, [LogicalTypePropertyName("regex-wjfswaefaewf")]string regex) => value is string;
 
-        public static string ConvertToBaseSchemaType(string logicalTypeValue, [LogicalTypePropertyName("regex")]string regex)
+        public static string ConvertToBaseSchemaType(string logicalTypeValue, [LogicalTypePropertyName("regex-awefikawefawef")]string regexHola)
         {
           return logicalTypeValue;
         }

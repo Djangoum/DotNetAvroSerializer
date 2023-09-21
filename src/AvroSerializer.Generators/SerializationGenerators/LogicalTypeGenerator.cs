@@ -5,6 +5,7 @@ using DotNetAvroSerializer.Generators.Models;
 using Microsoft.CodeAnalysis;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 
@@ -49,7 +50,7 @@ namespace DotNetAvroSerializer.Generators.SerializationGenerators
 
                 var logicalTypesValues = customLogicalType.OrderedSchemaProperties.Select(logicalSchema.GetProperty).Where(v => v is not null);
 
-                if (logicalTypesValues.Count().Equals(customLogicalType.OrderedSchemaProperties.Count()))
+                if (!logicalTypesValues.Count().Equals(customLogicalType.OrderedSchemaProperties.Count()))
                     throw new AvroGeneratorException("Logical type properties could not be mapped");
                 
                 SerializationGenerator.GenerateSerializatonSourceForSchema(

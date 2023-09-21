@@ -100,7 +100,7 @@ public class RealTypesTests
     {
         public static bool CanSerialize(object? value, [LogicalTypePropertyName("regex")]string regex) => value is string;
 
-        public static object ConvertToBaseSchemaType(string logicalTypeValue, [LogicalTypePropertyName("regex")]string regex)
+        public static string ConvertToBaseSchemaType(string logicalTypeValue, [LogicalTypePropertyName("regex")]string regex)
         {
           return logicalTypeValue;
         }

@@ -17,11 +17,9 @@ namespace DotNetAvroSerializer.Generators.SerializationGenerators
             if (serializableTypeMetadata is null)
                 throw new AvroGeneratorException($"Logical type is not satisfied {serializableTypeMetadata}");
 
-            string serializerCallCode = default;
-
             if (serializableTypeMetadata is LogicalTypeSerializableTypeMetadata logicalTypeName)
             {
-                serializerCallCode = logicalSchema.LogicalType.Name switch
+                var serializerCallCode = logicalSchema.LogicalType.Name switch
                 {
                     "date" when logicalTypeName.TypeName.Equals("DateTime", StringComparison.InvariantCultureIgnoreCase)
                                || logicalTypeName.TypeName.Equals("DateOnly", StringComparison.InvariantCultureIgnoreCase) => $"DateSchema.Write(outputStream, {sourceAccesor});",
@@ -35,6 +33,16 @@ namespace DotNetAvroSerializer.Generators.SerializationGenerators
 
                     _ => null
                 };
+
+                if (serializerCallCode is not null)
+                {   // known logical type
+                    serializationCode.AppendLine(serializerCallCode);
+                }
+                else
+                {
+                    throw new AvroGeneratorException($"Logical type is not satisfied 2 {serializableTypeMetadata}");
+                    // custom logical type serialize base schema
+                }
             }
             else if (customLogicalTypes.Any(a => a.Name.Equals(logicalSchema.LogicalTypeName)))
             {
@@ -53,16 +61,6 @@ namespace DotNetAvroSerializer.Generators.SerializationGenerators
             else
             {
                 throw new AvroGeneratorException($"Logical type is not satisfied {serializableTypeMetadata}");
-            }
-
-            if (serializerCallCode is not null)
-            {   // known logical type
-                serializationCode.AppendLine(serializerCallCode);
-            }
-            else
-            {
-                throw new AvroGeneratorException($"Logical type is not satisfied 2 {serializableTypeMetadata}");
-                // custom logical type serialize base schema
             }
         }
     }

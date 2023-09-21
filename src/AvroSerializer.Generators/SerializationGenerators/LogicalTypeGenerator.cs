@@ -47,7 +47,7 @@ namespace DotNetAvroSerializer.Generators.SerializationGenerators
             {
                 var customLogicalType = customLogicalTypes.First(c => c.Name.Equals(logicalSchema.LogicalTypeName));
 
-                var logicalTypesValues = customLogicalType.OrderedSchemaProperties.Select(logicalSchema.GetProperty);
+                var logicalTypesValues = customLogicalType.OrderedSchemaProperties.Select(logicalSchema.GetProperty).Where(v => v is not null);
                 
                 SerializationGenerator.GenerateSerializatonSourceForSchema(
                     logicalSchema.BaseSchema,

@@ -61,7 +61,7 @@ namespace DotNetAvroSerializer.Generators.SerializationGenerators
             }
             else
             {
-                throw new AvroGeneratorException($"Logical type is not satisfied {serializableTypeMetadata}");
+                throw new AvroGeneratorException($"Logical type is not satisfied 2 {serializableTypeMetadata}");
                 // custom logical type serialize base schema
             }
         }

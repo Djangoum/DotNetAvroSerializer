@@ -66,8 +66,6 @@ namespace DotNetAvroSerializer.Generators.Write
 
         private static (SerializerMetadata serializerMetadata, EquatableArray<Diagnostic> errors) GetTargetDataForGeneration(GeneratorSyntaxContext ctx, CancellationToken ct)
         {
-            if (!Debugger.IsAttached) Debugger.Launch();
-
             var diagnostics = ImmutableArray<Diagnostic>.Empty;
             var serializerSyntax = ctx.Node as ClassDeclarationSyntax;
 
@@ -127,7 +125,6 @@ namespace DotNetAvroSerializer.Generators.Write
                 diagnostics = diagnostics.Add(Diagnostic.Create(DiagnosticsDescriptors.AvroSchemaIsNotValidDescriptor, serializerSyntax.GetLocation(), serializerSyntax.Identifier.ToString(), ex.Message));
                 return (null, diagnostics);
             }
-            if (!Debugger.IsAttached) Debugger.Launch();
 
             ct.ThrowIfCancellationRequested();
 
@@ -149,6 +146,9 @@ namespace DotNetAvroSerializer.Generators.Write
         
         private static (IEnumerable<CustomLogicalTypeMetadata> fullyQualifiedLogicalTypes, IEnumerable<Diagnostic> diagnostics) GetCustomLogicalTypesMetadata(ExpressionSyntax customLogicalTypesDeclarationExpression, ClassDeclarationSyntax serializerSymbol, GeneratorSyntaxContext ctx)
         {
+            if (customLogicalTypesDeclarationExpression is null)
+                return (Array.Empty<CustomLogicalTypeMetadata>(), Array.Empty<Diagnostic>());
+
             var customLogicalTypesArray = ctx
                 .SemanticModel
                 .GetOperation(customLogicalTypesDeclarationExpression)!

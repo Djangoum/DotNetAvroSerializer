@@ -204,9 +204,6 @@ namespace DotNetAvroSerializer.Write.Tests
         }
     }
 
-
-
-
     [AvroSchema(@"{ ""type"": [""long"", ""string""] }")]
     public partial class LongStringSerializer : AvroSerializer<Union<long, string>>
     {
@@ -245,6 +242,12 @@ namespace DotNetAvroSerializer.Write.Tests
 
     [AvroSchema(@"{ ""type"": [ ""int"", ""long"", ""null"" ] }")]
     public partial class IntLongNullSerializer : AvroSerializer<Union<int, long, Null>>
+    {
+
+    }
+
+    [AvroSchema(@"{ ""type"": [""int"", ""long""] }")]
+    public partial class IntegerLongSerializer : AvroSerializer<Union<int, long>>
     {
 
     }

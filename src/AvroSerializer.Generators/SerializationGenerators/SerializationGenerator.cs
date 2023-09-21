@@ -1,13 +1,15 @@
 ﻿using Avro;
 using DotNetAvroSerializer.Generators.Helpers;
 using DotNetAvroSerializer.Generators.Models;
+using System.Collections;
+using System.Collections.Generic;
 using System.Text;
 
 namespace DotNetAvroSerializer.Generators.SerializationGenerators
 {
     internal static class SerializationGenerator
     {
-        internal static void GenerateSerializatonSourceForSchema(Schema schema, StringBuilder serializationCode, PrivateFieldsCode privateFieldsCode, SerializableTypeMetadata serializableTypeMetadata, string sourceAccesor)
+        internal static void GenerateSerializatonSourceForSchema(Schema schema, StringBuilder serializationCode, PrivateFieldsCode privateFieldsCode, SerializableTypeMetadata serializableTypeMetadata, string sourceAccesor, IEnumerable<CustomLogicalTypeMetadata> customLogicalTypes)
         {
             switch (schema)
             {

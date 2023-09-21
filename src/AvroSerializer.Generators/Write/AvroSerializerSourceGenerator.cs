@@ -154,7 +154,9 @@ namespace DotNetAvroSerializer.Generators.Write
                 ?.ChildOperations
                 .Where(o => o.Kind == OperationKind.TypeOf)
                 .Select(o => (o as ITypeOfOperation)!.TypeOperand as INamedTypeSymbol);
-            
+
+            if (!Debugger.IsAttached) Debugger.Launch();
+
             var fullyQualifiedLogicalTypes = new List<CustomLogicalTypeMetadata>(customLogicalTypesArray.Count());
             var diagnosticsProduced = new List<Diagnostic>();
             
@@ -174,10 +176,10 @@ namespace DotNetAvroSerializer.Generators.Write
                              .GetMembers()
                              .Where(m => m.Kind == SymbolKind.Method)
                              .Cast<IMethodSymbol>()
-                             .Any(m => m.Name.Equals("CanSerialize") 
-                                       && m.ReturnType.Name.Equals("bool") 
+                             .Any(m => m.Name.Equals("CanSerialize", StringComparison.InvariantCultureIgnoreCase) 
+                                       && m.ReturnType.Name.Equals("Boolean", StringComparison.InvariantCultureIgnoreCase) 
                                        && m.Parameters.Count() == 1 
-                                       && m.Parameters.First().Type.Name.Equals("object")))
+                                       && m.Parameters.First().Type.Name.Equals("object", StringComparison.InvariantCultureIgnoreCase)))
                 {
                     diagnosticsProduced.Add(Diagnostic.Create(DiagnosticsDescriptors.LogicalTypeDoesNotHaveCanSerializeMethod, customLogicalTypeSymbol.Locations.First(), customLogicalTypeSymbol.Name));
                 }
@@ -185,8 +187,8 @@ namespace DotNetAvroSerializer.Generators.Write
                              .GetMembers()
                              .Where(m => m.Kind == SymbolKind.Method)
                              .Cast<IMethodSymbol>()
-                             .Any(m => m.Name.Equals("ConvertToBaseSchemaType")
-                                       && m.ReturnType.Name.Equals("object")
+                             .Any(m => m.Name.Equals("ConvertToBaseSchemaType", StringComparison.InvariantCultureIgnoreCase)
+                                       && m.ReturnType.Name.Equals("object", StringComparison.InvariantCultureIgnoreCase)
                                        && m.Parameters.Any()))
                 {
                     diagnosticsProduced.Add(Diagnostic.Create(DiagnosticsDescriptors.LogicalTypeDoesNotHaveConvertToBaseTypeMethod, customLogicalTypeSymbol.Locations.First(), customLogicalTypeSymbol.Name));
@@ -250,7 +252,7 @@ namespace DotNetAvroSerializer.Generators.Write
                 var serializatonCode = new StringBuilder();
                 var privateFieldsCode = new PrivateFieldsCode();
 
-                SerializationGenerator.GenerateSerializatonSourceForSchema(schema, serializatonCode, privateFieldsCode, serializerMetadata.SerializableTypeMetadata, sourceAccesor);
+                SerializationGenerator.GenerateSerializatonSourceForSchema(schema, serializatonCode, privateFieldsCode, serializerMetadata.SerializableTypeMetadata, sourceAccesor, serializerMetadata.CustomLogicalTypesMetadata);
 
                 return (serializatonCode.ToString(), privateFieldsCode.ToString(), null);
             }

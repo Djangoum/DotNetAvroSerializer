@@ -66,6 +66,8 @@ namespace DotNetAvroSerializer.Generators.Write
 
         private static (SerializerMetadata serializerMetadata, EquatableArray<Diagnostic> errors) GetTargetDataForGeneration(GeneratorSyntaxContext ctx, CancellationToken ct)
         {
+            if (!Debugger.IsAttached) Debugger.Launch();
+
             var diagnostics = ImmutableArray<Diagnostic>.Empty;
             var serializerSyntax = ctx.Node as ClassDeclarationSyntax;
 
@@ -125,6 +127,7 @@ namespace DotNetAvroSerializer.Generators.Write
                 diagnostics = diagnostics.Add(Diagnostic.Create(DiagnosticsDescriptors.AvroSchemaIsNotValidDescriptor, serializerSyntax.GetLocation(), serializerSyntax.Identifier.ToString(), ex.Message));
                 return (null, diagnostics);
             }
+            if (!Debugger.IsAttached) Debugger.Launch();
 
             ct.ThrowIfCancellationRequested();
 
@@ -155,8 +158,6 @@ namespace DotNetAvroSerializer.Generators.Write
                 .Where(o => o.Kind == OperationKind.TypeOf)
                 .Select(o => (o as ITypeOfOperation)!.TypeOperand as INamedTypeSymbol);
 
-            if (!Debugger.IsAttached) Debugger.Launch();
-
             var fullyQualifiedLogicalTypes = new List<CustomLogicalTypeMetadata>(customLogicalTypesArray.Count());
             var diagnosticsProduced = new List<Diagnostic>();
             
@@ -178,7 +179,7 @@ namespace DotNetAvroSerializer.Generators.Write
                              .Cast<IMethodSymbol>()
                              .Any(m => m.Name.Equals("CanSerialize", StringComparison.InvariantCultureIgnoreCase) 
                                        && m.ReturnType.Name.Equals("Boolean", StringComparison.InvariantCultureIgnoreCase) 
-                                       && m.Parameters.Count() == 1 
+                                       && m.Parameters.Any() 
                                        && m.Parameters.First().Type.Name.Equals("object", StringComparison.InvariantCultureIgnoreCase)))
                 {
                     diagnosticsProduced.Add(Diagnostic.Create(DiagnosticsDescriptors.LogicalTypeDoesNotHaveCanSerializeMethod, customLogicalTypeSymbol.Locations.First(), customLogicalTypeSymbol.Name));
@@ -188,7 +189,6 @@ namespace DotNetAvroSerializer.Generators.Write
                              .Where(m => m.Kind == SymbolKind.Method)
                              .Cast<IMethodSymbol>()
                              .Any(m => m.Name.Equals("ConvertToBaseSchemaType", StringComparison.InvariantCultureIgnoreCase)
-                                       && m.ReturnType.Name.Equals("object", StringComparison.InvariantCultureIgnoreCase)
                                        && m.Parameters.Any()))
                 {
                     diagnosticsProduced.Add(Diagnostic.Create(DiagnosticsDescriptors.LogicalTypeDoesNotHaveConvertToBaseTypeMethod, customLogicalTypeSymbol.Locations.First(), customLogicalTypeSymbol.Name));
@@ -201,9 +201,15 @@ namespace DotNetAvroSerializer.Generators.Write
                         .First(m => m.Name.Equals("ConvertToBaseSchemaType"))
                         .Parameters
                         .Skip(1);
-                    
+
+                    var logicalTypeName = customLogicalTypeSymbol.GetAttributes().First(a => a.AttributeClass
+                        .ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat).Equals(
+                            "global::DotNetAvroSerializer.LogicalTypeNameAttribute",
+                            StringComparison.InvariantCultureIgnoreCase)).ConstructorArguments.First().Value.ToString();
+
                     fullyQualifiedLogicalTypes.Add(new CustomLogicalTypeMetadata()
                     {
+                        Name = logicalTypeName,
                         LogicalTypeFullyQualifiedName = customLogicalTypeSymbol.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat),
                         OrderedSchemaProperties = convertToBaseTypeMethodParameters.Select(p =>
                         { 
@@ -218,12 +224,7 @@ namespace DotNetAvroSerializer.Generators.Write
                             return overridenName is not null ? overridenName.ToString() : p.Name;
                         })
                     });
-                    
-                    var logicalTypeName = customLogicalTypeSymbol.GetAttributes().First(a => a.AttributeClass
-                        .ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat).Equals(
-                            "global::DotNetAvroSerializer.LogicalTypeNameAttribute",
-                            StringComparison.InvariantCultureIgnoreCase)).ConstructorArguments.First().Value.ToString();
-                    
+
                     LogicalTypeFactory.Instance.Register(new CustomLogicalType(logicalTypeName));
                 }
             }

@@ -21,7 +21,7 @@ namespace DotNetAvroSerializer.Generators.SerializationGenerators
                 {
                     var unionTypeSerializableTypeMetadata = unionSerializableTypeMetadata.UnionTypes.ElementAt(unionSchemaIndex);
 
-                    var canSerializedCheck = GetCanSerializeCheck(schema, $"{sourceAccesor}.GetUnionValue()", unionTypeSerializableTypeMetadata.FullNameDisplay);
+                    var canSerializedCheck = GetCanSerializeCheck(schema, $"{sourceAccesor}.GetUnionValue()", customLogicalTypes, unionTypeSerializableTypeMetadata.FullNameDisplay);
 
                     if (unionSchemaIndex == 0)
                     {
@@ -38,7 +38,7 @@ namespace DotNetAvroSerializer.Generators.SerializationGenerators
                 }
                 else if (originTypeSymbol is NullableSerializableTypeMetadata nullableSeralizableTypeMetadata)
                 {
-                    var canSerializedCheck = GetCanSerializeCheck(schema, sourceAccesor);
+                    var canSerializedCheck = GetCanSerializeCheck(schema, sourceAccesor, customLogicalTypes);
 
                     if (unionSchemaIndex == 0)
                     {
@@ -58,7 +58,7 @@ namespace DotNetAvroSerializer.Generators.SerializationGenerators
             }
         }
 
-        private static string GetCanSerializeCheck(Schema schema, string sourceAccesor, string typeFullName = null)
+        private static string GetCanSerializeCheck(Schema schema, string sourceAccesor, IEnumerable<CustomLogicalTypeMetadata> customLogicalTypes, string typeFullName = null)
         {
             return schema switch
             {
@@ -84,8 +84,9 @@ namespace DotNetAvroSerializer.Generators.SerializationGenerators
                     "time-micros" => $"TimeMillisSchema.CanSerialize({sourceAccesor})",
                     "timestamp-micros" => $"TimestampMilisSchema.CanSerialize({sourceAccesor})",
                     "local-timestamp-micros" => $"TimestampMilisSchema.CanSerialize({sourceAccesor})",
-
-                    _ => GetCanSerializeCheck(logicalSchema.BaseSchema, sourceAccesor)
+                    _ when customLogicalTypes.Any(l => l.Name.Equals(logicalSchema.LogicalTypeName)) 
+                        => GetCustomLogicalTypeCanSerializeCheck(logicalSchema, customLogicalTypes.First(l => l.Name.Equals(logicalSchema.LogicalTypeName)), sourceAccesor),
+                    _ => GetCanSerializeCheck(logicalSchema.BaseSchema, sourceAccesor, customLogicalTypes)
                 },
                 RecordSchema => $"RecordSchema.CanSerialize<{typeFullName}>({sourceAccesor})",
                 ArraySchema => $"ArraySchema.CanSerialize({sourceAccesor})",
@@ -94,6 +95,12 @@ namespace DotNetAvroSerializer.Generators.SerializationGenerators
                 UnionSchema => throw new AvroGeneratorException("Unions cannot hold directly unions"),
                 _ => null
             };
+        }
+
+        private static string GetCustomLogicalTypeCanSerializeCheck(LogicalSchema logicalSchema, CustomLogicalTypeMetadata logicalTypeMetadata, string sourceAccessor)
+        {
+            var logicalTypesProperties = logicalTypeMetadata.OrderedSchemaProperties.Select(p => logicalSchema.GetProperty(p));
+            return $"{logicalTypeMetadata.LogicalTypeFullyQualifiedName}.CanSerialize({sourceAccessor}, {string.Join(",", logicalTypesProperties)})";
         }
     }
 }

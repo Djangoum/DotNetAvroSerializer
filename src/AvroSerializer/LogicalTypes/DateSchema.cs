@@ -11,7 +11,6 @@ namespace DotNetAvroSerializer.LogicalTypes
 
         public static bool CanSerialize(object? value) => value is DateOnly;
 
-
         public static void Write(Stream outputStream, DateOnly? value)
         {
             if (value is null)

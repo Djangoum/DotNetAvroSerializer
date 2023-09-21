@@ -2,7 +2,6 @@ namespace DotNetAvroSerializer.Write.Tests;
 
 public class RealTypesTests
 {
-    
     [AvroSchema(@"{
       ""type"": ""record"",
       ""name"": ""UserPromotionLoyaltyView"",
@@ -78,11 +77,14 @@ public class RealTypesTests
                   },
                   {
                     ""name"": ""ActionLocation"",
-                    ""type"": {
-                      ""logicalType"": ""regex-string"",
-                      ""type"": ""string"",
-                      ""regex"": "".+""
-                    }
+                    ""type"": [
+                      ""null"",
+                      {
+                        ""logicalType"": ""regex-string"",
+                        ""type"": ""string"",
+                        ""regex"": "".+""
+                      }
+                    ]
                   }
               ]
             }
@@ -98,9 +100,9 @@ public class RealTypesTests
     [LogicalTypeName("regex-string")]
     public static class RegexStringLogicalType
     {
-        public static bool CanSerialize(object? value, [LogicalTypePropertyName("regex-wjfswaefaewf")]string regex) => value is string;
+        public static bool CanSerialize(object? value, [LogicalTypePropertyName("regex")]string regex) => value is string;
 
-        public static string ConvertToBaseSchemaType(string logicalTypeValue, [LogicalTypePropertyName("regex-awefikawefawef")]string regexHola)
+        public static string ConvertToBaseSchemaType(string logicalTypeValue, [LogicalTypePropertyName("regex")]string regex)
         {
           return logicalTypeValue;
         }
@@ -121,7 +123,6 @@ public class RealTypesTests
       public Guid PromotionId { get; set; }
       public required string Channel { get; set; }
       public bool IsActivable { get; set; }
-      public required string ActionLocation { get; set; }
+      public Union<Null, string> ActionLocation { get; set; }
     }
-
 }

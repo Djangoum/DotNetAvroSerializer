@@ -99,8 +99,11 @@ namespace DotNetAvroSerializer.Generators.SerializationGenerators
 
         private static string GetCustomLogicalTypeCanSerializeCheck(LogicalSchema logicalSchema, CustomLogicalTypeMetadata logicalTypeMetadata, string sourceAccessor)
         {
-            var logicalTypesProperties = logicalTypeMetadata.OrderedSchemaProperties.Select(p => logicalSchema.GetProperty(p));
-            return $"{logicalTypeMetadata.LogicalTypeFullyQualifiedName}.CanSerialize({sourceAccessor}, {string.Join(",", logicalTypesProperties)})";
+            var logicalTypesProperties = logicalTypeMetadata.OrderedSchemaProperties.Select(logicalSchema.GetProperty).Where(v => v is not null);
+            if (logicalTypesProperties.Count().Equals(logicalTypeMetadata.OrderedSchemaProperties.Count()))
+                throw new AvroGeneratorException("Logical type properties could not be mapped");
+            
+            return $"{logicalTypeMetadata.LogicalTypeFullyQualifiedName}.CanSerialize({sourceAccessor}{(logicalTypesProperties.Any() ? "," + string.Join(",", logicalTypesProperties) : "")})";
         }
     }
 }

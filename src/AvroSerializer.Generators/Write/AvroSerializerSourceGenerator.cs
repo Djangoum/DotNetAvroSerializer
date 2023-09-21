@@ -245,16 +245,16 @@ namespace DotNetAvroSerializer.Generators.Write
             return symbol;
         }
 
-        private (string serializationCode, string privateFieldsCode, Diagnostic diagnostic) SerializationCodeGeneratorLoop(SerializerMetadata serializerMetadata, Schema schema, string sourceAccesor = "source")
+        private (string serializationCode, string privateFieldsCode, Diagnostic diagnostic) SerializationCodeGeneratorLoop(SerializerMetadata serializerMetadata, Schema schema, string sourceAccessor = "source")
         {
             try
             {
-                var serializatonCode = new StringBuilder();
+                var serializationCode = new StringBuilder();
                 var privateFieldsCode = new PrivateFieldsCode();
 
-                SerializationGenerator.GenerateSerializatonSourceForSchema(schema, serializatonCode, privateFieldsCode, serializerMetadata.SerializableTypeMetadata, sourceAccesor, serializerMetadata.CustomLogicalTypesMetadata);
+                SerializationGenerator.GenerateSerializatonSourceForSchema(schema, serializationCode, privateFieldsCode, serializerMetadata.SerializableTypeMetadata, serializerMetadata.CustomLogicalTypesMetadata, sourceAccessor);
 
-                return (serializatonCode.ToString(), privateFieldsCode.ToString(), null);
+                return (serializationCode.ToString(), privateFieldsCode.ToString(), null);
             }
             catch (AvroGeneratorException ex)
             {

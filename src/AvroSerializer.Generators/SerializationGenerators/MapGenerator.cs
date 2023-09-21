@@ -3,6 +3,7 @@ using DotNetAvroSerializer.Generators.Exceptions;
 using DotNetAvroSerializer.Generators.Helpers;
 using DotNetAvroSerializer.Generators.Models;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
@@ -10,7 +11,7 @@ namespace DotNetAvroSerializer.Generators.SerializationGenerators
 {
     internal static class MapGenerator
     {
-        internal static void GenerateSerializationSourceFoMap(MapSchema schema, StringBuilder serializationCode, PrivateFieldsCode privateFieldsCode, SerializableTypeMetadata dictionarySymbol, string sourceAccesor)
+        internal static void GenerateSerializationSourceFoMap(MapSchema schema, StringBuilder serializationCode, PrivateFieldsCode privateFieldsCode, SerializableTypeMetadata dictionarySymbol, IEnumerable<CustomLogicalTypeMetadata> customLogicalTypes, string sourceAccesor)
         {
             if (dictionarySymbol is null || dictionarySymbol is not DictionarySerializableTypeMetadata dictonaryTypeMetadata)
                 throw new AvroGeneratorException($"Type for map schema was not satisfied. Maps must implement IDictionary but {dictionarySymbol} found");
@@ -23,7 +24,7 @@ namespace DotNetAvroSerializer.Generators.SerializationGenerators
             serializationCode.AppendLine("{");
 
             serializationCode.AppendLine($@"StringSchema.Write(outputStream, item{VariableNamesHelpers.RemoveSpecialCharacters(sourceAccesor)}.Key);");
-            SerializationGenerator.GenerateSerializatonSourceForSchema(schema.ValueSchema, serializationCode, privateFieldsCode, dictonaryTypeMetadata.ValuesMetadata, $"item{VariableNamesHelpers.RemoveSpecialCharacters(sourceAccesor)}.Value");
+            SerializationGenerator.GenerateSerializatonSourceForSchema(schema.ValueSchema, serializationCode, privateFieldsCode, dictonaryTypeMetadata.ValuesMetadata, customLogicalTypes, $"item{VariableNamesHelpers.RemoveSpecialCharacters(sourceAccesor)}.Value");
 
             serializationCode.AppendLine("}");
             serializationCode.AppendLine("LongSchema.Write(outputStream, 0L);");

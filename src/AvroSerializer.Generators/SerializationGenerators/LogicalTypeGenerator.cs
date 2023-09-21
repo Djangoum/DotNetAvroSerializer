@@ -4,13 +4,14 @@ using DotNetAvroSerializer.Generators.Helpers;
 using DotNetAvroSerializer.Generators.Models;
 using Microsoft.CodeAnalysis;
 using System;
+using System.Collections.Generic;
 using System.Text;
 
 namespace DotNetAvroSerializer.Generators.SerializationGenerators
 {
     internal static class LogicalTypeGenerator
     {
-        internal static void GenerateSerializationSourceForLogicalType(LogicalSchema logicalSchema, StringBuilder serializationCode, PrivateFieldsCode privateFieldsCode, SerializableTypeMetadata serializableTypeMetadata, string sourceAccesor)
+        internal static void GenerateSerializationSourceForLogicalType(LogicalSchema logicalSchema, StringBuilder serializationCode, PrivateFieldsCode privateFieldsCode, SerializableTypeMetadata serializableTypeMetadata, IEnumerable<CustomLogicalTypeMetadata> customLogicalTypes, string sourceAccesor)
         {
             if (serializableTypeMetadata is null || serializableTypeMetadata is not LogicalTypeSerializableTypeMetadata logicalTypeSerializableTypeMetadata)
                 throw new AvroGeneratorException($"Logical type is not satisfied {serializableTypeMetadata}");
@@ -37,7 +38,7 @@ namespace DotNetAvroSerializer.Generators.SerializationGenerators
             else
             {
                 // custom logical type serialize base schema
-                SerializationGenerator.GenerateSerializatonSourceForSchema(logicalSchema.BaseSchema, serializationCode, privateFieldsCode, serializableTypeMetadata, sourceAccesor);
+                SerializationGenerator.GenerateSerializatonSourceForSchema(logicalSchema.BaseSchema, serializationCode, privateFieldsCode, serializableTypeMetadata, customLogicalTypes, sourceAccesor);
             }
         }
     }

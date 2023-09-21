@@ -1,4 +1,5 @@
-﻿using Avro;
+﻿using System.Collections.Generic;
+using Avro;
 using DotNetAvroSerializer.Generators.Exceptions;
 using DotNetAvroSerializer.Generators.Helpers;
 using DotNetAvroSerializer.Generators.Models;
@@ -8,7 +9,7 @@ namespace DotNetAvroSerializer.Generators.SerializationGenerators
 {
     internal static class ArrayGenerator
     {
-        internal static void GenerateSerializationSourceForArray(ArraySchema schema, StringBuilder serializationCode, PrivateFieldsCode privateFieldsCode, SerializableTypeMetadata serializableType, string sourceAccesor)
+        internal static void GenerateSerializationSourceForArray(ArraySchema schema, StringBuilder serializationCode, PrivateFieldsCode privateFieldsCode, SerializableTypeMetadata serializableType, IEnumerable<CustomLogicalTypeMetadata> customLogicalTypes, string sourceAccesor)
         {
             if (serializableType is null || serializableType is not IterableSerializableTypeMetadata iterableSerializableTypeMetadata)
                 throw new AvroGeneratorException($"Array type for {schema.Name} is not satisfied {serializableType.GetType().Name} provided, arrays must be arrays or anything that implements IEnumerable");
@@ -17,7 +18,7 @@ namespace DotNetAvroSerializer.Generators.SerializationGenerators
             serializationCode.AppendLine($@"foreach(var item{VariableNamesHelpers.RemoveSpecialCharacters(sourceAccesor)} in {sourceAccesor})");
             serializationCode.AppendLine("{");
 
-            SerializationGenerator.GenerateSerializatonSourceForSchema(schema.ItemSchema, serializationCode, privateFieldsCode, iterableSerializableTypeMetadata.ItemsTypeMetadata, $"item{VariableNamesHelpers.RemoveSpecialCharacters(sourceAccesor)}");
+            SerializationGenerator.GenerateSerializatonSourceForSchema(schema.ItemSchema, serializationCode, privateFieldsCode, iterableSerializableTypeMetadata.ItemsTypeMetadata, customLogicalTypes, $"item{VariableNamesHelpers.RemoveSpecialCharacters(sourceAccesor)}");
 
             serializationCode.AppendLine("}");
             serializationCode.AppendLine(@$"LongSchema.Write(outputStream, 0L);");

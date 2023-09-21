@@ -3,6 +3,7 @@ using DotNetAvroSerializer.Generators.Exceptions;
 using DotNetAvroSerializer.Generators.Helpers;
 using DotNetAvroSerializer.Generators.Models;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
@@ -10,7 +11,7 @@ namespace DotNetAvroSerializer.Generators.SerializationGenerators
 {
     internal static class UnionGenerator
     {
-        internal static void GenerateSerializationSourceForUnion(UnionSchema unionSchema, StringBuilder serializationCode, PrivateFieldsCode privateFieldsCode, SerializableTypeMetadata originTypeSymbol, string sourceAccesor)
+        internal static void GenerateSerializationSourceForUnion(UnionSchema unionSchema, StringBuilder serializationCode, PrivateFieldsCode privateFieldsCode, SerializableTypeMetadata originTypeSymbol, IEnumerable<CustomLogicalTypeMetadata> customLogicalTypes, string sourceAccesor)
         {
             foreach (var schema in unionSchema.Schemas)
             {
@@ -33,7 +34,7 @@ namespace DotNetAvroSerializer.Generators.SerializationGenerators
 
                     serializationCode.AppendLine($"IntSchema.Write(outputStream, {unionSchemaIndex});");
 
-                    SerializationGenerator.GenerateSerializatonSourceForSchema(schema, serializationCode, privateFieldsCode, unionTypeSerializableTypeMetadata, $"(({unionTypeSerializableTypeMetadata.FullNameDisplay}){sourceAccesor})");
+                    SerializationGenerator.GenerateSerializatonSourceForSchema(schema, serializationCode, privateFieldsCode, unionTypeSerializableTypeMetadata, customLogicalTypes, $"(({unionTypeSerializableTypeMetadata.FullNameDisplay}){sourceAccesor})");
                 }
                 else if (originTypeSymbol is NullableSerializableTypeMetadata nullableSeralizableTypeMetadata)
                 {
@@ -50,7 +51,7 @@ namespace DotNetAvroSerializer.Generators.SerializationGenerators
 
                     serializationCode.AppendLine($"IntSchema.Write(outputStream, {unionSchemaIndex});");
 
-                    SerializationGenerator.GenerateSerializatonSourceForSchema(schema, serializationCode, privateFieldsCode, nullableSeralizableTypeMetadata.InnerNullableTypeSymbol, sourceAccesor);
+                    SerializationGenerator.GenerateSerializatonSourceForSchema(schema, serializationCode, privateFieldsCode, nullableSeralizableTypeMetadata.InnerNullableTypeSymbol, customLogicalTypes, sourceAccesor);
                 }
 
                 serializationCode.AppendLine("}");

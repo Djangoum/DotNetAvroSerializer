@@ -43,18 +43,20 @@ public static class CustomLogicalTypesMetadataProcessor
             }
             else
             {
-                var convertToBaseTypeMethodParameters = GetConvertToBaseTypeMethodParameters(customLogicalTypeSymbol);
+                var convertToBaseTypeMethodParameters = GetConvertToBaseTypeMethodParameters(customLogicalTypeSymbol, "ConvertToBaseSchemaType");
+                var canSerializeMethodParameters = GetConvertToBaseTypeMethodParameters(customLogicalTypeSymbol, "CanSerialize");
 
                 var logicalTypeName = ExtractLogicalTypeNameFromAttribute(customLogicalTypeSymbol);
 
                 fullyQualifiedLogicalTypes.Add(new CustomLogicalTypeMetadata(
                     logicalTypeName,
                     customLogicalTypeSymbol.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat),
-                    convertToBaseTypeMethodParameters
+                    convertToBaseTypeMethodParameters,
+                    canSerializeMethodParameters
                 ));
             };
         }
-        
+
         return (fullyQualifiedLogicalTypes, diagnosticsProduced);
     }
 
@@ -63,11 +65,11 @@ public static class CustomLogicalTypesMetadataProcessor
             a.AttributeClass.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat).Equals("global::DotNetAvroSerializer.LogicalTypeNameAttribute",
                 StringComparison.InvariantCultureIgnoreCase));
 
-    private static IEnumerable<IParameterSymbol> GetConvertToBaseTypeMethodParameters(INamedTypeSymbol customLogicalTypeSymbol) =>
+    private static IEnumerable<IParameterSymbol> GetConvertToBaseTypeMethodParameters(INamedTypeSymbol customLogicalTypeSymbol, string methodName) =>
         customLogicalTypeSymbol.GetMembers()
             .Where(m => m.Kind == SymbolKind.Method)
             .Cast<IMethodSymbol>()
-            .First(m => m.Name.Equals("ConvertToBaseSchemaType"))
+            .First(m => m.Name.Equals(methodName))
             .Parameters
             .Skip(1);
 

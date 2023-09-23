@@ -8,11 +8,24 @@ namespace DotNetAvroSerializer.Generators.Models;
 
 public class CustomLogicalTypeMetadata
 {
-    public CustomLogicalTypeMetadata(string name, string logicalTypeFullyQualifiedName, IEnumerable<IParameterSymbol> orderedSchemaProperties)
+    public CustomLogicalTypeMetadata(string name, string logicalTypeFullyQualifiedName, IEnumerable<IParameterSymbol> orderedConvertToBaseTypeParameters, IEnumerable<IParameterSymbol> canSerializeOrderedParameters)
     {
         Name = name;
         LogicalTypeFullyQualifiedName = logicalTypeFullyQualifiedName;
-        OrderedSchemaProperties = orderedSchemaProperties.Select(p =>
+        OrderedSchemaPropertiesConvertToBaseType = orderedConvertToBaseTypeParameters.Select(p =>
+        {
+            var overridenName = p
+                .GetAttributes()
+                .FirstOrDefault(a => a
+                    .AttributeClass.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat)
+                    .Equals("global::DotNetAvroSerializer.LogicalTypePropertyNameAttribute"))?
+                .ConstructorArguments.First()
+                .Value;
+
+            return overridenName is not null ? overridenName.ToString() : p.Name;
+        });
+        
+        OrderedSchemaPropertiesCanSerialize = canSerializeOrderedParameters.Select(p =>
         {
             var overridenName = p
                 .GetAttributes()
@@ -30,5 +43,6 @@ public class CustomLogicalTypeMetadata
 
     public string Name { get; set; }
     public string LogicalTypeFullyQualifiedName { get; set; }
-    public IEnumerable<string> OrderedSchemaProperties { get; set; }
+    public IEnumerable<string> OrderedSchemaPropertiesConvertToBaseType { get; set; }
+    public IEnumerable<string> OrderedSchemaPropertiesCanSerialize { get; set; }
 }

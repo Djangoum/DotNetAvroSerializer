@@ -48,9 +48,9 @@ namespace DotNetAvroSerializer.Generators.SerializationGenerators
             {
                 var customLogicalType = customLogicalTypes.First(c => c.Name.Equals(logicalSchema.LogicalTypeName));
 
-                var logicalTypesValues = customLogicalType.OrderedSchemaProperties.Select(logicalSchema.GetProperty).Where(v => v is not null);
+                var logicalTypesValues = customLogicalType.OrderedSchemaPropertiesConvertToBaseType.Select(logicalSchema.GetProperty).Where(v => v is not null);
 
-                if (!logicalTypesValues.Count().Equals(customLogicalType.OrderedSchemaProperties.Count()))
+                if (!logicalTypesValues.Count().Equals(customLogicalType.OrderedSchemaPropertiesConvertToBaseType.Count()))
                     throw new AvroGeneratorException("Logical type properties could not be mapped");
 
                 if (logicalSchema.BaseSchema is not PrimitiveSchema)

@@ -26,8 +26,7 @@ namespace DotNetAvroSerializer.Generators.SerializationGenerators
                             || primitiveTypeMetadata.TypeName.Equals("Int64", StringComparison.InvariantCultureIgnoreCase)) => $"LongSchema.Write(outputStream, {sourceAccesor});",
                 "string" when serializableTypeMetadata is PrimitiveSerializableTypeMetadata primitiveTypeMetadata
                             && (primitiveTypeMetadata.TypeName.Equals("string", StringComparison.InvariantCultureIgnoreCase)) => $"StringSchema.Write(outputStream, {sourceAccesor});",
-                "bytes" when serializableTypeMetadata is IterableSerializableTypeMetadata iterableTypeMetadata
-                            && iterableTypeMetadata.ItemsTypeMetadata is PrimitiveSerializableTypeMetadata primitiveTypeMetadata 
+                "bytes" when serializableTypeMetadata is IterableSerializableTypeMetadata { ItemsTypeMetadata: PrimitiveSerializableTypeMetadata primitiveTypeMetadata }
                             && primitiveTypeMetadata.TypeName.Equals("byte", StringComparison.InvariantCultureIgnoreCase) => $"BytesSchema.Write(outputStream, {sourceAccesor});",
                 "double" when serializableTypeMetadata is PrimitiveSerializableTypeMetadata primitiveTypeMetadata
                             && primitiveTypeMetadata.TypeName.Equals("double", StringComparison.InvariantCultureIgnoreCase) => $"DoubleSchema.Write(outputStream, {sourceAccesor});",

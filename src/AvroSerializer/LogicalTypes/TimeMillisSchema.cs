@@ -7,8 +7,8 @@ namespace DotNetAvroSerializer.LogicalTypes
 {
     public static class TimeMillisSchema
     {
-        internal static readonly TimeOnly MaxTime = new TimeOnly(23, 59, 59);
-        internal static TimeOnly UnixEpochTime = new TimeOnly(0, 0, 0);
+        private static readonly TimeOnly MaxTime = new TimeOnly(23, 59, 59);
+        private static TimeOnly UnixEpochTime = new TimeOnly(0, 0, 0);
 
         public static bool CanSerialize(object? value) => value is TimeOnly;
 

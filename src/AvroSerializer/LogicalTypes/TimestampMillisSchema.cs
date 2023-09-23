@@ -5,7 +5,7 @@ using System.IO;
 
 namespace DotNetAvroSerializer.LogicalTypes
 {
-    public static class TimestampMilisSchema
+    public static class TimestampMillisSchema
     {
         static DateTime UnixEpochDateTime = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
 

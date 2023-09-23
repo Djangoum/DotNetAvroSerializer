@@ -30,115 +30,115 @@ namespace DotNetAvroSerializer.Write.Tests
         public static IEnumerable<object[]> RecordsUnionTestData =>
             new List<object[]>
             {
-                new object[] { 
-                    new UnionSideOne
-                    {
-                        Name = "name",
-                        Id = 1,
-                    },
-                    null!,
-                    "0002086E616D65"
-                },
-                new object[] {
-                    null!,
-                    new UnionSideTwo
-                    {
-                        SecondName = "name",
-                        Identifier = 1
-                    },
-                    "0202086E616D65"
-                }
+                 new object[] {
+                     new UnionSideOne
+                     {
+                         Name = "name",
+                         Id = 1,
+                     },
+                     null!,
+                     "0002086E616D65"
+                 },
+                 new object[] {
+                     null!,
+                     new UnionSideTwo
+                     {
+                         SecondName = "name",
+                         Identifier = 1
+                     },
+                     "0202086E616D65"
+                 }
             };
     }
 
     [AvroSchema(@"{
-        ""type"": [
-            {
-                ""type"": ""record"",
-                ""name"" : ""unionSideOne"",
-                ""fields"": [
-                    {
-                        ""name"": ""id"",
-                        ""type"": ""int""
-                    },
-                    {
-                        ""name"": ""name"",
-                        ""type"": ""string""
-                    }
-                ]
-            },
-            {
-                ""type"": ""record"",
-                ""name"": ""unionSideTwo"",
-                ""fields"": [
-                    {
-                        ""name"": ""identifier"",
-                        ""type"": ""int""
-                    },
-                    {
-                        ""name"": ""SecondName"",
-                        ""type"": ""string""
-                    }
-                ]
-            }
-        ]
-    }")]
+         ""type"": [
+             {
+                 ""type"": ""record"",
+                 ""name"" : ""unionSideOne"",
+                 ""fields"": [
+                     {
+                         ""name"": ""id"",
+                         ""type"": ""int""
+                     },
+                     {
+                         ""name"": ""name"",
+                         ""type"": ""string""
+                     }
+                 ]
+             },
+             {
+                 ""type"": ""record"",
+                 ""name"": ""unionSideTwo"",
+                 ""fields"": [
+                     {
+                         ""name"": ""identifier"",
+                         ""type"": ""int""
+                     },
+                     {
+                         ""name"": ""SecondName"",
+                         ""type"": ""string""
+                     }
+                 ]
+             }
+         ]
+     }")]
     public partial class RecordsUnionSerializer : AvroSerializer<Union<UnionSideOne, UnionSideTwo>>
     {
 
     }
 
     [AvroSchema(@"{
-        ""type"": [
-            {
-                ""type"": ""array"",
-                ""items"": ""int""
-            },
-            {
-                ""type"": ""record"",
-                ""name"" : ""unionSideOne"",
-                ""fields"": [
-                    {
-                        ""name"": ""id"",
-                        ""type"": ""int""
-                    },
-                    {
-                        ""name"": ""name"",
-                        ""type"": ""string""
-                    }
-                ]
-            }
-        ]
-    }")]
+         ""type"": [
+             {
+                 ""type"": ""array"",
+                 ""items"": ""int""
+             },
+             {
+                 ""type"": ""record"",
+                 ""name"" : ""unionSideOne"",
+                 ""fields"": [
+                     {
+                         ""name"": ""id"",
+                         ""type"": ""int""
+                     },
+                     {
+                         ""name"": ""name"",
+                         ""type"": ""string""
+                     }
+                 ]
+             }
+         ]
+     }")]
     public partial class ArrayRecordUnionSerializer : AvroSerializer<Union<int[], UnionSideOne>>
     {
 
     }
 
     [AvroSchema(@"{
-        ""type"": [
-            {
-                ""type"": ""array"",
-                ""items"": {
-                    ""type"": ""record"",
-                    ""name"": ""unionSideTwo"",
-                    ""fields"": [
-                        {
-                            ""name"": ""id"",
-                            ""type"": ""int""
-                        },
-                        {
-                            ""name"": ""name"",
-                            ""type"": ""string""
-                        }
-                    ]
-                }
-            },
-            {
-                ""type"": ""long""
-            }
-        ]
-    }")]
+         ""type"": [
+             {
+                 ""type"": ""array"",
+                 ""items"": {
+                     ""type"": ""record"",
+                     ""name"": ""unionSideTwo"",
+                     ""fields"": [
+                         {
+                             ""name"": ""id"",
+                             ""type"": ""int""
+                         },
+                         {
+                             ""name"": ""name"",
+                             ""type"": ""string""
+                         }
+                     ]
+                 }
+             },
+             {
+                 ""type"": ""long""
+             }
+         ]
+     }")]
     public partial class ArrayRecordArrayLong : AvroSerializer<Union<UnionSideOne[], long>>
     {
 

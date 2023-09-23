@@ -62,8 +62,8 @@ namespace DotNetAvroSerializer.Write.Tests
         public static IEnumerable<object[]> SerializeTimestampData =>
             new List<object[]>
             {
-                new object[] { null!, "00" },
-                new object[] { new DateTime(2023, 01, 02, 15, 36, 55, DateTimeKind.Utc), "02B0A787B2AE61" }
+                 new object[] { null!, "00" },
+                 new object[] { new DateTime(2023, 01, 02, 15, 36, 55, DateTimeKind.Utc), "02B0A787B2AE61" }
             };
     }
 

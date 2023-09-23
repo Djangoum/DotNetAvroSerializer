@@ -8,10 +8,14 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using System;
+using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading;
+using Avro.Util;
+using Microsoft.CodeAnalysis.Operations;
 
 namespace DotNetAvroSerializer.Generators.Write
 {
@@ -39,17 +43,17 @@ namespace DotNetAvroSerializer.Generators.Write
                 ctx.ReportDiagnostic(error);
             });
 
-            context.RegisterSourceOutput(validSerializers, (context, serializerData) =>
+            context.RegisterSourceOutput(validSerializers, (ctx, serializerData) =>
             {
                 var (serializationCode, privateFieldsCode, diagnostic) = SerializationCodeGeneratorLoop(serializerData, serializerData.AvroSchema);
 
                 if (diagnostic is not null)
                 {
-                    context.ReportDiagnostic(diagnostic);
+                    ctx.ReportDiagnostic(diagnostic);
                 }
                 else
                 {
-                    context.AddSource($"{serializerData.SerializerClassName}.write.g.cs", 
+                    ctx.AddSource($"{serializerData.SerializerClassName}.write.g.cs", 
                         GetGeneratedSerializationSource(
                             serializerData.SerializerNamespace, 
                             serializerData.SerializerClassName,
@@ -86,15 +90,25 @@ namespace DotNetAvroSerializer.Generators.Write
             }
 
             var attributeSchemaText = attribute.ArgumentList?.Arguments.First()?.Expression;
+            var customLogicalTypes = attribute.ArgumentList?.Arguments.Count > 1
+                ? attribute.ArgumentList.Arguments.ElementAt(1).Expression
+                : null;
+
+            var (customLogicalTypeNames, logicalTypesDiagnostics) = CustomLogicalTypesMetadataProcessor.GetCustomLogicalTypesMetadata(customLogicalTypes, serializerSyntax, ctx);
+
+            if (logicalTypesDiagnostics.Any())
+            {
+                diagnostics = diagnostics.AddRange(logicalTypesDiagnostics);
+                return (null, diagnostics);
+            }
 
             var schemaString = ctx
                 .SemanticModel
-                .GetConstantValue(attributeSchemaText)
-                .ToString();
+                .GetConstantValue(attributeSchemaText);
 
             ct.ThrowIfCancellationRequested();
 
-            if (schemaString is null || attributeSchemaText is null)
+            if (!schemaString.HasValue)
             {
                 diagnostics = diagnostics.Add(Diagnostic.Create(DiagnosticsDescriptors.MissingSchemaInAvroSchemaAttributeDescriptor, serializerSyntax.GetLocation(), serializerSyntax.Identifier.ToString()));
                 return (null, diagnostics);
@@ -104,7 +118,7 @@ namespace DotNetAvroSerializer.Generators.Write
 
             try
             {
-                schema = Schema.Parse(schemaString);
+                schema = Schema.Parse(schemaString.ToString());
             }
             catch (Exception ex)
             {
@@ -125,11 +139,14 @@ namespace DotNetAvroSerializer.Generators.Write
 
             ct.ThrowIfCancellationRequested();
 
-            return (
-                new SerializerMetadata(serializerSyntax.Identifier.ToString(),
-                    Namespaces.GetNamespace(serializerSyntax), schema, serializableTypeMetadata), diagnostics);
+            var serializerMetadata = new SerializerMetadata(serializerSyntax.Identifier.ToString(),
+                Namespaces.GetNamespace(serializerSyntax), schema, serializableTypeMetadata, customLogicalTypeNames);
+            
+            serializerMetadata.ExtractLocation(serializerSyntax.GetLocation());
+            
+            return (serializerMetadata, diagnostics);
         }
-
+        
         private static ITypeSymbol GetSerializableTypeSymbol(ClassDeclarationSyntax serializerSyntax, GeneratorSyntaxContext ctx)
         {
             var serializerGenericArgument = ((GenericNameSyntax)serializerSyntax.BaseList.Types.First().Type).TypeArgumentList.Arguments.First();
@@ -144,20 +161,20 @@ namespace DotNetAvroSerializer.Generators.Write
             return symbol;
         }
 
-        private (string serializationCode, string privateFieldsCode, Diagnostic diagnostic) SerializationCodeGeneratorLoop(SerializerMetadata serializerMetadata, Schema schema, string sourceAccesor = "source")
+        private (string serializationCode, string privateFieldsCode, Diagnostic diagnostic) SerializationCodeGeneratorLoop(SerializerMetadata serializerMetadata, Schema schema, string sourceAccessor = "source")
         {
             try
             {
-                var serializatonCode = new StringBuilder();
+                var serializationCode = new StringBuilder();
                 var privateFieldsCode = new PrivateFieldsCode();
 
-                SerializationGenerator.GenerateSerializatonSourceForSchema(schema, serializatonCode, privateFieldsCode, serializerMetadata.SerializableTypeMetadata, sourceAccesor);
+                SerializationGenerator.GenerateSerializatonSourceForSchema(schema, serializationCode, privateFieldsCode, serializerMetadata.SerializableTypeMetadata, serializerMetadata.CustomLogicalTypesMetadata, sourceAccessor);
 
-                return (serializatonCode.ToString(), privateFieldsCode.ToString(), null);
+                return (serializationCode.ToString(), privateFieldsCode.ToString(), null);
             }
             catch (AvroGeneratorException ex)
             {
-                return (string.Empty, string.Empty, Diagnostic.Create(DiagnosticsDescriptors.SerializableTypeMissMatchDescriptor, null, ex.Message));
+                return (string.Empty, string.Empty, Diagnostic.Create(DiagnosticsDescriptors.SerializableTypeMissMatchDescriptor, serializerMetadata.GetSerializerLocation(), ex.Message));
             }
         }
     }

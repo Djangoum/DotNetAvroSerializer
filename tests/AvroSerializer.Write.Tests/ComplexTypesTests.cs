@@ -34,11 +34,11 @@ namespace DotNetAvroSerializer.Write.Tests
             MapSerializer serializer = new MapSerializer();
 
             var result = serializer.Serialize(new Dictionary<string, int>()
-            {
-                { "item1", 1 },
-                { "item2", 2 },
-                { "item3", 3 }
-            });
+             {
+                 { "item1", 1 },
+                 { "item2", 2 },
+                 { "item3", 3 }
+             });
 
             Convert.ToHexString(result).Should().BeEquivalentTo("060A6974656D31020A6974656D32040A6974656D330600");
         }
@@ -49,18 +49,18 @@ namespace DotNetAvroSerializer.Write.Tests
             ArrayOfRecordsSerializer serializer = new ArrayOfRecordsSerializer();
 
             var result = serializer.Serialize(new List<InnerRecord>
-            {
-                new InnerRecord
-                {
-                    Field2 = 2,
-                    Field1 = "holiwis"
-                },
-                new InnerRecord
-                {
-                    Field2 = 2,
-                    Field1 = "holiwis"
-                }
-            });
+             {
+                 new InnerRecord
+                 {
+                     Field2 = 2,
+                     Field1 = "holiwis"
+                 },
+                 new InnerRecord
+                 {
+                     Field2 = 2,
+                     Field1 = "holiwis"
+                 }
+             });
 
             Convert.ToHexString(result).Should().BeEquivalentTo("040E686F6C69776973040E686F6C697769730400");
         }
@@ -109,37 +109,37 @@ namespace DotNetAvroSerializer.Write.Tests
                 Doubles = new List<double> { 1.2d, 3.4d, 12.6d },
                 InnerRecords = new[]
                 {
-                    new InnerRecord
-                    {
-                        Field1 = "teststring",
-                        Field2 = 124
-                    },
-                    new InnerRecord
-                    {
-                        Field1 = "teststring",
-                        Field2 = 124
-                    }
-                },
+                     new InnerRecord
+                     {
+                         Field1 = "teststring",
+                         Field2 = 124
+                     },
+                     new InnerRecord
+                     {
+                         Field1 = "teststring",
+                         Field2 = 124
+                     }
+                 },
                 NullableFloat = 12.6f,
                 MapField = new Dictionary<string, InnerRecord>
-                {
-                    {
-                        "key1",
-                        new InnerRecord
-                        {
-                            Field1 = "teststring",
-                            Field2 = 124
-                        }
-                    },
-                    {
-                        "key2",
-                        new InnerRecord
-                        {
-                            Field1 = "teststring",
-                            Field2 = 124
-                        }
-                    }
-                }
+                 {
+                     {
+                         "key1",
+                         new InnerRecord
+                         {
+                             Field1 = "teststring",
+                             Field2 = 124
+                         }
+                     },
+                     {
+                         "key2",
+                         new InnerRecord
+                         {
+                             Field1 = "teststring",
+                             Field2 = 124
+                         }
+                     }
+                 }
             });
 
             Convert.ToHexString(result).Should().BeEquivalentTo("1474657374737472696E67F801041474657374737472696E67F8011474657374737472696E67F8010006333333333333F33F3333333333330B40333333333333294000029A99494104086B6579311474657374737472696E67F801086B6579321474657374737472696E67F80100");
@@ -153,90 +153,90 @@ namespace DotNetAvroSerializer.Write.Tests
             var result = serializer.Serialize(
                 new List<RecordWithComplexTypes>
                 {
-                new RecordWithComplexTypes
-                {
-                    InnerRecord = new InnerRecord
-                    {
-                        Field1 = "teststring",
-                        Field2 = 124
-                    },
-                    Doubles = new List<double> { 1.2d, 3.4d, 12.6d },
-                    InnerRecords = new[]
-                    {
-                        new InnerRecord
-                        {
-                            Field1 = "teststring",
-                            Field2 = 124
-                        },
-                        new InnerRecord
-                        {
-                            Field1 = "teststring",
-                            Field2 = 124
-                        }
-                    },
-                    NullableFloat = 12.6f,
-                    MapField = new Dictionary<string, InnerRecord>
-                    {
-                        {
-                            "key1",
-                            new InnerRecord
-                            {
-                                Field1 = "teststring",
-                                Field2 = 124
-                            }
-                        },
-                        {
-                            "key2",
-                            new InnerRecord
-                            {
-                                Field1 = "teststring",
-                                Field2 = 124
-                            }
-                        }
-                    }
-                },
-                new RecordWithComplexTypes
-                {
-                    InnerRecord = new InnerRecord
-                    {
-                        Field1 = "teststring",
-                        Field2 = 124
-                    },
-                    Doubles = new List<double> { 1.2d, 3.4d, 12.6d },
-                    InnerRecords = new[]
-                    {
-                        new InnerRecord
-                        {
-                            Field1 = "teststring",
-                            Field2 = 124
-                        },
-                        new InnerRecord
-                        {
-                            Field1 = "teststring",
-                            Field2 = 124
-                        }
-                    },
-                    NullableFloat = 12.6f,
-                    MapField = new Dictionary<string, InnerRecord>
-                    {
-                        {
-                            "key1",
-                            new InnerRecord
-                            {
-                                Field1 = "teststring",
-                                Field2 = 124
-                            }
-                        },
-                        {
-                            "key2",
-                            new InnerRecord
-                            {
-                                Field1 = "teststring",
-                                Field2 = 124
-                            }
-                        }
-                    }
-                }
+                 new RecordWithComplexTypes
+                 {
+                     InnerRecord = new InnerRecord
+                     {
+                         Field1 = "teststring",
+                         Field2 = 124
+                     },
+                     Doubles = new List<double> { 1.2d, 3.4d, 12.6d },
+                     InnerRecords = new[]
+                     {
+                         new InnerRecord
+                         {
+                             Field1 = "teststring",
+                             Field2 = 124
+                         },
+                         new InnerRecord
+                         {
+                             Field1 = "teststring",
+                             Field2 = 124
+                         }
+                     },
+                     NullableFloat = 12.6f,
+                     MapField = new Dictionary<string, InnerRecord>
+                     {
+                         {
+                             "key1",
+                             new InnerRecord
+                             {
+                                 Field1 = "teststring",
+                                 Field2 = 124
+                             }
+                         },
+                         {
+                             "key2",
+                             new InnerRecord
+                             {
+                                 Field1 = "teststring",
+                                 Field2 = 124
+                             }
+                         }
+                     }
+                 },
+                 new RecordWithComplexTypes
+                 {
+                     InnerRecord = new InnerRecord
+                     {
+                         Field1 = "teststring",
+                         Field2 = 124
+                     },
+                     Doubles = new List<double> { 1.2d, 3.4d, 12.6d },
+                     InnerRecords = new[]
+                     {
+                         new InnerRecord
+                         {
+                             Field1 = "teststring",
+                             Field2 = 124
+                         },
+                         new InnerRecord
+                         {
+                             Field1 = "teststring",
+                             Field2 = 124
+                         }
+                     },
+                     NullableFloat = 12.6f,
+                     MapField = new Dictionary<string, InnerRecord>
+                     {
+                         {
+                             "key1",
+                             new InnerRecord
+                             {
+                                 Field1 = "teststring",
+                                 Field2 = 124
+                             }
+                         },
+                         {
+                             "key2",
+                             new InnerRecord
+                             {
+                                 Field1 = "teststring",
+                                 Field2 = 124
+                             }
+                         }
+                     }
+                 }
                 });
 
             Convert.ToHexString(result).Should().BeEquivalentTo("041474657374737472696E67F801041474657374737472696E67F8011474657374737472696E67F8010006333333333333F33F3333333333330B40333333333333294000029A99494104086B6579311474657374737472696E67F801086B6579321474657374737472696E67F801001474657374737472696E67F801041474657374737472696E67F8011474657374737472696E67F8010006333333333333F33F3333333333330B40333333333333294000029A99494104086B6579311474657374737472696E67F801086B6579321474657374737472696E67F8010000");
@@ -244,148 +244,147 @@ namespace DotNetAvroSerializer.Write.Tests
     }
 
     [AvroSchema(@"{
-        ""type"": ""record"",
-        ""name"" : ""recordWithOverridenNames"",
-        ""fields"": [
-            {
-                ""name"": ""matching_name"",
-                ""type"": ""string""
-            }
-        ]
-    }")]
+         ""type"": ""record"",
+         ""name"" : ""recordWithOverridenNames"",
+         ""fields"": [
+             {
+                 ""name"": ""matching_name"",
+                 ""type"": ""string""
+             }
+         ]
+     }")]
     public partial class RecordWitOverridenFieldNamesSerializer : AvroSerializer<RecordWithOverridenNames>
     {
 
     }
 
     [AvroSchema(@"{
-        ""type"": ""array"",
-        ""items"": {
-            ""type"": ""record"",
-            ""name"" : ""recordWithComplexTypes"",
-            ""fields"" :[
-                {
-                    ""name"": ""InnerRecord"",
-                    ""type"": {
-                        ""name"": ""InnerRecord"",
-                        ""type"": ""record"",
-                        ""fields"": [
-                            {
-                                ""name"": ""Field1"",
-                                ""type"": ""string""
-                            },
-                            {
-                                ""name"": ""Field2"",
-                                ""type"": ""int""
-                            }
-                        ]
-                    } 
-                },
-                {
-                    ""name"": ""InnerRecords"",
-                    ""type"": {
-                        ""type"": ""array"",
-                        ""items"": ""InnerRecord""
-                    }
-                },
-                {
-                    ""name"": ""Doubles"",
-                    ""type"": {
-                        ""type"": ""array"",
-                        ""items"": ""double""
-                    }
-                },
-                {
-                    ""name"": ""NullableFloat"",
-                    ""type"": [ ""null"", ""float"" ]
-                },
-                {
-                    ""name"": ""MapField"",
-                    ""type"": {
-                        ""type"": ""map"",
-                        ""names"": ""dictionary"",
-                        ""values"": ""InnerRecord""
-                    }
-                }
-            ]
-        }
-    }")]
+         ""type"": ""array"",
+         ""items"": {
+             ""type"": ""record"",
+             ""name"" : ""recordWithComplexTypes"",
+             ""fields"" :[
+                 {
+                     ""name"": ""InnerRecord"",
+                     ""type"": {
+                         ""name"": ""InnerRecord"",
+                         ""type"": ""record"",
+                         ""fields"": [
+                             {
+                                 ""name"": ""Field1"",
+                                 ""type"": ""string""
+                             },
+                             {
+                                 ""name"": ""Field2"",
+                                 ""type"": ""int""
+                             }
+                         ]
+                     } 
+                 },
+                 {
+                     ""name"": ""InnerRecords"",
+                     ""type"": {
+                         ""type"": ""array"",
+                         ""items"": ""InnerRecord""
+                     }
+                 },
+                 {
+                     ""name"": ""Doubles"",
+                     ""type"": {
+                         ""type"": ""array"",
+                         ""items"": ""double""
+                     }
+                 },
+                 {
+                     ""name"": ""NullableFloat"",
+                     ""type"": [ ""null"", ""float"" ]
+                 },
+                 {
+                     ""name"": ""MapField"",
+                     ""type"": {
+                         ""type"": ""map"",
+                         ""names"": ""dictionary"",
+                         ""values"": ""InnerRecord""
+                     }
+                 }
+             ]
+         }
+     }")]
     public partial class ArrayOfRecordWithComplexTypesSerializer : AvroSerializer<IEnumerable<RecordWithComplexTypes>>
     {
 
     }
-
     [AvroSchema(@"{
-        ""type"": ""array"",
-        ""items"": {
-            ""name"": ""InnerRecord"",
-            ""type"": ""record"",
-            ""fields"": [
-                {
-                    ""name"": ""Field1"",
-                    ""type"": ""string""
-                },
-                {
-                    ""name"": ""Field2"",
-                    ""type"": ""int""
-                }
-            ]
-        } 
-    }")]
+         ""type"": ""array"",
+         ""items"": {
+             ""name"": ""InnerRecord"",
+             ""type"": ""record"",
+             ""fields"": [
+                 {
+                     ""name"": ""Field1"",
+                     ""type"": ""string""
+                 },
+                 {
+                     ""name"": ""Field2"",
+                     ""type"": ""int""
+                 }
+             ]
+         } 
+     }")]
     public partial class ArrayOfRecordsSerializer : AvroSerializer<IEnumerable<InnerRecord>>
     {
 
     }
 
     [AvroSchema(@"{
-        ""type"": ""record"",
-        ""name"" : ""recordWithComplexTypes"",
-        ""fields"" :[
-            {
-                ""name"": ""InnerRecord"",
-                ""type"": {
-                    ""name"": ""InnerRecord"",
-                    ""type"": ""record"",
-                    ""fields"": [
-                        {
-                            ""name"": ""Field1"",
-                            ""type"": ""string""
-                        },
-                        {
-                            ""name"": ""Field2"",
-                            ""type"": ""int""
-                        }
-                    ]
-                } 
-            },
-            {
-                ""name"": ""InnerRecords"",
-                ""type"": {
-                    ""type"": ""array"",
-                    ""items"": ""InnerRecord""
-                }
-            },
-            {
-                ""name"": ""Doubles"",
-                ""type"": {
-                    ""type"": ""array"",
-                    ""items"": ""double""
-                }
-            },
-            {
-                ""name"": ""NullableFloat"",
-                ""type"": [ ""null"", ""float"" ]
-            },
-            {
-                ""name"": ""MapField"",
-                ""type"": {
-                    ""type"": ""map"",
-                    ""names"": ""dictionary"",
-                    ""values"": ""InnerRecord""
-                }
-            }
-        ]
-    }")]
+         ""type"": ""record"",
+         ""name"" : ""recordWithComplexTypes"",
+         ""fields"" :[
+             {
+                 ""name"": ""InnerRecord"",
+                 ""type"": {
+                     ""name"": ""InnerRecord"",
+                     ""type"": ""record"",
+                     ""fields"": [
+                         {
+                             ""name"": ""Field1"",
+                             ""type"": ""string""
+                         },
+                         {
+                             ""name"": ""Field2"",
+                             ""type"": ""int""
+                         }
+                     ]
+                 } 
+             },
+             {
+                 ""name"": ""InnerRecords"",
+                 ""type"": {
+                     ""type"": ""array"",
+                     ""items"": ""InnerRecord""
+                 }
+             },
+             {
+                 ""name"": ""Doubles"",
+                 ""type"": {
+                     ""type"": ""array"",
+                     ""items"": ""double""
+                 }
+             },
+             {
+                 ""name"": ""NullableFloat"",
+                 ""type"": [ ""null"", ""float"" ]
+             },
+             {
+                 ""name"": ""MapField"",
+                 ""type"": {
+                     ""type"": ""map"",
+                     ""names"": ""dictionary"",
+                     ""values"": ""InnerRecord""
+                 }
+             }
+         ]
+     }")]
     public partial class RecordWithComplexTypesSerializer : AvroSerializer<RecordWithComplexTypes>
     {
 
@@ -416,40 +415,40 @@ namespace DotNetAvroSerializer.Write.Tests
     }
 
     [AvroSchema(@"
-    {
-        ""type"": ""record"",
-        ""name"" : ""classWithPrimitivesSerializer"",
-        ""fields"" :[
-            { 
-                ""name"": ""IntegerField"",
-                ""type"": ""int""
-            },
-            {
-                ""name"": ""LongField"",
-                ""type"": ""long""
-            },
-            {
-                ""name"": ""StringField"",
-                ""type"": ""string""
-            },
-            {
-                ""name"": ""FloatField"",
-                ""type"": ""float""
-            },
-            {
-                ""name"": ""DoubleField"",
-                ""type"": ""double""
-            },
-            {
-                ""name"": ""BoolField"",
-                ""type"": ""boolean""
-            },
-            {
-                ""name"": ""BytesField"",
-                ""type"": ""bytes""
-            }
-        ]
-    }")]
+     {
+         ""type"": ""record"",
+         ""name"" : ""classWithPrimitivesSerializer"",
+         ""fields"" :[
+             { 
+                 ""name"": ""IntegerField"",
+                 ""type"": ""int""
+             },
+             {
+                 ""name"": ""LongField"",
+                 ""type"": ""long""
+             },
+             {
+                 ""name"": ""StringField"",
+                 ""type"": ""string""
+             },
+             {
+                 ""name"": ""FloatField"",
+                 ""type"": ""float""
+             },
+             {
+                 ""name"": ""DoubleField"",
+                 ""type"": ""double""
+             },
+             {
+                 ""name"": ""BoolField"",
+                 ""type"": ""boolean""
+             },
+             {
+                 ""name"": ""BytesField"",
+                 ""type"": ""bytes""
+             }
+         ]
+     }")]
     public partial class ClassWithPrimitivesSerializer : AvroSerializer<ClassWithPrimitives>
     {
 

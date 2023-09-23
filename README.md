@@ -293,3 +293,8 @@ Find some benchmarks results here.
 
 ## Important note 
 As of now, the library exclusively offers serialization capabilities and does not support deserialization. We are actively working on expanding its functionality to cover deserialization as well.
+
+## Performance Improvements
+
+- [ ] Reduce boxing and casts
+- [ ] Allow logicalTypes with complex base types

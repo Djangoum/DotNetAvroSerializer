@@ -29,4 +29,5 @@
     <ProjectReference Include="..\..\src\AvroSerializer\DotNetAvroSerializer.csproj" />
   </ItemGroup>
 
+
 </Project>

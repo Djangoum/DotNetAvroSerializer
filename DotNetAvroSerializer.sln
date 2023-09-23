@@ -5,8 +5,6 @@ VisualStudioVersion = 17.6.33712.159
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{889A8BF9-4712-4207-B972-585A3B939828}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DotNetAvroSerializer.Generators", "src\AvroSerializer.Generators\DotNetAvroSerializer.Generators.csproj", "{539B8084-E539-4852-B072-9CF93AF72AE8}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{1D44F55D-A7EB-4C5A-9E06-AEAC301B1454}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "benchmarks", "benchmarks", "{4F4F9197-B785-4365-9247-F42D3361074F}"
@@ -23,7 +21,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".repo", ".repo", "{0871CC56
 		README.md = README.md
 	EndProjectSection
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DotNetAvroSerializer", "src\AvroSerializer\DotNetAvroSerializer.csproj", "{D5405A49-C066-46E1-B2A0-C9C2503E1D77}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotNetAvroSerializer", "src\DotNetAvroSerialiaer\DotNetAvroSerializer.csproj", "{8DE0217B-F37C-479F-BC78-0EA5895A8FAD}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotNetAvroSerializer.Generators", "src\DotNetAvroSerialier.Generators\DotNetAvroSerializer.Generators.csproj", "{6F2820E4-039C-4DC7-858D-1D6369AB49F9}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -31,10 +31,6 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{539B8084-E539-4852-B072-9CF93AF72AE8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{539B8084-E539-4852-B072-9CF93AF72AE8}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{539B8084-E539-4852-B072-9CF93AF72AE8}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{539B8084-E539-4852-B072-9CF93AF72AE8}.Release|Any CPU.Build.0 = Release|Any CPU
 		{7DEC8099-52FE-496B-A5A1-FE5616D7E88C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{7DEC8099-52FE-496B-A5A1-FE5616D7E88C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7DEC8099-52FE-496B-A5A1-FE5616D7E88C}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -43,19 +39,23 @@ Global
 		{AD5A36E3-930B-4633-AD8E-E0C442355369}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AD5A36E3-930B-4633-AD8E-E0C442355369}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{AD5A36E3-930B-4633-AD8E-E0C442355369}.Release|Any CPU.Build.0 = Release|Any CPU
-		{D5405A49-C066-46E1-B2A0-C9C2503E1D77}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{D5405A49-C066-46E1-B2A0-C9C2503E1D77}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{D5405A49-C066-46E1-B2A0-C9C2503E1D77}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{D5405A49-C066-46E1-B2A0-C9C2503E1D77}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8DE0217B-F37C-479F-BC78-0EA5895A8FAD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8DE0217B-F37C-479F-BC78-0EA5895A8FAD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8DE0217B-F37C-479F-BC78-0EA5895A8FAD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8DE0217B-F37C-479F-BC78-0EA5895A8FAD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6F2820E4-039C-4DC7-858D-1D6369AB49F9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6F2820E4-039C-4DC7-858D-1D6369AB49F9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6F2820E4-039C-4DC7-858D-1D6369AB49F9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6F2820E4-039C-4DC7-858D-1D6369AB49F9}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
-		{539B8084-E539-4852-B072-9CF93AF72AE8} = {889A8BF9-4712-4207-B972-585A3B939828}
 		{7DEC8099-52FE-496B-A5A1-FE5616D7E88C} = {4F4F9197-B785-4365-9247-F42D3361074F}
 		{AD5A36E3-930B-4633-AD8E-E0C442355369} = {1D44F55D-A7EB-4C5A-9E06-AEAC301B1454}
-		{D5405A49-C066-46E1-B2A0-C9C2503E1D77} = {889A8BF9-4712-4207-B972-585A3B939828}
+		{8DE0217B-F37C-479F-BC78-0EA5895A8FAD} = {889A8BF9-4712-4207-B972-585A3B939828}
+		{6F2820E4-039C-4DC7-858D-1D6369AB49F9} = {889A8BF9-4712-4207-B972-585A3B939828}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {22F6DE55-AE4C-45DA-A7E2-DAECBF43E0C6}

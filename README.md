@@ -33,27 +33,18 @@ public partial class IntSerializer : AvroSerializer<int>
 ```
 Generated code looks like this
 ```csharp
-using AvroSerializer.Primitives;
-using AvroSerializer.LogicalTypes;
-using AvroSerializer.Exceptions;
-using AvroSerializer.ComplexTypes;
-using System.Linq;
-
-namespace AvroSerializer.Write.Tests
+public partial class IntSerializer
 {
-    public partial class IntSerializer
+    public byte[] Serialize(int source)
     {
-        public byte[] Serialize(int source)
-        {
-            var outputStream = new MemoryStream();
-            SerializeToStream(outputStream, source);
-            return outputStream.ToArray();
-        }
+        var outputStream = new MemoryStream();
+        SerializeToStream(outputStream, source);
+        return outputStream.ToArray();
+    }
 
-        public void SerializeToStream(Stream outputStream, int source)
-        {
-            IntSchema.Write(outputStream, source);
-        }
+    public void SerializeToStream(Stream outputStream, int source)
+    {
+        IntSchema.Write(outputStream, source);
     }
 }
 ```

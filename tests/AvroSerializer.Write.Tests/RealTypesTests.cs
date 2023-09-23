@@ -21,7 +21,7 @@ public class RealTypesTests
     [LogicalTypeName("regex-string")]
     public static class RegexStringLogicalType
     {
-        public static bool CanSerialize(object? value, string regex2esgrers) => value is string;
+        public static bool CanSerialize(object? value, string regex) => value is string;
 
         public static string ConvertToBaseSchemaType(string logicalTypeValue, string regex)
         {

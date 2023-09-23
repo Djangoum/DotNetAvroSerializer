@@ -9,9 +9,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{1D44F55D-A
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "benchmarks", "benchmarks", "{4F4F9197-B785-4365-9247-F42D3361074F}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DotNetAvroSerializer.Benchmarks", "benchmarks\AvroSerializer.Benchmarks\DotNetAvroSerializer.Benchmarks.csproj", "{7DEC8099-52FE-496B-A5A1-FE5616D7E88C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DotNetAvroSerializer.Benchmarks", "benchmarks\DotNetAvroSerializer.Benchmarks\DotNetAvroSerializer.Benchmarks.csproj", "{7DEC8099-52FE-496B-A5A1-FE5616D7E88C}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DotNetAvroSerializer.Write.Tests", "tests\AvroSerializer.Write.Tests\DotNetAvroSerializer.Write.Tests.csproj", "{AD5A36E3-930B-4633-AD8E-E0C442355369}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DotNetAvroSerializer.Write.Tests", "tests\DotNetAvroSerializer.Write.Tests\DotNetAvroSerializer.Write.Tests.csproj", "{AD5A36E3-930B-4633-AD8E-E0C442355369}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".repo", ".repo", "{0871CC56-D238-4517-9019-92E9FE21DC7D}"
 	ProjectSection(SolutionItems) = preProject

@@ -52,6 +52,9 @@ namespace DotNetAvroSerializer.Generators.SerializationGenerators
 
                 if (!logicalTypesValues.Count().Equals(customLogicalType.OrderedSchemaProperties.Count()))
                     throw new AvroGeneratorException("Logical type properties could not be mapped");
+
+                if (logicalSchema.BaseSchema is not PrimitiveSchema)
+                    throw new AvroGeneratorException("Custom logical types with complex base types are not supported");
                 
                 SerializationGenerator.GenerateSerializatonSourceForSchema(
                     logicalSchema.BaseSchema,

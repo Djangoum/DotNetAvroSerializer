@@ -25,11 +25,11 @@ namespace DotNetAvroSerializer.Generators.SerializationGenerators
 
                     if (unionSchemaIndex == 0)
                     {
-                        serializationCode.AppendLine($@"if ({canSerializedCheck}) {{");
+                        serializationCode.AppendLine($"if ({canSerializedCheck}) {{");
                     }
                     else
                     {
-                        serializationCode.AppendLine($@"else if ({canSerializedCheck}) {{");
+                        serializationCode.AppendLine($"else if ({canSerializedCheck}) {{");
                     }
 
                     serializationCode.AppendLine($"IntSchema.Write(outputStream, {unionSchemaIndex});");
@@ -42,11 +42,11 @@ namespace DotNetAvroSerializer.Generators.SerializationGenerators
 
                     if (unionSchemaIndex == 0)
                     {
-                        serializationCode.AppendLine($@"if ({canSerializedCheck}) {{");
+                        serializationCode.AppendLine($"if ({canSerializedCheck}) {{");
                     }
                     else
                     {
-                        serializationCode.AppendLine($@"else if ({canSerializedCheck}) {{");
+                        serializationCode.AppendLine($"else if ({canSerializedCheck}) {{");
                     }
 
                     serializationCode.AppendLine($"IntSchema.Write(outputStream, {unionSchemaIndex});");

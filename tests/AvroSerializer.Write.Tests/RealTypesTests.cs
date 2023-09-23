@@ -94,15 +94,15 @@ public class RealTypesTests
     }", new []{ typeof(RegexStringLogicalType) })]
     public partial class UserPromotionLoyaltyViewV2Serializer : AvroSerializer<UserPromotionViewRecordsDataEventApiV2>
     {
-        
+         
     }
     
     [LogicalTypeName("regex-string")]
     public static class RegexStringLogicalType
     {
-        public static bool CanSerialize(object? value, [LogicalTypePropertyName("regex")]string regex) => value is string;
+        public static bool CanSerialize(object? value, string regex) => value is string;
 
-        public static string ConvertToBaseSchemaType(string logicalTypeValue, [LogicalTypePropertyName("regex")]string regex)
+        public static string ConvertToBaseSchemaType(string logicalTypeValue, string regex)
         {
           return logicalTypeValue;
         }

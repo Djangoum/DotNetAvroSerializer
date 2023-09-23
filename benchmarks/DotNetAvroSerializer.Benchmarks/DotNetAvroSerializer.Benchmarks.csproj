@@ -13,8 +13,8 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <ProjectReference Include="..\..\src\DotNetAvroSerialiaer\DotNetAvroSerializer.csproj" />
-	  <ProjectReference Include="..\..\src\DotNetAvroSerialier.Generators\DotNetAvroSerializer.Generators.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
+	  <ProjectReference Include="..\..\src\DotNetAvroSerializer\DotNetAvroSerializer.csproj" />
+	  <ProjectReference Include="..\..\src\DotNetAvroSerializer.Generators\DotNetAvroSerializer.Generators.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
 	</ItemGroup>
 
 </Project>

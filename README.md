@@ -266,6 +266,57 @@ public partial class NullableStringSerializer : AvroSerializer<bool?>
 
 This approach simplifies the code when dealing with unions containing only any type and null values.
 
+## Custom logical types
+
+Most .NET Avro libraries do not support custom logical types. Whenever these libraries detect unrecognized logical types, they throw an exception. However, this conflicts with what Avro specifies in its [docs](https://avro.apache.org/docs/1.11.1/specification/#logical-types). According to Avro's specification, these logical types should be serialized using the base types instead. In line with this specification, DotNetAvroSerializer allows the use of custom logical types and permits developers to specify their behavior during serialization.
+
+How to define these logical types ? 
+
+```csharp 
+[AvroSchema(@"{
+  ""type"": [
+    ""null"",
+    {
+      ""logicalType"": ""regex-string"",
+      ""type"": ""string"",
+      ""regex"": "".+""
+    }
+  ]
+}", new []{ typeof(RegexStringLogicalType) })]
+public partial class NullRegexStringSerializer : AvroSerializer<string?>
+{
+}
+
+[LogicalTypeName("regex-string")]
+public static class RegexStringLogicalType
+{
+    public static bool CanSerialize(object? value, [LogicalTypePropertyName("regex")]string regexPattern) => value is string;
+
+    public static string ConvertToBaseSchemaType(string logicalTypeValue, [LogicalTypePropertyName("regex")]string regexPattern)
+    {
+        var regex = new Regex(regexPattern, RegexOptions.Compiled);
+
+        if (!regex.Matches(logicalTypeValue).Any())
+        {
+            throw new AvroSerializationException("Regex validation failed");
+        }
+          
+        return logicalTypeValue;
+    }
+}
+```
+
+**AvroSchema** attribute allows a second parameters where to specify a **Type[]** with types that are logical types. 
+
+### Rules for custom logical types 
+
+- Must be static classes
+- Must have **LogicalTypeName** attribute defined 
+- Extra parameters for **CanSerialize** and **ConvertToBaseSchemaType** methods are meant to receive logical type schema properties.
+- Extra parameters are mapped using parameter name or using the **LogicalTypePropertyName** attribute
+- All schema properties must be mapped or an error is thrown
+- Return type of **ConvertToBaseSchemaType** method must match schema base type C# representation
+
 ## Rules and limitations :
 
 There are some rules that Dotnet Avro Serializer source generators expect in order to generate serialization code. 

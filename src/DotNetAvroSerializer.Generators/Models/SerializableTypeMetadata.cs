@@ -1,5 +1,6 @@
 ﻿using Microsoft.CodeAnalysis;
 using System;
+using System.Diagnostics;
 
 namespace DotNetAvroSerializer.Generators.Models
 {

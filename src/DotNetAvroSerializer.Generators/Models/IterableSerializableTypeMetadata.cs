@@ -18,13 +18,13 @@ namespace DotNetAvroSerializer.Generators.Models
         internal static bool IsValidArrayType(ITypeSymbol symbol)
             => symbol is IArrayTypeSymbol
                 || symbol is INamedTypeSymbol { SpecialType: not SpecialType.System_String } namedTypeSymbol 
-                && namedTypeSymbol.AllInterfaces.Any(i => i.SpecialType is SpecialType.System_Collections_Generic_IEnumerable_T);
+                && namedTypeSymbol.AllInterfaces.Any(i => i.SpecialType is SpecialType.System_Collections_IEnumerable);
 
         internal static ITypeSymbol GetIterableItemsTypeSymbol(ITypeSymbol iterableTypeSymbol)
             => iterableTypeSymbol switch
             {
                 IArrayTypeSymbol arrayTypeSymbol => arrayTypeSymbol.ElementType,
-                INamedTypeSymbol { SpecialType: not SpecialType.System_String } namedTypeSymbol when namedTypeSymbol.AllInterfaces.Any(i => i.SpecialType is SpecialType.System_Collections_Generic_IEnumerable_T) => namedTypeSymbol.TypeArguments.First(),
+                INamedTypeSymbol { SpecialType: not SpecialType.System_String } namedTypeSymbol when namedTypeSymbol.AllInterfaces.Any(i => i.SpecialType is SpecialType.System_Collections_IEnumerable) => namedTypeSymbol.TypeArguments.First(),
 
                 _ => null
             };

@@ -11,7 +11,6 @@ using System.Collections.Immutable;
 using System.Linq;
 using System.Threading;
 using DotNetAvroSerializer.Generators.Extensions;
-using System.Diagnostics;
 
 namespace DotNetAvroSerializer.Generators.Write
 {

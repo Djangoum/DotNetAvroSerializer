@@ -43,7 +43,7 @@ public class CustomLogicalTypeTests
           ""regex"": "".+""
         }
       ]
-    }", new []{ typeof(RegexStringLogicalType) })]
+    }", new[] { typeof(RegexStringLogicalType) })]
 public partial class NullRegexStringSerializer : AvroSerializer<string?>
 {
 }
@@ -53,7 +53,7 @@ public static class RegexStringLogicalType
 {
     public static bool CanSerialize(object? value, string regex) => value is string;
 
-    public static string ConvertToBaseSchemaType(string logicalTypeValue, [LogicalTypePropertyName("regex")]string regexPattern)
+    public static string ConvertToBaseSchemaType(string logicalTypeValue, [LogicalTypePropertyName("regex")] string regexPattern)
     {
         var regex = new Regex(regexPattern, RegexOptions.Compiled);
 
@@ -61,7 +61,7 @@ public static class RegexStringLogicalType
         {
             throw new AvroSerializationException("Regex validation failed");
         }
-          
+
         return logicalTypeValue;
     }
 }

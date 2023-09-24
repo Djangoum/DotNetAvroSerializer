@@ -2,7 +2,7 @@ using System;
 
 namespace DotNetAvroSerializer;
 
-[AttributeUsage(AttributeTargets.Class)]  
+[AttributeUsage(AttributeTargets.Class)]
 public class LogicalTypeNameAttribute : Attribute
 {
     public string Name { get; }
@@ -13,7 +13,7 @@ public class LogicalTypeNameAttribute : Attribute
     }
 }
 
-[AttributeUsage(AttributeTargets.Parameter)]  
+[AttributeUsage(AttributeTargets.Parameter)]
 public class LogicalTypePropertyNameAttribute : Attribute
 {
     public string Name { get; }

@@ -1,15 +1,14 @@
-﻿namespace DotNetAvroSerializer.Generators.Models
+﻿namespace DotNetAvroSerializer.Generators.Models;
+
+public enum SerializableTypeKind
 {
-    public enum SerializableTypeKind
-    {
-        Record, 
-        Primitive,
-        Map,
-        Enumerable,
-        LogicalType,
-        Field,
-        Enum,
-        Nullable,
-        Union
-    }
+    Record,
+    Primitive,
+    Map,
+    Enumerable,
+    LogicalType,
+    Field,
+    Enum,
+    Nullable,
+    Union
 }

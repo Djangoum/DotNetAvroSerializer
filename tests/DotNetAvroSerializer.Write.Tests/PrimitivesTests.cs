@@ -1,4 +1,3 @@
-using DotNetAvroSerializer;
 using FluentAssertions;
 
 namespace DotNetAvroSerializer.Write.Tests;

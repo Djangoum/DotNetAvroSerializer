@@ -1,57 +1,57 @@
 ﻿using DotNetAvroSerializer.Write.Tests.Models;
 using FluentAssertions;
 
-namespace DotNetAvroSerializer.Write.Tests
+namespace DotNetAvroSerializer.Write.Tests;
+
+public class ComplexUnionsTests
 {
-    public class ComplexUnionsTests
+    [Theory]
+    [MemberData(nameof(RecordsUnionTestData))]
+    public void SerializeRecordsUnion(UnionSideOne? unionSideOne, UnionSideTwo? unionSideTwo, string hexString)
     {
-        [Theory]
-        [MemberData(nameof(RecordsUnionTestData))]
-        public void SerializeRecordsUnion(UnionSideOne? unionSideOne, UnionSideTwo? unionSideTwo, string hexString)
+        Union<UnionSideOne, UnionSideTwo> union;
+
+        if (unionSideOne is not null)
         {
-            Union<UnionSideOne, UnionSideTwo> union;
-
-            if (unionSideOne is not null)
-            {
-                union = unionSideOne;
-            }
-            else
-            {
-                union = unionSideTwo!;
-            }
-
-            var serializer = new RecordsUnionSerializer();
-
-            var result = serializer.Serialize(union);
-
-            Convert.ToHexString(result).Should().BeEquivalentTo(hexString);
+            union = unionSideOne;
+        }
+        else
+        {
+            union = unionSideTwo!;
         }
 
-        public static IEnumerable<object[]> RecordsUnionTestData =>
-            new List<object[]>
-            {
-                 new object[] {
-                     new UnionSideOne
-                     {
-                         Name = "name",
-                         Id = 1,
-                     },
-                     null!,
-                     "0002086E616D65"
-                 },
-                 new object[] {
-                     null!,
-                     new UnionSideTwo
-                     {
-                         SecondName = "name",
-                         Identifier = 1
-                     },
-                     "0202086E616D65"
-                 }
-            };
+        var serializer = new RecordsUnionSerializer();
+
+        var result = serializer.Serialize(union);
+
+        Convert.ToHexString(result).Should().BeEquivalentTo(hexString);
     }
 
-    [AvroSchema(@"{
+    public static IEnumerable<object[]> RecordsUnionTestData =>
+        new List<object[]>
+        {
+             new object[] {
+                 new UnionSideOne
+                 {
+                     Name = "name",
+                     Id = 1,
+                 },
+                 null!,
+                 "0002086E616D65"
+             },
+             new object[] {
+                 null!,
+                 new UnionSideTwo
+                 {
+                     SecondName = "name",
+                     Identifier = 1
+                 },
+                 "0202086E616D65"
+             }
+        };
+}
+
+[AvroSchema(@"{
          ""type"": [
              {
                  ""type"": ""record"",
@@ -83,12 +83,12 @@ namespace DotNetAvroSerializer.Write.Tests
              }
          ]
      }")]
-    public partial class RecordsUnionSerializer : AvroSerializer<Union<UnionSideOne, UnionSideTwo>>
-    {
+public partial class RecordsUnionSerializer : AvroSerializer<Union<UnionSideOne, UnionSideTwo>>
+{
 
-    }
+}
 
-    [AvroSchema(@"{
+[AvroSchema(@"{
          ""type"": [
              {
                  ""type"": ""array"",
@@ -110,12 +110,12 @@ namespace DotNetAvroSerializer.Write.Tests
              }
          ]
      }")]
-    public partial class ArrayRecordUnionSerializer : AvroSerializer<Union<int[], UnionSideOne>>
-    {
+public partial class ArrayRecordUnionSerializer : AvroSerializer<Union<int[], UnionSideOne>>
+{
 
-    }
+}
 
-    [AvroSchema(@"{
+[AvroSchema(@"{
          ""type"": [
              {
                  ""type"": ""array"",
@@ -139,8 +139,7 @@ namespace DotNetAvroSerializer.Write.Tests
              }
          ]
      }")]
-    public partial class ArrayRecordArrayLong : AvroSerializer<Union<UnionSideOne[], long>>
-    {
+public partial class ArrayRecordArrayLong : AvroSerializer<Union<UnionSideOne[], long>>
+{
 
-    }
 }

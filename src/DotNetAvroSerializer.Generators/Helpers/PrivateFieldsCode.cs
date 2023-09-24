@@ -1,23 +1,22 @@
 ﻿using System.Collections.Generic;
 using System.Text;
 
-namespace DotNetAvroSerializer.Generators.Helpers
+namespace DotNetAvroSerializer.Generators.Helpers;
+
+public class PrivateFieldsCode
 {
-    public class PrivateFieldsCode
+    private readonly StringBuilder privateFieldsCode = new StringBuilder();
+    private List<string> symbols = new List<string>();
+
+    public void AppendLine(string symbolName, string code)
     {
-        private readonly StringBuilder privateFieldsCode = new StringBuilder();
-        private List<string> symbols = new List<string>();
+        if (symbols.Contains(symbolName)) return;
 
-        public void AppendLine(string symbolName, string code)
-        {
-            if (symbols.Contains(symbolName)) return;
+        privateFieldsCode.AppendLine(code);
+    }
 
-            privateFieldsCode.AppendLine(code);
-        }
-
-        public override string ToString()
-        {
-            return privateFieldsCode.ToString();
-        }
+    public override string ToString()
+    {
+        return privateFieldsCode.ToString();
     }
 }

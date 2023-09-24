@@ -1,25 +1,24 @@
-﻿using DotNetAvroSerializer.Exceptions;
-using DotNetAvroSerializer.Primitives;
-using System;
+﻿using System;
 using System.IO;
+using DotNetAvroSerializer.Exceptions;
+using DotNetAvroSerializer.Primitives;
 
-namespace DotNetAvroSerializer.LogicalTypes
+namespace DotNetAvroSerializer.LogicalTypes;
+
+public static class UuidSchema
 {
-    public static class UuidSchema
+    public static bool CanSerialize(object? value) => value is Guid;
+
+    public static void Write(Stream outputStream, Guid? value)
     {
-        public static bool CanSerialize(object? value) => value is Guid;
+        if (value is null)
+            throw new AvroSerializationException("Cannot serialize null value to int");
 
-        public static void Write(Stream outputStream, Guid? value)
-        {
-            if (value is null)
-                throw new AvroSerializationException("Cannot serialize null value to int");
+        Write(outputStream, value.Value);
+    }
 
-            Write(outputStream, value.Value);
-        }
-
-        public static void Write(Stream outputStream, Guid guid)
-        {
-            StringSchema.Write(outputStream, guid.ToString());
-        }
+    public static void Write(Stream outputStream, Guid guid)
+    {
+        StringSchema.Write(outputStream, guid.ToString());
     }
 }

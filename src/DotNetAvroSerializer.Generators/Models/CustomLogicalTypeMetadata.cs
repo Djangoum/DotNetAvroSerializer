@@ -1,8 +1,8 @@
+using System.Collections.Generic;
+using System.Linq;
 using Avro.Util;
 using DotNetAvroSerializer.Generators.Helpers;
 using Microsoft.CodeAnalysis;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace DotNetAvroSerializer.Generators.Models;
 
@@ -24,7 +24,7 @@ public class CustomLogicalTypeMetadata
 
             return overridenName is not null ? overridenName.ToString() : p.Name;
         });
-        
+
         OrderedSchemaPropertiesCanSerialize = canSerializeOrderedParameters.Select(p =>
         {
             var overridenName = p
@@ -37,7 +37,7 @@ public class CustomLogicalTypeMetadata
 
             return overridenName is not null ? overridenName.ToString() : p.Name;
         });
-        
+
         LogicalTypeFactory.Instance.Register(new CustomLogicalType(name));
     }
 

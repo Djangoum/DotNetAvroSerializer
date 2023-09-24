@@ -1,7 +1,6 @@
-﻿namespace DotNetAvroSerializer
+﻿namespace DotNetAvroSerializer;
+
+public struct Null
 {
-    public struct Null
-    {
-        public static Null Instance => new Null();
-    }
+    public static Null Instance => new Null();
 }

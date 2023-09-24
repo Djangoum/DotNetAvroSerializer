@@ -22,7 +22,7 @@ internal static class SchemaExtensions
 
     private static void Generate(this MapSchema schema, AvroGenerationContext ctx) => MapGenerator.GenerateSerializationSourceForMap(ctx);
 
-    public static void Generate(this LogicalSchema schema, AvroGenerationContext ctx) => LogicalTypeGenerator.GenerateSerializationSourceForLogicalType(ctx);
+    private static void Generate(this LogicalSchema schema, AvroGenerationContext ctx) => LogicalTypeGenerator.GenerateSerializationSourceForLogicalType(ctx);
 
     private static void Generate(this RecordSchema schema, AvroGenerationContext ctx)
     {

@@ -1,21 +1,16 @@
 ﻿using Avro;
 using DotNetAvroSerializer.Generators.Diagnostics;
 using DotNetAvroSerializer.Generators.Exceptions;
+using DotNetAvroSerializer.Generators.Extensions;
 using DotNetAvroSerializer.Generators.Helpers;
 using DotNetAvroSerializer.Generators.Models;
-using DotNetAvroSerializer.Generators.SerializationGenerators;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using System;
-using System.Collections.Generic;
 using System.Collections.Immutable;
-using System.Diagnostics;
 using System.Linq;
-using System.Text;
 using System.Threading;
-using Avro.Util;
-using Microsoft.CodeAnalysis.Operations;
 
 namespace DotNetAvroSerializer.Generators.Write
 {
@@ -155,22 +150,21 @@ namespace DotNetAvroSerializer.Generators.Write
 
             if (serializerGenericArgument.Kind() == SyntaxKind.NullableType)
             {
-                symbol = symbol.WithNullableAnnotation(NullableAnnotation.Annotated);
+                symbol = symbol!.WithNullableAnnotation(NullableAnnotation.Annotated);
             }
 
             return symbol;
         }
 
-        private (string serializationCode, string privateFieldsCode, Diagnostic diagnostic) SerializationCodeGeneratorLoop(SerializerMetadata serializerMetadata, Schema schema, string sourceAccessor = "source")
+        private static (string serializationCode, string privateFieldsCode, Diagnostic diagnostic) SerializationCodeGeneratorLoop(SerializerMetadata serializerMetadata, Schema schema, string sourceAccessor = "source")
         {
             try
             {
-                var serializationCode = new StringBuilder();
-                var privateFieldsCode = new PrivateFieldsCode();
+                var generationContext = AvroGenerationContext.From(serializerMetadata, schema);
 
-                SerializationGenerator.GenerateSerializatonSourceForSchema(schema, serializationCode, privateFieldsCode, serializerMetadata.SerializableTypeMetadata, serializerMetadata.CustomLogicalTypesMetadata, sourceAccessor);
+                schema.Generate(generationContext);
 
-                return (serializationCode.ToString(), privateFieldsCode.ToString(), null);
+                return (generationContext.SerializationCode.ToString(), generationContext.PrivateFieldsCode.ToString(), null);
             }
             catch (AvroGeneratorException ex)
             {

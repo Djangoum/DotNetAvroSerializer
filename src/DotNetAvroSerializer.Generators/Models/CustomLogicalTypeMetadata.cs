@@ -1,8 +1,8 @@
-using System.Collections.Generic;
-using System.Linq;
 using Avro.Util;
 using DotNetAvroSerializer.Generators.Helpers;
 using Microsoft.CodeAnalysis;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace DotNetAvroSerializer.Generators.Models;
 
@@ -41,8 +41,8 @@ public class CustomLogicalTypeMetadata
         LogicalTypeFactory.Instance.Register(new CustomLogicalType(name));
     }
 
-    public string Name { get; set; }
-    public string LogicalTypeFullyQualifiedName { get; set; }
-    public IEnumerable<string> OrderedSchemaPropertiesConvertToBaseType { get; set; }
-    public IEnumerable<string> OrderedSchemaPropertiesCanSerialize { get; set; }
+    public string Name { get; }
+    public string LogicalTypeFullyQualifiedName { get; }
+    public IEnumerable<string> OrderedSchemaPropertiesConvertToBaseType { get; }
+    public IEnumerable<string> OrderedSchemaPropertiesCanSerialize { get; }
 }

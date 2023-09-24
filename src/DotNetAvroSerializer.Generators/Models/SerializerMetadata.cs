@@ -1,6 +1,6 @@
-﻿using System.Collections.Generic;
-using Avro;
+﻿using Avro;
 using Microsoft.CodeAnalysis;
+using System.Collections.Generic;
 
 namespace DotNetAvroSerializer.Generators.Models
 {

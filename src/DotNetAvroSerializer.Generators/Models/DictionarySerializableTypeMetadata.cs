@@ -11,13 +11,13 @@ namespace DotNetAvroSerializer.Generators.Models
         {
             ValuesMetadata = valuesTypeMetadata;
 
-            if (dictionaryTypeSymbol is not null  && dictionaryTypeSymbol is INamedTypeSymbol namedTypeSymbol)
+            if (dictionaryTypeSymbol is INamedTypeSymbol namedTypeSymbol)
             {
                 KeysTypeName = namedTypeSymbol.TypeArguments.ElementAt(0).Name;
             }
         }
 
-        internal override SerializableTypeKind Kind => SerializableTypeKind.Map;
+        protected override SerializableTypeKind Kind => SerializableTypeKind.Map;
         internal SerializableTypeMetadata ValuesMetadata { get; set; }
         internal string KeysTypeName { get; set; }
 

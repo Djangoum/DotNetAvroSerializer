@@ -1,13 +1,11 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using Avro.Util;
 using DotNetAvroSerializer.Generators.Diagnostics;
-using DotNetAvroSerializer.Generators.Helpers;
 using DotNetAvroSerializer.Generators.Models;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Operations;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace DotNetAvroSerializer.Generators.Write;
 

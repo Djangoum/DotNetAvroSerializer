@@ -2,22 +2,22 @@
 using DotNetAvroSerializer.Generators.Exceptions;
 using DotNetAvroSerializer.Generators.Models;
 using System;
-using System.Text;
 
 namespace DotNetAvroSerializer.Generators.SerializationGenerators
 {
-    internal class FixedGenerator
+    internal static class FixedGenerator
     {
-        internal static void GenerateSerializationSourceForFixed(FixedSchema schema, StringBuilder code, SerializableTypeMetadata byteArraySerializableType, string sourceAccesor)
+        internal static void GenerateSerializationSourceForFixed(AvroGenerationContext context)
         {
-            if (byteArraySerializableType is null 
-                || byteArraySerializableType is not IterableSerializableTypeMetadata iterableSerializableTypeMetadata
-                || iterableSerializableTypeMetadata.ItemsTypeMetadata is not PrimitiveSerializableTypeMetadata primitiveTypeMetadata 
+            var schema = context.Schema as FixedSchema;
+            
+            if (context.SerializableTypeMetadata is not IterableSerializableTypeMetadata 
+                    { ItemsTypeMetadata: PrimitiveSerializableTypeMetadata primitiveTypeMetadata } 
                 || !primitiveTypeMetadata.TypeName.Equals("byte", StringComparison.InvariantCultureIgnoreCase))
-                throw new AvroGeneratorException($"Required type was not satisfied to serialize {schema.Name}");
+                throw new AvroGeneratorException($"Required type was not satisfied to serialize {schema!.Name}");
 
-            code.AppendLine(@$"if ({sourceAccesor}.Length != {schema.Size}) throw new AvroSerializationException(""Byte array {sourceAccesor} has to be of a fixed length of {schema.Size} but found {{{sourceAccesor}.Length}}"");");
-            code.AppendLine($@"BytesSchema.Write(outputStream, {sourceAccesor});");
+            context.SerializationCode.AppendLine(@$"if ({context.SourceAccessor}.Length != {schema!.Size}) throw new AvroSerializationException(""Byte array {context.SourceAccessor} has to be of a fixed length of {schema.Size} but found {{{context.SourceAccessor}.Length}}"");");
+            context.SerializationCode.AppendLine($@"BytesSchema.Write(outputStream, {context.SourceAccessor});");
         }
     }
 }

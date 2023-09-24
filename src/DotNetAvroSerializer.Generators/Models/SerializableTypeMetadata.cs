@@ -5,16 +5,16 @@ namespace DotNetAvroSerializer.Generators.Models
 {
     internal abstract class SerializableTypeMetadata : IEquatable<SerializableTypeMetadata>
     {
-        public SerializableTypeMetadata(ITypeSymbol symbol)
+        protected SerializableTypeMetadata(ISymbol symbol)
         {
             FullNameDisplay = symbol.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
             StringRepresentation = symbol.ToString();
         }
 
-        internal abstract SerializableTypeKind Kind { get; }
+        protected abstract SerializableTypeKind Kind { get; }
         internal bool IsValid { get; set; }
-        internal string FullNameDisplay { get; set; }
-        protected virtual string StringRepresentation { get; set; }
+        internal string FullNameDisplay { get; }
+        private string StringRepresentation { get; }
 
         internal static SerializableTypeMetadata From(ITypeSymbol symbol)
         {
@@ -24,34 +24,38 @@ namespace DotNetAvroSerializer.Generators.Models
                 {
                     return new LogicalTypeSerializableTypeMetadata(symbol);
                 }
-                else if (NullableSerializableTypeMetadata.IsNullableType(symbol))
+
+                if (NullableSerializableTypeMetadata.IsNullableType(symbol))
                 {
                     return new NullableSerializableTypeMetadata(From(NullableSerializableTypeMetadata.GetInnerNullableTypeSymbol(symbol)), symbol);
                 }
-                else if (UnionSerializableTypeMetadata.IsUnionType(symbol))
+
+                if (UnionSerializableTypeMetadata.IsUnionType(symbol))
                 {
                     return new UnionSerializableTypeMetadata(symbol, UnionSerializableTypeMetadata.GetInnerUnionTypeSymbols(symbol));
                 }
-                else if (DictionarySerializableTypeMetadata.IsValidMapType(symbol))
+
+                if (DictionarySerializableTypeMetadata.IsValidMapType(symbol))
                 {
                     return new DictionarySerializableTypeMetadata(From(DictionarySerializableTypeMetadata.GetValuesTypeSymbol(symbol)), symbol);
                 }
-                else if (IterableSerializableTypeMetadata.IsValidArrayType(symbol))
+
+                if (IterableSerializableTypeMetadata.IsValidArrayType(symbol))
                 {
                     return new IterableSerializableTypeMetadata(From(IterableSerializableTypeMetadata.GetIterableItemsTypeSymbol(symbol)), symbol);
                 }
-                else if (EnumSerializableTypeMetadata.IsEnumType(symbol))
+
+                if (EnumSerializableTypeMetadata.IsEnumType(symbol))
                 {
                     return new EnumSerializableTypeMetadata(symbol);
                 }
-                else if (PrimitiveSerializableTypeMetadata.IsAllowedPrimitiveType(symbol))
+
+                if (PrimitiveSerializableTypeMetadata.IsAllowedPrimitiveType(symbol))
                 {
                     return new PrimitiveSerializableTypeMetadata(symbol);
                 }
-                else
-                {
-                    return new RecordSerializableTypeMetadata(symbol);
-                }
+
+                return new RecordSerializableTypeMetadata(symbol);
             }
 
             return null;
@@ -64,7 +68,7 @@ namespace DotNetAvroSerializer.Generators.Models
 
         public virtual bool Equals(SerializableTypeMetadata other)
         {
-            return Kind == other.Kind && FullNameDisplay == other.FullNameDisplay;
+            return other is not null && Kind == other.Kind && FullNameDisplay == other.FullNameDisplay;
         }
     }
 }

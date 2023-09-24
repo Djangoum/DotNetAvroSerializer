@@ -1,6 +1,5 @@
 ﻿using Microsoft.CodeAnalysis;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 
 namespace DotNetAvroSerializer.Generators.Models
@@ -16,10 +15,10 @@ namespace DotNetAvroSerializer.Generators.Models
             GetFieldNames(propertySymbol);
         }
 
-        internal override SerializableTypeKind Kind => SerializableTypeKind.Field;
+        protected override SerializableTypeKind Kind => SerializableTypeKind.Field;
 
         internal string Name { get; set; }
-        internal ICollection<string> Names { get; set; } = new List<string>();
+        internal ICollection<string> Names { get; private set; } = new List<string>();
         internal SerializableTypeMetadata InnerSerializableType { get; set; }
 
         private void GetFieldNames(IPropertySymbol fieldSymbol)

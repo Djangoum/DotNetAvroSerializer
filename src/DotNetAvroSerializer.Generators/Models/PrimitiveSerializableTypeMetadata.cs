@@ -10,8 +10,9 @@ namespace DotNetAvroSerializer.Generators.Models
             TypeName = primitiveTypeSymbol.Name;
         }
 
-        internal override SerializableTypeKind Kind => SerializableTypeKind.Primitive;
-        internal string TypeName { get; init; }
+        protected override SerializableTypeKind Kind => SerializableTypeKind.Primitive;
+
+        internal string TypeName { get; }
 
         internal static bool IsAllowedPrimitiveType (ITypeSymbol typeSymbol)
         {

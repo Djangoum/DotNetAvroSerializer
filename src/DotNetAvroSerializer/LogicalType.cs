@@ -1,5 +1,5 @@
 using System;
- 
+
 namespace DotNetAvroSerializer;
 
 [AttributeUsage(AttributeTargets.Class)]  

@@ -1,33 +1,39 @@
 ﻿using Avro;
 using DotNetAvroSerializer.Generators.Exceptions;
+using DotNetAvroSerializer.Generators.Extensions;
 using DotNetAvroSerializer.Generators.Helpers;
 using DotNetAvroSerializer.Generators.Models;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace DotNetAvroSerializer.Generators.SerializationGenerators
 {
     internal static class MapGenerator
     {
-        internal static void GenerateSerializationSourceFoMap(MapSchema schema, StringBuilder serializationCode, PrivateFieldsCode privateFieldsCode, SerializableTypeMetadata dictionarySymbol, IEnumerable<CustomLogicalTypeMetadata> customLogicalTypes, string sourceAccesor)
+        internal static void GenerateSerializationSourceForMap(AvroGenerationContext context)
         {
-            if (dictionarySymbol is null || dictionarySymbol is not DictionarySerializableTypeMetadata dictonaryTypeMetadata)
-                throw new AvroGeneratorException($"Type for map schema was not satisfied. Maps must implement IDictionary but {dictionarySymbol} found");
+            var schema = context.Schema as MapSchema;
+            
+            if (context.SerializableTypeMetadata is not DictionarySerializableTypeMetadata dictionaryTypeMetadata)
+                throw new AvroGeneratorException($"Type for map schema was not satisfied. Maps must implement IDictionary but {context.SerializableTypeMetadata} found");
 
-            if (!dictonaryTypeMetadata.KeysTypeName.Equals("string", StringComparison.InvariantCultureIgnoreCase))
-                throw new AvroGeneratorException($"Map keys have to be strings but {dictonaryTypeMetadata.KeysTypeName}");
+            if (!dictionaryTypeMetadata.KeysTypeName.Equals("string", StringComparison.InvariantCultureIgnoreCase))
+                throw new AvroGeneratorException($"Map keys have to be strings but {dictionaryTypeMetadata.KeysTypeName}");
 
-            serializationCode.AppendLine($@"if ({sourceAccesor}.Count() > 0) LongSchema.Write(outputStream, {sourceAccesor}.Count());");
-            serializationCode.AppendLine($@"foreach(var item{VariableNamesHelpers.RemoveSpecialCharacters(sourceAccesor)} in {sourceAccesor})");
-            serializationCode.AppendLine("{");
+            context.SerializationCode.AppendLine($"if ({context.SourceAccessor}.Count() > 0) LongSchema.Write(outputStream, {context.SourceAccessor}.Count());");
+            context.SerializationCode.AppendLine($"foreach(var item{VariableNamesHelpers.RemoveSpecialCharacters(context.SourceAccessor)} in {context.SourceAccessor})");
+            context.SerializationCode.AppendLine("{");
 
-            serializationCode.AppendLine($@"StringSchema.Write(outputStream, item{VariableNamesHelpers.RemoveSpecialCharacters(sourceAccesor)}.Key);");
-            SerializationGenerator.GenerateSerializatonSourceForSchema(schema.ValueSchema, serializationCode, privateFieldsCode, dictonaryTypeMetadata.ValuesMetadata, customLogicalTypes, $"item{VariableNamesHelpers.RemoveSpecialCharacters(sourceAccesor)}.Value");
+            context.SerializationCode.AppendLine($"StringSchema.Write(outputStream, item{VariableNamesHelpers.RemoveSpecialCharacters(context.SourceAccessor)}.Key);");
+            
+            schema!.ValueSchema.Generate(context with
+            {
+                Schema = schema!.ValueSchema,
+                SerializableTypeMetadata = dictionaryTypeMetadata.ValuesMetadata,
+                SourceAccessor = $"item{VariableNamesHelpers.RemoveSpecialCharacters(context.SourceAccessor)}.Value"
+            });
 
-            serializationCode.AppendLine("}");
-            serializationCode.AppendLine("LongSchema.Write(outputStream, 0L);");
+            context.SerializationCode.AppendLine("}");
+            context.SerializationCode.AppendLine("LongSchema.Write(outputStream, 0L);");
         }
     }
 }

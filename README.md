@@ -303,10 +303,12 @@ public static class RegexStringLogicalType
 
 - Must be static classes
 - Must have **LogicalTypeName** attribute defined 
+- Must have **CanSerialize** method accepting **object?** and returning **bool** can have extra parameters that match schema properties
+- Must have **ConverToBaseSchemaType** accepting logical type and returning base schema type C# representation
+- Return type of **ConvertToBaseSchemaType** method must match schema base type C# representation
 - Extra parameters for **CanSerialize** and **ConvertToBaseSchemaType** methods are meant to receive logical type schema properties.
 - Extra parameters are mapped using parameter name or using the **LogicalTypePropertyName** attribute
 - All schema properties must be mapped or an error is thrown
-- Return type of **ConvertToBaseSchemaType** method must match schema base type C# representation
 
 ## Rules and limitations :
 

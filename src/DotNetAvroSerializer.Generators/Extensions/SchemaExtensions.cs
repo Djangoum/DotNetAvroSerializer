@@ -43,7 +43,7 @@ internal static class SchemaExtensions
         if (property is null)
             throw new AvroGeneratorException($"Property {field.Name} not found in {recordTypeMetadata}");
 
-        field.Schema.Generate(ctx with { Schema = field.Schema, SerializableTypeMetadata = property.InnerSerializableType });
+        field.Schema.Generate(ctx with { Schema = field.Schema, SerializableTypeMetadata = property.InnerSerializableType , SourceAccessor = $"{ctx.SourceAccessor}.{property.Name}"  });
     }
     
     internal static void Generate(this Schema schema, AvroGenerationContext context)

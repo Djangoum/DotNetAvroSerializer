@@ -54,7 +54,7 @@ namespace DotNetAvroSerializer.Generators.SerializationGenerators
                 if (schema!.BaseSchema is not PrimitiveSchema)
                     throw new AvroGeneratorException("Custom logical types with complex base types are not supported");
 
-                schema.Generate(context
+                schema.BaseSchema.Generate(context
                     with
                     {
                         Schema = schema.BaseSchema,

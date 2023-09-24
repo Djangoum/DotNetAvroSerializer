@@ -161,7 +161,6 @@ namespace DotNetAvroSerializer.Generators.Write
         {
             try
             {
-                if (!Debugger.IsAttached) Debugger.Launch();
                 var generationContext = AvroGenerationContext.From(serializerMetadata, schema);
 
                 schema.Generate(generationContext);

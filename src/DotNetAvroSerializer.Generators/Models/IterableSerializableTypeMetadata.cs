@@ -6,7 +6,7 @@ namespace DotNetAvroSerializer.Generators.Models
 {
     internal class IterableSerializableTypeMetadata : SerializableTypeMetadata
     {
-        public IterableSerializableTypeMetadata(SerializableTypeMetadata itemsTypeMetadata, ITypeSymbol iterableSymbol)
+        public IterableSerializableTypeMetadata(SerializableTypeMetadata itemsTypeMetadata, ISymbol iterableSymbol)
             : base(iterableSymbol)
         {
             ItemsTypeMetadata = itemsTypeMetadata;
@@ -14,7 +14,7 @@ namespace DotNetAvroSerializer.Generators.Models
 
         internal SerializableTypeMetadata ItemsTypeMetadata { get; set; }
 
-        internal override SerializableTypeKind Kind => SerializableTypeKind.Enumerable;
+        protected override SerializableTypeKind Kind => SerializableTypeKind.Enumerable;
 
         internal static bool IsValidArrayType(ITypeSymbol symbol)
             => symbol is IArrayTypeSymbol

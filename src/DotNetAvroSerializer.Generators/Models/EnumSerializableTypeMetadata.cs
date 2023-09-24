@@ -10,7 +10,7 @@ namespace DotNetAvroSerializer.Generators.Models
             
         }
 
-        internal override SerializableTypeKind Kind => SerializableTypeKind.Enum;
+        protected override SerializableTypeKind Kind => SerializableTypeKind.Enum;
 
         internal static bool IsEnumType(ITypeSymbol enumSymbol)
             => enumSymbol.TypeKind is TypeKind.Enum;

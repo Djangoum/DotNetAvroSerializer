@@ -1,27 +1,33 @@
-﻿using System.Collections.Generic;
-using Avro;
+﻿using Avro;
 using DotNetAvroSerializer.Generators.Exceptions;
 using DotNetAvroSerializer.Generators.Helpers;
 using DotNetAvroSerializer.Generators.Models;
-using System.Text;
+using DotNetAvroSerializer.Generators.Extensions;
 
 namespace DotNetAvroSerializer.Generators.SerializationGenerators
 {
     internal static class ArrayGenerator
     {
-        internal static void GenerateSerializationSourceForArray(ArraySchema schema, StringBuilder serializationCode, PrivateFieldsCode privateFieldsCode, SerializableTypeMetadata serializableType, IEnumerable<CustomLogicalTypeMetadata> customLogicalTypes, string sourceAccesor)
+        internal static void GenerateSerializationSourceForArray(AvroGenerationContext context)
         {
-            if (serializableType is null || serializableType is not IterableSerializableTypeMetadata iterableSerializableTypeMetadata)
-                throw new AvroGeneratorException($"Array type for {schema.Name} is not satisfied {serializableType.GetType().Name} provided, arrays must be arrays or anything that implements IEnumerable");
+            var schema = context.Schema as ArraySchema;
+            
+            if (context.SerializableTypeMetadata is not IterableSerializableTypeMetadata iterableSerializableTypeMetadata)
+                throw new AvroGeneratorException($"Array type for {schema!.Name} is not satisfied {context.SerializableTypeMetadata?.GetType().Name} provided, arrays must be arrays or anything that implements IEnumerable");
 
-            serializationCode.AppendLine(@$"if ({sourceAccesor}.Count() > 0) LongSchema.Write(outputStream, (long){sourceAccesor}.Count());");
-            serializationCode.AppendLine($@"foreach(var item{VariableNamesHelpers.RemoveSpecialCharacters(sourceAccesor)} in {sourceAccesor})");
-            serializationCode.AppendLine("{");
+            context.SerializationCode.AppendLine($"if ({context.SourceAccessor}.Count() > 0) LongSchema.Write(outputStream, (long){context.SourceAccessor}.Count());");
+            context.SerializationCode.AppendLine($"foreach(var item{VariableNamesHelpers.RemoveSpecialCharacters(context.SourceAccessor)} in {context.SourceAccessor})");
+            context.SerializationCode.AppendLine("{");
+            
+            schema!.ItemSchema.Generate(context 
+                with
+                {
+                    SourceAccessor = $"item{VariableNamesHelpers.RemoveSpecialCharacters(context.SourceAccessor)}", 
+                    SerializableTypeMetadata = iterableSerializableTypeMetadata.ItemsTypeMetadata
+                });
 
-            SerializationGenerator.GenerateSerializatonSourceForSchema(schema.ItemSchema, serializationCode, privateFieldsCode, iterableSerializableTypeMetadata.ItemsTypeMetadata, customLogicalTypes, $"item{VariableNamesHelpers.RemoveSpecialCharacters(sourceAccesor)}");
-
-            serializationCode.AppendLine("}");
-            serializationCode.AppendLine(@$"LongSchema.Write(outputStream, 0L);");
+            context.SerializationCode.AppendLine("}");
+            context.SerializationCode.AppendLine("LongSchema.Write(outputStream, 0L);");
         }
     }
 }

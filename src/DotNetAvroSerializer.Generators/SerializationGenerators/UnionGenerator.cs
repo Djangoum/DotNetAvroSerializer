@@ -1,60 +1,67 @@
 ﻿using Avro;
 using DotNetAvroSerializer.Generators.Exceptions;
-using DotNetAvroSerializer.Generators.Helpers;
 using DotNetAvroSerializer.Generators.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
+using DotNetAvroSerializer.Generators.Extensions;
 
 namespace DotNetAvroSerializer.Generators.SerializationGenerators
 {
     internal static class UnionGenerator
     {
-        internal static void GenerateSerializationSourceForUnion(UnionSchema unionSchema, StringBuilder serializationCode, PrivateFieldsCode privateFieldsCode, SerializableTypeMetadata originTypeSymbol, IEnumerable<CustomLogicalTypeMetadata> customLogicalTypes, string sourceAccesor)
+        internal static void GenerateSerializationSourceForUnion(AvroGenerationContext context)
         {
-            foreach (var schema in unionSchema.Schemas)
+            var unionSchema = context.Schema as UnionSchema;
+            
+            foreach (var schema in unionSchema!.Schemas)
             {
                 var unionSchemaIndex = unionSchema.Schemas.IndexOf(schema);
 
-                if (originTypeSymbol is UnionSerializableTypeMetadata unionSerializableTypeMetadata)
+                if (context.SerializableTypeMetadata is UnionSerializableTypeMetadata unionSerializableTypeMetadata)
                 {
                     var unionTypeSerializableTypeMetadata = unionSerializableTypeMetadata.UnionTypes.ElementAt(unionSchemaIndex);
 
-                    var canSerializedCheck = GetCanSerializeCheck(schema, $"{sourceAccesor}.GetUnionValue()", customLogicalTypes, unionTypeSerializableTypeMetadata.FullNameDisplay);
+                    var canSerializedCheck = GetCanSerializeCheck(schema, $"{context.SourceAccessor}.GetUnionValue()", context.CustomLogicalTypesMetadata, unionTypeSerializableTypeMetadata.FullNameDisplay);
 
                     if (unionSchemaIndex == 0)
                     {
-                        serializationCode.AppendLine($"if ({canSerializedCheck}) {{");
+                        context.SerializationCode.AppendLine($"if ({canSerializedCheck}) {{");
                     }
                     else
                     {
-                        serializationCode.AppendLine($"else if ({canSerializedCheck}) {{");
+                        context.SerializationCode.AppendLine($"else if ({canSerializedCheck}) {{");
                     }
 
-                    serializationCode.AppendLine($"IntSchema.Write(outputStream, {unionSchemaIndex});");
+                    context.SerializationCode.AppendLine($"IntSchema.Write(outputStream, {unionSchemaIndex});");
 
-                    SerializationGenerator.GenerateSerializatonSourceForSchema(schema, serializationCode, privateFieldsCode, unionTypeSerializableTypeMetadata, customLogicalTypes, $"(({unionTypeSerializableTypeMetadata.FullNameDisplay}){sourceAccesor})");
+                    schema.Generate(context with
+                    {
+                        SourceAccessor = $"(({unionTypeSerializableTypeMetadata.FullNameDisplay}){context.SourceAccessor})"
+                    });
                 }
-                else if (originTypeSymbol is NullableSerializableTypeMetadata nullableSeralizableTypeMetadata)
+                else if (context.SerializableTypeMetadata is NullableSerializableTypeMetadata nullableSerializableTypeMetadata)
                 {
-                    var canSerializedCheck = GetCanSerializeCheck(schema, sourceAccesor, customLogicalTypes);
+                    var canSerializedCheck = GetCanSerializeCheck(schema, context.SourceAccessor, context.CustomLogicalTypesMetadata);
 
                     if (unionSchemaIndex == 0)
                     {
-                        serializationCode.AppendLine($"if ({canSerializedCheck}) {{");
+                        context.SerializationCode.AppendLine($"if ({canSerializedCheck}) {{");
                     }
                     else
                     {
-                        serializationCode.AppendLine($"else if ({canSerializedCheck}) {{");
+                        context.SerializationCode.AppendLine($"else if ({canSerializedCheck}) {{");
                     }
 
-                    serializationCode.AppendLine($"IntSchema.Write(outputStream, {unionSchemaIndex});");
-
-                    SerializationGenerator.GenerateSerializatonSourceForSchema(schema, serializationCode, privateFieldsCode, nullableSeralizableTypeMetadata.InnerNullableTypeSymbol, customLogicalTypes, sourceAccesor);
+                    context.SerializationCode.AppendLine($"IntSchema.Write(outputStream, {unionSchemaIndex});");
+                    
+                    schema.Generate(context with
+                    {
+                        SerializableTypeMetadata = nullableSerializableTypeMetadata.InnerNullableTypeSymbol
+                    });
                 }
 
-                serializationCode.AppendLine("}");
+                context.SerializationCode.AppendLine("}");
             }
         }
 

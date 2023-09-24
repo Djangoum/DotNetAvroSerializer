@@ -1,5 +1,4 @@
 ﻿using Microsoft.CodeAnalysis;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -7,16 +6,16 @@ namespace DotNetAvroSerializer.Generators.Models
 {
     internal class UnionSerializableTypeMetadata : SerializableTypeMetadata
     {
-        internal override SerializableTypeKind Kind => SerializableTypeKind.Union;
+        protected override SerializableTypeKind Kind => SerializableTypeKind.Union;
 
-        public UnionSerializableTypeMetadata(ITypeSymbol typeSymbol, IEnumerable<SerializableTypeMetadata> unionTypes) 
+        public UnionSerializableTypeMetadata(ISymbol typeSymbol, IEnumerable<SerializableTypeMetadata> unionTypes) 
             : base(typeSymbol)
         {
             UnionTypes = unionTypes;
         }
 
         internal static bool IsUnionType(ITypeSymbol typeSymbol)
-            => typeSymbol is INamedTypeSymbol namedTypeSymbol && namedTypeSymbol.Name == "Union";
+            => typeSymbol is INamedTypeSymbol { Name: "Union" };
 
         internal IEnumerable<SerializableTypeMetadata> UnionTypes { get; }
 
@@ -25,7 +24,7 @@ namespace DotNetAvroSerializer.Generators.Models
             var namedTypeSymbol = typeSymbol as INamedTypeSymbol;
             var unionTypes = new List<SerializableTypeMetadata>();
 
-            foreach (var genericTypes in namedTypeSymbol.TypeArguments)
+            foreach (var genericTypes in namedTypeSymbol!.TypeArguments)
             {
                 unionTypes.Add(From(genericTypes));
             }

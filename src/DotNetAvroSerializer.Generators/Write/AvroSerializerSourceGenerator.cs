@@ -11,6 +11,7 @@ using System.Collections.Immutable;
 using System.Linq;
 using System.Threading;
 using DotNetAvroSerializer.Generators.Extensions;
+using System.Diagnostics;
 
 namespace DotNetAvroSerializer.Generators.Write
 {
@@ -160,8 +161,9 @@ namespace DotNetAvroSerializer.Generators.Write
         {
             try
             {
+                if (!Debugger.IsAttached) Debugger.Launch();
                 var generationContext = AvroGenerationContext.From(serializerMetadata, schema);
-                
+
                 schema.Generate(generationContext);
 
                 return (generationContext.SerializationCode.ToString(), generationContext.PrivateFieldsCode.ToString(), null);

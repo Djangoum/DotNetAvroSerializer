@@ -10,46 +10,25 @@ namespace DotNetAvroSerializer.Generators.Extensions;
 
 internal static class SchemaExtensions
 {
-    private static void Generate(this PrimitiveSchema schema, AvroGenerationContext ctx)
-    {
-        PrimitiveTypesGenerator.GenerateSerializationSourceForPrimitive(ctx);
-    }
+    private static void Generate(this PrimitiveSchema schema, AvroGenerationContext ctx) => PrimitiveTypesGenerator.GenerateSerializationSourceForPrimitive(ctx);
 
-    private static void Generate(this ArraySchema schema, AvroGenerationContext ctx)
-    {
-        ArrayGenerator.GenerateSerializationSourceForArray(ctx);
-    }
+    private static void Generate(this ArraySchema schema, AvroGenerationContext ctx) => ArrayGenerator.GenerateSerializationSourceForArray(ctx);
 
-    private static void Generate(this EnumSchema schema, AvroGenerationContext ctx)
-    {
-        EnumGenerator.GenerateSerializationSourceForEnum(ctx);
-    }
+    private static void Generate(this EnumSchema schema, AvroGenerationContext ctx) => EnumGenerator.GenerateSerializationSourceForEnum(ctx);
 
-    private static void Generate(this FixedSchema schema, AvroGenerationContext ctx)
-    {
-        FixedGenerator.GenerateSerializationSourceForFixed(ctx);
-    }
+    private static void Generate(this FixedSchema schema, AvroGenerationContext ctx) => FixedGenerator.GenerateSerializationSourceForFixed(ctx);
 
-    private static void Generate(this UnionSchema schema, AvroGenerationContext ctx)
-    {
-        UnionGenerator.GenerateSerializationSourceForUnion(ctx);
-    }
+    private static void Generate(this UnionSchema schema, AvroGenerationContext ctx) => UnionGenerator.GenerateSerializationSourceForUnion(ctx);
 
-    private static void Generate(this MapSchema schema, AvroGenerationContext ctx)
-    {
-        MapGenerator.GenerateSerializationSourceForMap(ctx);
-    }
-    
-    public static void Generate(this LogicalSchema schema, AvroGenerationContext ctx)
-    {
-        LogicalTypeGenerator.GenerateSerializationSourceForLogicalType(ctx);
-    }
+    private static void Generate(this MapSchema schema, AvroGenerationContext ctx) => MapGenerator.GenerateSerializationSourceForMap(ctx);
+
+    public static void Generate(this LogicalSchema schema, AvroGenerationContext ctx) => LogicalTypeGenerator.GenerateSerializationSourceForLogicalType(ctx);
 
     private static void Generate(this RecordSchema schema, AvroGenerationContext ctx)
     {
         foreach (var field in schema.Fields)
         {
-            field.Generate(ctx with { Schema = schema});
+            field.Generate(ctx with { Schema = schema });
         }
     }
 
@@ -64,21 +43,21 @@ internal static class SchemaExtensions
         if (property is null)
             throw new AvroGeneratorException($"Property {field.Name} not found in {recordTypeMetadata}");
 
-        field.Schema.Generate(ctx with { Schema = field.Schema });
+        field.Schema.Generate(ctx with { Schema = field.Schema, SerializableTypeMetadata = property.InnerSerializableType });
     }
     
     internal static void Generate(this Schema schema, AvroGenerationContext context)
     {
         Action<AvroGenerationContext> generator = schema switch
         {
-            RecordSchema recordSchema => (ctx) => recordSchema.Generate(ctx),
-            ArraySchema recordSchema => (ctx) => recordSchema.Generate(ctx),
-            EnumSchema recordSchema => (ctx) => recordSchema.Generate(ctx),
-            FixedSchema recordSchema => (ctx) => recordSchema.Generate(ctx),
-            UnionSchema recordSchema => (ctx) => recordSchema.Generate(ctx),
-            MapSchema recordSchema => (ctx) => recordSchema.Generate(ctx),
-            LogicalSchema recordSchema => (ctx) => recordSchema.Generate(ctx),
-            PrimitiveSchema recordSchema => (ctx) => recordSchema.Generate(ctx),
+            RecordSchema recordSchema => recordSchema.Generate,
+            ArraySchema recordSchema => recordSchema.Generate,
+            EnumSchema recordSchema => recordSchema.Generate,
+            FixedSchema recordSchema => recordSchema.Generate,
+            UnionSchema recordSchema => recordSchema.Generate,
+            MapSchema recordSchema => recordSchema.Generate,
+            LogicalSchema recordSchema => recordSchema.Generate,
+            PrimitiveSchema recordSchema => recordSchema.Generate,
             
             _ => throw new UnreachableException()
         };

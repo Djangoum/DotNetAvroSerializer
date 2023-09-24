@@ -18,7 +18,7 @@ namespace DotNetAvroSerializer.Generators.Models
         }
 
         protected override SerializableTypeKind Kind => SerializableTypeKind.Map;
-        private SerializableTypeMetadata ValuesMetadata { get; set; }
+        internal SerializableTypeMetadata ValuesMetadata { get; set; }
         internal string KeysTypeName { get; set; }
 
         internal static bool IsValidMapType(ITypeSymbol symbol)

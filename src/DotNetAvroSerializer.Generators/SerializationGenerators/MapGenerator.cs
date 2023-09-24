@@ -28,6 +28,7 @@ namespace DotNetAvroSerializer.Generators.SerializationGenerators
             schema!.ValueSchema.Generate(context with
             {
                 Schema = schema!.ValueSchema,
+                SerializableTypeMetadata = dictionaryTypeMetadata.ValuesMetadata,
                 SourceAccessor = $"item{VariableNamesHelpers.RemoveSpecialCharacters(context.SourceAccessor)}.Value"
             });
 

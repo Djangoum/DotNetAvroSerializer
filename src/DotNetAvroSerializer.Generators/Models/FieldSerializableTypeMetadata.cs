@@ -19,7 +19,7 @@ namespace DotNetAvroSerializer.Generators.Models
 
         internal string Name { get; set; }
         internal ICollection<string> Names { get; private set; } = new List<string>();
-        private SerializableTypeMetadata InnerSerializableType { get; set; }
+        internal SerializableTypeMetadata InnerSerializableType { get; set; }
 
         private void GetFieldNames(IPropertySymbol fieldSymbol)
         {

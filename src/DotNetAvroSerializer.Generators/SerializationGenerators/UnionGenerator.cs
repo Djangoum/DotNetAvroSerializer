@@ -37,6 +37,8 @@ namespace DotNetAvroSerializer.Generators.SerializationGenerators
 
                     schema.Generate(context with
                     {
+                        Schema = schema,
+                        SerializableTypeMetadata = unionTypeSerializableTypeMetadata,
                         SourceAccessor = $"(({unionTypeSerializableTypeMetadata.FullNameDisplay}){context.SourceAccessor})"
                     });
                 }
@@ -57,6 +59,7 @@ namespace DotNetAvroSerializer.Generators.SerializationGenerators
                     
                     schema.Generate(context with
                     {
+                        Schema = schema,
                         SerializableTypeMetadata = nullableSerializableTypeMetadata.InnerNullableTypeSymbol
                     });
                 }

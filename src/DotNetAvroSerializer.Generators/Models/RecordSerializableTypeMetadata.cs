@@ -17,7 +17,6 @@ namespace DotNetAvroSerializer.Generators.Models
         }
 
         protected override SerializableTypeKind Kind => SerializableTypeKind.Record;
-        internal string Name { get; set; }
 
         internal IEnumerable<FieldSerializableTypeMetadata> Fields { get; }
 

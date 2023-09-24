@@ -4,7 +4,7 @@ namespace DotNetAvroSerializer.Generators.Models
 {
     internal class EnumSerializableTypeMetadata : SerializableTypeMetadata
     {
-        public EnumSerializableTypeMetadata(ITypeSymbol enumSymbol)
+        public EnumSerializableTypeMetadata(ISymbol enumSymbol)
             : base(enumSymbol)
         {
             

@@ -16,18 +16,14 @@ namespace DotNetAvroSerializer.Generators.Models
 
         internal static bool IsAllowedPrimitiveType (ITypeSymbol typeSymbol)
         {
-            return typeSymbol.Name.Equals("string", System.StringComparison.InvariantCultureIgnoreCase)
-                || typeSymbol.Name.Equals("int", System.StringComparison.InvariantCultureIgnoreCase)
-                || typeSymbol.Name.Equals("long", System.StringComparison.InvariantCultureIgnoreCase)
-                || typeSymbol.Name.Equals("bool", System.StringComparison.InvariantCultureIgnoreCase)
-                || typeSymbol.Name.Equals("Boolean", System.StringComparison.InvariantCultureIgnoreCase)
-                || typeSymbol.Name.Equals("double", System.StringComparison.InvariantCultureIgnoreCase)
-                || typeSymbol.Name.Equals("float", System.StringComparison.InvariantCultureIgnoreCase)
-                || typeSymbol.Name.Equals("single", System.StringComparison.InvariantCultureIgnoreCase)
-                || typeSymbol.Name.Equals("null", System.StringComparison.InvariantCultureIgnoreCase)
-                || typeSymbol.Name.Equals("Int32", System.StringComparison.InvariantCultureIgnoreCase)
-                || typeSymbol.Name.Equals("Int64", System.StringComparison.InvariantCultureIgnoreCase)
-                || typeSymbol.Name.Equals("byte", System.StringComparison.InvariantCultureIgnoreCase);
+            return typeSymbol.SpecialType is SpecialType.System_String
+                   || typeSymbol.SpecialType is SpecialType.System_Int32
+                   || typeSymbol.SpecialType is SpecialType.System_Int64
+                   || typeSymbol.SpecialType is SpecialType.System_Boolean
+                   || typeSymbol.SpecialType is SpecialType.System_Double
+                   || typeSymbol.SpecialType is SpecialType.System_Single
+                   || typeSymbol.SpecialType is SpecialType.System_Byte
+                   || typeSymbol.Name.Equals("null", System.StringComparison.InvariantCultureIgnoreCase);
         }
     }
 }

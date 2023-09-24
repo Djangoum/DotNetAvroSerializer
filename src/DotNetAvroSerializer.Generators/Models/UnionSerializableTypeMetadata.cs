@@ -22,14 +22,8 @@ namespace DotNetAvroSerializer.Generators.Models
         internal static IEnumerable<SerializableTypeMetadata> GetInnerUnionTypeSymbols(ITypeSymbol typeSymbol)
         {
             var namedTypeSymbol = typeSymbol as INamedTypeSymbol;
-            var unionTypes = new List<SerializableTypeMetadata>();
 
-            foreach (var genericTypes in namedTypeSymbol!.TypeArguments)
-            {
-                unionTypes.Add(From(genericTypes));
-            }
-
-            return unionTypes;
+            return namedTypeSymbol!.TypeArguments.Select(From).ToList();
         }
 
         public override bool Equals(SerializableTypeMetadata other)

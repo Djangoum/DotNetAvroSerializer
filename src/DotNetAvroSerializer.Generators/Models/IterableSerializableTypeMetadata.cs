@@ -1,5 +1,4 @@
 ﻿using Microsoft.CodeAnalysis;
-using System;
 using System.Linq;
 
 namespace DotNetAvroSerializer.Generators.Models
@@ -12,19 +11,20 @@ namespace DotNetAvroSerializer.Generators.Models
             ItemsTypeMetadata = itemsTypeMetadata;
         }
 
-        internal SerializableTypeMetadata ItemsTypeMetadata { get; set; }
+        internal SerializableTypeMetadata ItemsTypeMetadata { get; }
 
         protected override SerializableTypeKind Kind => SerializableTypeKind.Enumerable;
 
         internal static bool IsValidArrayType(ITypeSymbol symbol)
             => symbol is IArrayTypeSymbol
-                || symbol is INamedTypeSymbol namedTypeSymbol && !namedTypeSymbol.Name.Equals("string", StringComparison.InvariantCultureIgnoreCase) &&  namedTypeSymbol.AllInterfaces.Any(i => i.Name.Contains("IEnumerable"));
+                || symbol is INamedTypeSymbol { SpecialType: not SpecialType.System_String } namedTypeSymbol 
+                && namedTypeSymbol.AllInterfaces.Any(i => i.SpecialType is SpecialType.System_Collections_Generic_IEnumerable_T);
 
         internal static ITypeSymbol GetIterableItemsTypeSymbol(ITypeSymbol iterableTypeSymbol)
             => iterableTypeSymbol switch
             {
                 IArrayTypeSymbol arrayTypeSymbol => arrayTypeSymbol.ElementType,
-                INamedTypeSymbol namedTypeSymbol when !namedTypeSymbol.Name.Equals("string", StringComparison.InvariantCultureIgnoreCase) && namedTypeSymbol.AllInterfaces.Any(i => i.Name.Contains("IEnumerable")) => namedTypeSymbol.TypeArguments.First(),
+                INamedTypeSymbol { SpecialType: not SpecialType.System_String } namedTypeSymbol when namedTypeSymbol.AllInterfaces.Any(i => i.SpecialType is SpecialType.System_Collections_Generic_IEnumerable_T) => namedTypeSymbol.TypeArguments.First(),
 
                 _ => null
             };

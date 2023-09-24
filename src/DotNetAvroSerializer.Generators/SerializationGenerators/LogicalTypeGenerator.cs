@@ -34,7 +34,7 @@ namespace DotNetAvroSerializer.Generators.SerializationGenerators
                 };
 
                 if (serializerCallCode is not null)
-                {   // known logical type
+                {
                     context.SerializationCode.AppendLine(serializerCallCode);
                 }
                 else

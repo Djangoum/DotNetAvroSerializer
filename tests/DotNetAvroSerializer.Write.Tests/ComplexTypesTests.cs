@@ -314,6 +314,7 @@ namespace DotNetAvroSerializer.Write.Tests
     {
 
     }
+    
     [AvroSchema(@"{
          ""type"": ""array"",
          ""items"": {

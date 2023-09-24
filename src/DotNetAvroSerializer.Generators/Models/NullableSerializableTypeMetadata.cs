@@ -17,7 +17,7 @@ namespace DotNetAvroSerializer.Generators.Models
         internal static bool IsNullableType(ITypeSymbol typeSymbol)
             => typeSymbol.NullableAnnotation is NullableAnnotation.Annotated || typeSymbol is INamedTypeSymbol
             {
-                Name: "Nullable"
+                SpecialType: SpecialType.System_Nullable_T
             };
 
         internal static ITypeSymbol GetInnerNullableTypeSymbol(ITypeSymbol typeSymbol)

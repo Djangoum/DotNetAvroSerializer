@@ -91,9 +91,9 @@ public static class CustomLogicalTypesMetadataProcessor
             .Where(m => m.Kind == SymbolKind.Method)
             .Cast<IMethodSymbol>()
             .Any(m => m.Name.Equals("CanSerialize", StringComparison.InvariantCultureIgnoreCase) 
-                      && m.ReturnType.Name.Equals("Boolean", StringComparison.InvariantCultureIgnoreCase) 
+                      && m.ReturnType.SpecialType is SpecialType.System_Boolean
                       && m.Parameters.Any() 
-                      && m.Parameters.First().Type.Name.Equals("object", StringComparison.InvariantCultureIgnoreCase));
+                      && m.Parameters.First().Type.SpecialType is SpecialType.System_Object);
     
     private static IEnumerable<INamedTypeSymbol> ExtractCustomLogicalTypesArray(ExpressionSyntax customLogicalTypesDeclarationExpression, GeneratorSyntaxContext ctx) => 
         ctx

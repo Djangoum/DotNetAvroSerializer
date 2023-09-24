@@ -109,7 +109,7 @@ namespace DotNetAvroSerializer.Generators.Write
                 return (null, diagnostics);
             }
 
-            Schema schema = default;
+            Schema schema;
 
             try
             {

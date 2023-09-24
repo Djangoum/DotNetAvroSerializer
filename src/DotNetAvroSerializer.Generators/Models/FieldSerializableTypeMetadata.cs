@@ -21,9 +21,11 @@ namespace DotNetAvroSerializer.Generators.Models
         internal ICollection<string> Names { get; private set; } = new List<string>();
         internal SerializableTypeMetadata InnerSerializableType { get; set; }
 
-        private void GetFieldNames(IPropertySymbol fieldSymbol)
+        private void GetFieldNames(ISymbol fieldSymbol)
         {
-            var avroFieldAttributes = fieldSymbol.GetAttributes().Where(a => a.AttributeClass.Name == "AvroFieldAttribute");
+            var avroFieldAttributes = fieldSymbol
+                .GetAttributes()
+                .Where(a => a.AttributeClass.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat) == "global::DotNetAvroSerializer.AvroFieldAttribute");
 
             foreach (var avroAttribute in avroFieldAttributes)
             {

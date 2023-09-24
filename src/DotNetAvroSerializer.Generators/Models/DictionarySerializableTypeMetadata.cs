@@ -6,7 +6,7 @@ namespace DotNetAvroSerializer.Generators.Models
 {
     internal class DictionarySerializableTypeMetadata : SerializableTypeMetadata
     {
-        public DictionarySerializableTypeMetadata(SerializableTypeMetadata valuesTypeMetadata, ITypeSymbol dictionaryTypeSymbol)
+        public DictionarySerializableTypeMetadata(SerializableTypeMetadata valuesTypeMetadata, ISymbol dictionaryTypeSymbol)
             : base(dictionaryTypeSymbol)
         {
             ValuesMetadata = valuesTypeMetadata;
@@ -18,8 +18,8 @@ namespace DotNetAvroSerializer.Generators.Models
         }
 
         protected override SerializableTypeKind Kind => SerializableTypeKind.Map;
-        internal SerializableTypeMetadata ValuesMetadata { get; set; }
-        internal string KeysTypeName { get; set; }
+        internal SerializableTypeMetadata ValuesMetadata { get; }
+        internal string KeysTypeName { get; }
 
         internal static bool IsValidMapType(ITypeSymbol symbol)
             => symbol is INamedTypeSymbol dictionaryTypeSymbol 

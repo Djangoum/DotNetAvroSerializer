@@ -30,8 +30,7 @@ public class AvroSerializersBenchmarks
             StringField = "test text"
         });
     }
-
-
+    
     [Benchmark]
     public byte[] AvroSerializerRecordWithComplexTypes()
     {

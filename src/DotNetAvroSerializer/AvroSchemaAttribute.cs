@@ -2,6 +2,7 @@
 
 namespace DotNetAvroSerializer
 {
+    [AttributeUsage(AttributeTargets.Class)]
     public class AvroSchemaAttribute : Attribute
     {
         public AvroSchemaAttribute(string schemaFilePath, Type[]? allowedCustomLogicalTypes = null)

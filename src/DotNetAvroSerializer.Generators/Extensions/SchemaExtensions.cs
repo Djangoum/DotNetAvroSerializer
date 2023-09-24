@@ -1,10 +1,10 @@
-using System;
-using System.Linq;
-using System.Runtime.CompilerServices;
 using Avro;
 using DotNetAvroSerializer.Generators.Exceptions;
 using DotNetAvroSerializer.Generators.Models;
 using DotNetAvroSerializer.Generators.SerializationGenerators;
+using System;
+using System.Linq;
+using System.Runtime.CompilerServices;
 
 namespace DotNetAvroSerializer.Generators.Extensions;
 

@@ -1,9 +1,9 @@
 ﻿using Avro;
 using DotNetAvroSerializer.Generators.Exceptions;
+using DotNetAvroSerializer.Generators.Extensions;
 using DotNetAvroSerializer.Generators.Helpers;
 using DotNetAvroSerializer.Generators.Models;
 using System;
-using DotNetAvroSerializer.Generators.Extensions;
 
 namespace DotNetAvroSerializer.Generators.SerializationGenerators
 {

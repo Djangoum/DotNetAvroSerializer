@@ -1,6 +1,6 @@
-using System;
 using Avro;
 using Avro.Util;
+using System;
 
 namespace DotNetAvroSerializer.Generators.Helpers;
 

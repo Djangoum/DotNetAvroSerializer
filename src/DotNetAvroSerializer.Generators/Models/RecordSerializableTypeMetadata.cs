@@ -6,14 +6,14 @@ namespace DotNetAvroSerializer.Generators.Models;
 
 internal class RecordSerializableTypeMetadata : SerializableTypeMetadata
 {
-    public RecordSerializableTypeMetadata(ITypeSymbol typeSymbol)
+    public RecordSerializableTypeMetadata(ITypeSymbol typeSymbol, Compilation compilation)
         : base(typeSymbol)
     {
         Fields = typeSymbol
                 .GetMembers()
                 .Where(s => s.Kind is SymbolKind.Property)
                 .Cast<IPropertySymbol>()
-                .Select(t => new FieldSerializableTypeMetadata(From(t.Type), t, t.Name));
+                .Select(t => new FieldSerializableTypeMetadata(From(t.Type, compilation), t, t.Name));
     }
 
     protected override SerializableTypeKind Kind => SerializableTypeKind.Record;

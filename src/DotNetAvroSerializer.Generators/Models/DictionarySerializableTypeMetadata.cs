@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics;
 using System.Linq;
 using Microsoft.CodeAnalysis;
 
@@ -21,10 +22,14 @@ internal class DictionarySerializableTypeMetadata : SerializableTypeMetadata
     internal SerializableTypeMetadata ValuesMetadata { get; }
     internal string KeysTypeName { get; }
 
-    internal static bool IsValidMapType(ITypeSymbol symbol)
-        => symbol is INamedTypeSymbol dictionaryTypeSymbol
-        && (dictionaryTypeSymbol.Name == "IDictionary"
-            || dictionaryTypeSymbol.AllInterfaces.Any(i => i.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat).StartsWith("global::System.Collections.Generic.IDictionary<global::System.String")));
+    internal static bool IsValidMapType(ITypeSymbol symbol, Compilation compilation)
+    {
+        var dictionaryType = compilation.GetTypeByMetadataName("System.Collections.Generic.IDictionary`2");
+
+        return symbol is INamedTypeSymbol dictionaryTypeSymbol
+            && (dictionaryTypeSymbol.OriginalDefinition.Equals(dictionaryType, SymbolEqualityComparer.Default)
+                || dictionaryTypeSymbol.AllInterfaces.Any(i => i.Equals(dictionaryType, SymbolEqualityComparer.Default) && i.TypeParameters.First().SpecialType is SpecialType.System_String));
+    }
 
     internal static ITypeSymbol GetValuesTypeSymbol(ITypeSymbol symbol)
     {

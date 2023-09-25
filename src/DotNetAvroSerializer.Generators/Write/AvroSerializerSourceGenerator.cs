@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Immutable;
 using System.Linq;
 using System.Threading;
@@ -125,7 +125,7 @@ public partial class AvroSerializerSourceGenerator : IIncrementalGenerator
 
         var serializableType = GetSerializableTypeSymbol(serializerSyntax, ctx);
 
-        var serializableTypeMetadata = SerializableTypeMetadata.From(serializableType);
+        var serializableTypeMetadata = SerializableTypeMetadata.From(serializableType, ctx.SemanticModel.Compilation);
 
         if (serializableTypeMetadata is null)
         {
@@ -156,7 +156,7 @@ public partial class AvroSerializerSourceGenerator : IIncrementalGenerator
         return symbol;
     }
 
-    private static (string serializationCode, string privateFieldsCode, Diagnostic diagnostic) SerializationCodeGeneratorLoop(SerializerMetadata serializerMetadata, Schema schema, string sourceAccessor = "source")
+    private static (string serializationCode, string privateFieldsCode, Diagnostic diagnostic) SerializationCodeGeneratorLoop(SerializerMetadata serializerMetadata, Schema schema)
     {
         try
         {

@@ -19,11 +19,11 @@ internal class UnionSerializableTypeMetadata : SerializableTypeMetadata
 
     internal IEnumerable<SerializableTypeMetadata> UnionTypes { get; }
 
-    internal static IEnumerable<SerializableTypeMetadata> GetInnerUnionTypeSymbols(ITypeSymbol typeSymbol)
+    internal static IEnumerable<SerializableTypeMetadata> GetInnerUnionTypeSymbols(ITypeSymbol typeSymbol, Compilation compilation)
     {
         var namedTypeSymbol = typeSymbol as INamedTypeSymbol;
 
-        return namedTypeSymbol!.TypeArguments.Select(From).ToList();
+        return namedTypeSymbol!.TypeArguments.Select(a => From(a, compilation)).ToList();
     }
 
     public override bool Equals(SerializableTypeMetadata other)

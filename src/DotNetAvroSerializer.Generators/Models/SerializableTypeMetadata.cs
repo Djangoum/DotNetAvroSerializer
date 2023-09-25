@@ -16,7 +16,7 @@ internal abstract class SerializableTypeMetadata : IEquatable<SerializableTypeMe
     internal string FullNameDisplay { get; }
     private string StringRepresentation { get; }
 
-    internal static SerializableTypeMetadata From(ITypeSymbol symbol)
+    internal static SerializableTypeMetadata From(ITypeSymbol symbol, Compilation compilation)
     {
         if (symbol.TypeKind is TypeKind.Class or TypeKind.Interface or TypeKind.Struct or TypeKind.Array or TypeKind.Enum)
         {
@@ -27,22 +27,22 @@ internal abstract class SerializableTypeMetadata : IEquatable<SerializableTypeMe
 
             if (NullableSerializableTypeMetadata.IsNullableType(symbol))
             {
-                return new NullableSerializableTypeMetadata(From(NullableSerializableTypeMetadata.GetInnerNullableTypeSymbol(symbol)), symbol);
+                return new NullableSerializableTypeMetadata(From(NullableSerializableTypeMetadata.GetInnerNullableTypeSymbol(symbol), compilation), symbol);
             }
 
             if (UnionSerializableTypeMetadata.IsUnionType(symbol))
             {
-                return new UnionSerializableTypeMetadata(symbol, UnionSerializableTypeMetadata.GetInnerUnionTypeSymbols(symbol));
+                return new UnionSerializableTypeMetadata(symbol, UnionSerializableTypeMetadata.GetInnerUnionTypeSymbols(symbol, compilation));
             }
 
-            if (DictionarySerializableTypeMetadata.IsValidMapType(symbol))
+            if (DictionarySerializableTypeMetadata.IsValidMapType(symbol, compilation))
             {
-                return new DictionarySerializableTypeMetadata(From(DictionarySerializableTypeMetadata.GetValuesTypeSymbol(symbol)), symbol);
+                return new DictionarySerializableTypeMetadata(From(DictionarySerializableTypeMetadata.GetValuesTypeSymbol(symbol), compilation), symbol);
             }
 
             if (IterableSerializableTypeMetadata.IsValidArrayType(symbol))
             {
-                return new IterableSerializableTypeMetadata(From(IterableSerializableTypeMetadata.GetIterableItemsTypeSymbol(symbol)), symbol);
+                return new IterableSerializableTypeMetadata(From(IterableSerializableTypeMetadata.GetIterableItemsTypeSymbol(symbol), compilation), symbol);
             }
 
             if (EnumSerializableTypeMetadata.IsEnumType(symbol))
@@ -55,7 +55,7 @@ internal abstract class SerializableTypeMetadata : IEquatable<SerializableTypeMe
                 return new PrimitiveSerializableTypeMetadata(symbol);
             }
 
-            return new RecordSerializableTypeMetadata(symbol);
+            return new RecordSerializableTypeMetadata(symbol, compilation);
         }
 
         return null;

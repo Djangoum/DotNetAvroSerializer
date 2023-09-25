@@ -1,4 +1,4 @@
-﻿using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis;
 
 namespace DotNetAvroSerializer.Generators.Models;
 
@@ -8,11 +8,13 @@ internal class PrimitiveSerializableTypeMetadata : SerializableTypeMetadata
         : base(primitiveTypeSymbol)
     {
         TypeName = primitiveTypeSymbol.Name;
+        SpecialType = primitiveTypeSymbol.SpecialType;
     }
 
     protected override SerializableTypeKind Kind => SerializableTypeKind.Primitive;
 
     internal string TypeName { get; }
+    internal SpecialType SpecialType { get; }
 
     internal static bool IsAllowedPrimitiveType(ITypeSymbol typeSymbol)
     {

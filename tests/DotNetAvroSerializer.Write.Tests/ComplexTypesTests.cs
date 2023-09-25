@@ -1,4 +1,4 @@
-﻿using DotNetAvroSerializer.Write.Tests.Models;
+using DotNetAvroSerializer.Write.Tests.Models;
 using FluentAssertions;
 
 namespace DotNetAvroSerializer.Write.Tests;
@@ -28,9 +28,24 @@ public class ComplexTypesTests
     }
 
     [Fact]
-    public void SerializeMapOfInts()
+    public void SerializeMapOfIntsWithIDictionary()
     {
-        MapSerializer serializer = new MapSerializer();
+        IDictionaryMapSerializer serializer = new IDictionaryMapSerializer();
+
+        var result = serializer.Serialize(new Dictionary<string, int>()
+         {
+             { "item1", 1 },
+             { "item2", 2 },
+             { "item3", 3 }
+         });
+
+        Convert.ToHexString(result).Should().BeEquivalentTo("060A6974656D31020A6974656D32040A6974656D330600");
+    }
+
+    [Fact]
+    public void SerializeMapOfIntsWithDictionary()
+    {
+        DictionaryMapSerializer serializer = new DictionaryMapSerializer();
 
         var result = serializer.Serialize(new Dictionary<string, int>()
          {
@@ -397,7 +412,13 @@ public partial class FixedSerializer : AvroSerializer<byte[]>
 }
 
 [AvroSchema(@"{ ""type"" : ""map"", ""values"": ""int"" }")]
-public partial class MapSerializer : AvroSerializer<IDictionary<string, int>>
+public partial class IDictionaryMapSerializer : AvroSerializer<IDictionary<string, int>>
+{
+
+}
+
+[AvroSchema(@"{ ""type"" : ""map"", ""values"": ""int"" }")]
+public partial class DictionaryMapSerializer : AvroSerializer<Dictionary<string, int>>
 {
 
 }

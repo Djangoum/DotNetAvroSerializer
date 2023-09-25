@@ -28,7 +28,7 @@ internal class DictionarySerializableTypeMetadata : SerializableTypeMetadata
 
         return symbol is INamedTypeSymbol dictionaryTypeSymbol
             && (dictionaryTypeSymbol.OriginalDefinition.Equals(dictionaryType, SymbolEqualityComparer.Default)
-                || dictionaryTypeSymbol.AllInterfaces.Any(i => i.Equals(dictionaryType, SymbolEqualityComparer.Default) && i.TypeParameters.First().SpecialType is SpecialType.System_String));
+                || dictionaryTypeSymbol.AllInterfaces.Any(i => i.OriginalDefinition.Equals(dictionaryType, SymbolEqualityComparer.Default) && i.TypeArguments.First().SpecialType is SpecialType.System_String));
     }
 
     internal static ITypeSymbol GetValuesTypeSymbol(ITypeSymbol symbol)

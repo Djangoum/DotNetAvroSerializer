@@ -1,4 +1,4 @@
-﻿using System.Linq;
+using System.Linq;
 using Microsoft.CodeAnalysis;
 
 namespace DotNetAvroSerializer.Generators.Models;
@@ -30,9 +30,7 @@ internal class IterableSerializableTypeMetadata : SerializableTypeMetadata
         };
 
     public override bool Equals(SerializableTypeMetadata other)
-    {
-        return base.Equals(other)
+        => base.Equals(other)
             && other is IterableSerializableTypeMetadata iterableSerializableType
             && ItemsTypeMetadata.Equals(iterableSerializableType.ItemsTypeMetadata);
-    }
 }

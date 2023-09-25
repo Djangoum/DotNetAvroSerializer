@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Linq;
 using Microsoft.CodeAnalysis;
 
@@ -24,7 +24,7 @@ internal class DictionarySerializableTypeMetadata : SerializableTypeMetadata
     internal static bool IsValidMapType(ITypeSymbol symbol)
         => symbol is INamedTypeSymbol dictionaryTypeSymbol
         && (dictionaryTypeSymbol.Name == "IDictionary"
-            || dictionaryTypeSymbol.AllInterfaces.Any(i => i.Name.Contains("Dictionary")));
+            || dictionaryTypeSymbol.AllInterfaces.Any(i => i.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat).StartsWith("global::System.Collections.Generic.IDictionary<global::System.String")));
 
     internal static ITypeSymbol GetValuesTypeSymbol(ITypeSymbol symbol)
     {
@@ -35,10 +35,8 @@ internal class DictionarySerializableTypeMetadata : SerializableTypeMetadata
     }
 
     public override bool Equals(SerializableTypeMetadata other)
-    {
-        return base.Equals(other)
+        => base.Equals(other)
             && other is DictionarySerializableTypeMetadata dictionarySerializableType
             && KeysTypeName.Equals(dictionarySerializableType.KeysTypeName, StringComparison.InvariantCultureIgnoreCase)
             && ValuesMetadata.Equals(dictionarySerializableType.ValuesMetadata);
-    }
 }

@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Text;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
@@ -76,7 +76,12 @@ public partial class AvroSerializerSourceGenerator
                 Identifier("Serialize"))
             .WithModifiers(
                 TokenList(
-                    Token(SyntaxKind.PublicKeyword)))
+                    new []
+                    {
+                        Token(SyntaxKind.PublicKeyword),
+                        Token(SyntaxKind.OverrideKeyword)
+                    })
+                )
             .WithParameterList(
                 ParameterList(
                     SingletonSeparatedList<ParameterSyntax>(
@@ -130,7 +135,12 @@ public partial class AvroSerializerSourceGenerator
                 Identifier("SerializeToStream"))
             .WithModifiers(
                 TokenList(
-                    Token(SyntaxKind.PublicKeyword)))
+                    new []
+                    {
+                        Token(SyntaxKind.PublicKeyword),
+                        Token(SyntaxKind.OverrideKeyword)
+                    })
+                )
             .WithParameterList(
                 ParameterList(
                     SeparatedList<ParameterSyntax>(

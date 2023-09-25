@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Microsoft.CodeAnalysis;
 
 namespace DotNetAvroSerializer.Generators.Models;
@@ -61,13 +61,8 @@ internal abstract class SerializableTypeMetadata : IEquatable<SerializableTypeMe
         return null;
     }
 
-    public override string ToString()
-    {
-        return StringRepresentation;
-    }
+    public override string ToString() => StringRepresentation;
 
     public virtual bool Equals(SerializableTypeMetadata other)
-    {
-        return other is not null && Kind == other.Kind && FullNameDisplay == other.FullNameDisplay;
-    }
+        => other is not null && Kind == other.Kind && FullNameDisplay == other.FullNameDisplay;
 }

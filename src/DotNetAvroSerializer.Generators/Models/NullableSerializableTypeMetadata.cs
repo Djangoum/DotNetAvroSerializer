@@ -1,4 +1,4 @@
-﻿using System.Linq;
+using System.Linq;
 using Microsoft.CodeAnalysis;
 
 namespace DotNetAvroSerializer.Generators.Models;
@@ -21,8 +21,7 @@ internal class NullableSerializableTypeMetadata : SerializableTypeMetadata
         };
 
     internal static ITypeSymbol GetInnerNullableTypeSymbol(ITypeSymbol typeSymbol)
-    {
-        return typeSymbol switch
+        => typeSymbol switch
         {
             INamedTypeSymbol namedTypeSymbol when namedTypeSymbol.TypeArguments.Any() => namedTypeSymbol
                 .TypeArguments.First(),
@@ -30,12 +29,9 @@ internal class NullableSerializableTypeMetadata : SerializableTypeMetadata
             IArrayTypeSymbol arrayTypeSymbol => arrayTypeSymbol.WithNullableAnnotation(NullableAnnotation.None),
             _ => null
         };
-    }
 
     public override bool Equals(SerializableTypeMetadata other)
-    {
-        return base.Equals(other)
+        => base.Equals(other)
             && other is NullableSerializableTypeMetadata nullableSerializableType
             && nullableSerializableType.InnerNullableTypeSymbol.Equals(nullableSerializableType.InnerNullableTypeSymbol);
-    }
 }

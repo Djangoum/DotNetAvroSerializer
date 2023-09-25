@@ -1,4 +1,4 @@
-﻿using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis;
 
 namespace DotNetAvroSerializer.Generators.Models;
 
@@ -15,10 +15,10 @@ internal class LogicalTypeSerializableTypeMetadata : SerializableTypeMetadata
 
     internal static bool IsValidLogicalType(ITypeSymbol typeSymbol)
     {
-        return typeSymbol.Name
-            is "DateTime"
-            or "DateOnly"
-            or "TimeOnly"
-            or "Guid";
+        return typeSymbol.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat)
+            is "global::System.DateTime"
+            or "global::System.DateOnly"
+            or "global::System.TimeOnly"
+            or "global::System.Guid";
     }
 }

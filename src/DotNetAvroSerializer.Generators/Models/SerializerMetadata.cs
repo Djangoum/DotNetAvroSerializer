@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using Avro;
 using Microsoft.CodeAnalysis;
 
@@ -13,9 +13,7 @@ internal record SerializerMetadata(string SerializerClassName,
     private SmallLocation location;
 
     public void ExtractLocation(Location serializerLocation)
-    {
-        this.location = new SmallLocation(serializerLocation.SourceTree?.FilePath, serializerLocation.SourceSpan, serializerLocation.GetLineSpan().Span);
-    }
+        => location = new SmallLocation(serializerLocation.SourceTree?.FilePath, serializerLocation.SourceSpan, serializerLocation.GetLineSpan().Span);
 
     public Location GetSerializerLocation() => Location.Create(location.FilePath, location.TextSpan, location.LineSpan);
 }

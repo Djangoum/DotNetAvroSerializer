@@ -23,7 +23,7 @@ internal static class PrimitiveTypesGenerator
             "double" when context.SerializableTypeMetadata is PrimitiveSerializableTypeMetadata { SpecialType: Microsoft.CodeAnalysis.SpecialType.System_Double } => $"DoubleSchema.Write(outputStream, {context.SourceAccessor});",
             "float" when context.SerializableTypeMetadata is PrimitiveSerializableTypeMetadata { SpecialType: Microsoft.CodeAnalysis.SpecialType.System_Single } => $"FloatSchema.Write(outputStream, {context.SourceAccessor});",
             "null" => $"NullSchema.Write(outputStream, {context.SourceAccessor});",
-            _ => throw new AvroGeneratorException($"Required type was not satisfied to serialize {schema!.Name} {context.SerializableTypeMetadata} found")
+            _ => throw new AvroGeneratorException($"Required type was not satisfied to serialize {schema!.Name}, {context.SerializableTypeMetadata} found")
         };
 
         context.SerializationCode.AppendLine(serializerCallCode);

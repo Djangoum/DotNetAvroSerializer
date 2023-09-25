@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Linq;
 using Microsoft.CodeAnalysis;
 
@@ -41,9 +41,7 @@ internal class FieldSerializableTypeMetadata : SerializableTypeMetadata
     }
 
     public override bool Equals(SerializableTypeMetadata other)
-    {
-        return base.Equals(other)
+        => base.Equals(other)
             && other is FieldSerializableTypeMetadata fieldSerializableType
             && InnerSerializableType.Equals(fieldSerializableType);
-    }
 }

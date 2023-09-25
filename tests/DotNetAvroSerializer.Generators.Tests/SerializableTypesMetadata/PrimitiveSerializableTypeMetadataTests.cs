@@ -33,5 +33,4 @@ public class PrimitiveSerializableTypeMetadataTests
 
         result.Should().Be(success);
     }
-
 }

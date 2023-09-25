@@ -1,9 +1,6 @@
-﻿using DotNetAvroSerializer;
+﻿namespace DotNetAvroSerializer.Benchmarks.Serializers;
 
-namespace DotNetAvroSerializer.Benchmarks.Serializers
+[AvroSchema($@"{{ ""type"": ""string"" }}")]
+public partial class StringSerializer : AvroSerializer<string>
 {
-    [AvroSchema($@"{{ ""type"": ""string"" }}")]
-    public partial class StringSerializer : AvroSerializer<string>
-    {
-    }
 }

@@ -342,3 +342,4 @@ As of now, the library exclusively offers serialization capabilities and does no
 
 - [ ] Reduce boxing and casts
 - [ ] Allow logicalTypes with complex base types
+- [ ] Decimal logical type

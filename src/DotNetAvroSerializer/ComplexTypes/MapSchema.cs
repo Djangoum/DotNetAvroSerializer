@@ -1,9 +1,8 @@
 ﻿using System.Collections;
 
-namespace DotNetAvroSerializer.ComplexTypes
+namespace DotNetAvroSerializer.ComplexTypes;
+
+public static class MapSchema
 {
-    public static class MapSchema
-    {
-        public static bool CanSerialize(object? value) => value is IDictionary;
-    }
+    public static bool CanSerialize(object? value) => value is IDictionary;
 }

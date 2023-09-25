@@ -1,8 +1,8 @@
 ﻿using DotNetAvroSerializer.Benchmarks.Models;
 
-namespace DotNetAvroSerializer.Benchmarks.Serializers
-{
-    [AvroSchema(@"
+namespace DotNetAvroSerializer.Benchmarks.Serializers;
+
+[AvroSchema(@"
     {
         ""type"": ""record"",
         ""name"" : ""classWithPrimitivesSerializer"",
@@ -37,12 +37,12 @@ namespace DotNetAvroSerializer.Benchmarks.Serializers
             }
         ]
     }")]
-    public partial class ClassWithPrimitivesSerializer : AvroSerializer<ClassWithPrimitives>
-    {
+public partial class ClassWithPrimitivesSerializer : AvroSerializer<ClassWithPrimitives>
+{
 
-    }
+}
 
-    [AvroSchema(@"{
+[AvroSchema(@"{
         ""type"": ""record"",
         ""name"" : ""recordWithComplexTypes"",
         ""fields"" :[
@@ -91,8 +91,7 @@ namespace DotNetAvroSerializer.Benchmarks.Serializers
             }
         ]
     }")]
-    public partial class RecordWithComplexTypesSerializer : AvroSerializer<RecordWithComplexTypes>
-    {
+public partial class RecordWithComplexTypesSerializer : AvroSerializer<RecordWithComplexTypes>
+{
 
-    }
 }

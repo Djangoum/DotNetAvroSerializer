@@ -1,11 +1,11 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using DotNetAvroSerializer.Generators.Diagnostics;
 using DotNetAvroSerializer.Generators.Models;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Operations;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace DotNetAvroSerializer.Generators.Write;
 
@@ -20,7 +20,7 @@ public static class CustomLogicalTypesMetadataProcessor
 
         var fullyQualifiedLogicalTypes = new List<CustomLogicalTypeMetadata>(customLogicalTypesArray.Count());
         var diagnosticsProduced = new List<Diagnostic>();
-        
+
         foreach (var customLogicalTypeSymbol in customLogicalTypesArray)
         {
             if (!customLogicalTypeSymbol.IsStatic)
@@ -85,17 +85,17 @@ public static class CustomLogicalTypesMetadataProcessor
             .Any(m => m.Name.Equals("ConvertToBaseSchemaType", StringComparison.InvariantCultureIgnoreCase)
                       && m.Parameters.Any());
 
-    private static bool DoesCustomLogicalTypeHaveCanSerializeMethod(INamedTypeSymbol customLogicalTypeSymbol) => 
+    private static bool DoesCustomLogicalTypeHaveCanSerializeMethod(INamedTypeSymbol customLogicalTypeSymbol) =>
         customLogicalTypeSymbol
             .GetMembers()
             .Where(m => m.Kind == SymbolKind.Method)
             .Cast<IMethodSymbol>()
-            .Any(m => m.Name.Equals("CanSerialize", StringComparison.InvariantCultureIgnoreCase) 
-                      && m.ReturnType.Name.Equals("Boolean", StringComparison.InvariantCultureIgnoreCase) 
-                      && m.Parameters.Any() 
-                      && m.Parameters.First().Type.Name.Equals("object", StringComparison.InvariantCultureIgnoreCase));
-    
-    private static IEnumerable<INamedTypeSymbol> ExtractCustomLogicalTypesArray(ExpressionSyntax customLogicalTypesDeclarationExpression, GeneratorSyntaxContext ctx) => 
+            .Any(m => m.Name.Equals("CanSerialize", StringComparison.InvariantCultureIgnoreCase)
+                      && m.ReturnType.SpecialType is SpecialType.System_Boolean
+                      && m.Parameters.Any()
+                      && m.Parameters.First().Type.SpecialType is SpecialType.System_Object);
+
+    private static IEnumerable<INamedTypeSymbol> ExtractCustomLogicalTypesArray(ExpressionSyntax customLogicalTypesDeclarationExpression, GeneratorSyntaxContext ctx) =>
         ctx
             .SemanticModel
             .GetOperation(customLogicalTypesDeclarationExpression)!

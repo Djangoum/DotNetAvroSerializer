@@ -1,29 +1,28 @@
-﻿using DotNetAvroSerializer.Exceptions;
-using System;
+﻿using System;
 using System.IO;
+using DotNetAvroSerializer.Exceptions;
 
-namespace DotNetAvroSerializer.Primitives
+namespace DotNetAvroSerializer.Primitives;
+
+public static class FloatSchema
 {
-    public static class FloatSchema
+    public static bool CanSerialize(object? value) => value is float;
+
+    public static void Write(Stream outputStream, float? value)
     {
-        public static bool CanSerialize(object? value) => value is float;
+        if (value is null)
+            throw new AvroSerializationException("Cannot serialize null value to int");
 
-        public static void Write(Stream outputStream, float? value)
+        Write(outputStream, value.Value);
+    }
+
+    public static void Write(Stream outputStream, float value)
+    {
+        var bytes = BitConverter.GetBytes(value);
+        if (!BitConverter.IsLittleEndian)
         {
-            if (value is null)
-                throw new AvroSerializationException("Cannot serialize null value to int");
-
-            Write(outputStream, value.Value);
+            Array.Reverse(bytes);
         }
-
-        public static void Write(Stream outputStream, float value)
-        {
-            var bytes = BitConverter.GetBytes(value);
-            if (!BitConverter.IsLittleEndian)
-            {
-                Array.Reverse(bytes);
-            }
-            outputStream.Write(bytes, 0, bytes.Length);
-        }
+        outputStream.Write(bytes, 0, bytes.Length);
     }
 }

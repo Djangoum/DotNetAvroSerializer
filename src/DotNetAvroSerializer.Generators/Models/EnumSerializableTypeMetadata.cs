@@ -1,18 +1,17 @@
 ﻿using Microsoft.CodeAnalysis;
 
-namespace DotNetAvroSerializer.Generators.Models
+namespace DotNetAvroSerializer.Generators.Models;
+
+internal class EnumSerializableTypeMetadata : SerializableTypeMetadata
 {
-    internal class EnumSerializableTypeMetadata : SerializableTypeMetadata
+    public EnumSerializableTypeMetadata(ISymbol enumSymbol)
+        : base(enumSymbol)
     {
-        public EnumSerializableTypeMetadata(ITypeSymbol enumSymbol)
-            : base(enumSymbol)
-        {
-            
-        }
 
-        protected override SerializableTypeKind Kind => SerializableTypeKind.Enum;
-
-        internal static bool IsEnumType(ITypeSymbol enumSymbol)
-            => enumSymbol.TypeKind is TypeKind.Enum;
     }
+
+    protected override SerializableTypeKind Kind => SerializableTypeKind.Enum;
+
+    internal static bool IsEnumType(ITypeSymbol enumSymbol)
+        => enumSymbol.TypeKind is TypeKind.Enum;
 }

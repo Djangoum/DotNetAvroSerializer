@@ -1,114 +1,182 @@
-﻿using DotNetAvroSerializer;
 using DotNetAvroSerializer.Write.Tests.Models;
 using FluentAssertions;
 
-namespace DotNetAvroSerializer.Write.Tests
+namespace DotNetAvroSerializer.Write.Tests;
+
+public class ComplexTypesTests
 {
-    public class ComplexTypesTests
+    [Fact]
+    public void SerializeArrayOfInts()
     {
-        [Fact]
-        public void SerializeArrayOfInts()
-        {
-            var array = new int[] { 1, 2, 3, 4 };
+        var array = new int[] { 1, 2, 3, 4 };
 
-            IntArraySerializer serializer = new IntArraySerializer();
+        IntArraySerializer serializer = new IntArraySerializer();
 
-            var result = serializer.Serialize(array);
+        var result = serializer.Serialize(array);
 
-            Convert.ToHexString(result).Should().BeEquivalentTo("080204060800");
-        }
+        Convert.ToHexString(result).Should().BeEquivalentTo("080204060800");
+    }
 
-        [Fact]
-        public void SerializeEnum()
-        {
-            EnumSerializer serializer = new EnumSerializer();
+    [Fact]
+    public void SerializeEnum()
+    {
+        EnumSerializer serializer = new EnumSerializer();
 
-            var result = serializer.Serialize(TestEnum.Value3);
+        var result = serializer.Serialize(TestEnum.Value3);
 
-            Convert.ToHexString(result).Should().BeEquivalentTo("04");
-        }
+        Convert.ToHexString(result).Should().BeEquivalentTo("04");
+    }
 
-        [Fact]
-        public void SerializeMapOfInts()
-        {
-            MapSerializer serializer = new MapSerializer();
+    [Fact]
+    public void SerializeMapOfIntsWithIDictionary()
+    {
+        IDictionaryMapSerializer serializer = new IDictionaryMapSerializer();
 
-            var result = serializer.Serialize(new Dictionary<string, int>()
+        var result = serializer.Serialize(new Dictionary<string, int>()
+         {
+             { "item1", 1 },
+             { "item2", 2 },
+             { "item3", 3 }
+         });
+
+        Convert.ToHexString(result).Should().BeEquivalentTo("060A6974656D31020A6974656D32040A6974656D330600");
+    }
+
+    [Fact]
+    public void SerializeMapOfIntsWithDictionary()
+    {
+        DictionaryMapSerializer serializer = new DictionaryMapSerializer();
+
+        var result = serializer.Serialize(new Dictionary<string, int>()
+         {
+             { "item1", 1 },
+             { "item2", 2 },
+             { "item3", 3 }
+         });
+
+        Convert.ToHexString(result).Should().BeEquivalentTo("060A6974656D31020A6974656D32040A6974656D330600");
+    }
+
+    [Fact]
+    public void SerializeArrayOfRecords()
+    {
+        ArrayOfRecordsSerializer serializer = new ArrayOfRecordsSerializer();
+
+        var result = serializer.Serialize(new List<InnerRecord>
+         {
+             new InnerRecord
              {
-                 { "item1", 1 },
-                 { "item2", 2 },
-                 { "item3", 3 }
-             });
-
-            Convert.ToHexString(result).Should().BeEquivalentTo("060A6974656D31020A6974656D32040A6974656D330600");
-        }
-
-        [Fact]
-        public void SerializeArrayOfRecords()
-        {
-            ArrayOfRecordsSerializer serializer = new ArrayOfRecordsSerializer();
-
-            var result = serializer.Serialize(new List<InnerRecord>
+                 Field2 = 2,
+                 Field1 = "holiwis"
+             },
+             new InnerRecord
              {
+                 Field2 = 2,
+                 Field1 = "holiwis"
+             }
+         });
+
+        Convert.ToHexString(result).Should().BeEquivalentTo("040E686F6C69776973040E686F6C697769730400");
+    }
+
+    [Fact]
+    public void SeralizeRecordWithPrimitiveTypes()
+    {
+        ClassWithPrimitivesSerializer serializer = new ClassWithPrimitivesSerializer();
+
+        var result = serializer.Serialize(new ClassWithPrimitives
+        {
+            BoolField = true,
+            BytesField = new byte[] { 1, 2, 3, 4 },
+            DoubleField = 12.5d,
+            FloatField = 15.6f,
+            IntegerField = 42,
+            LongField = 1234346567567563454,
+            StringField = "test text"
+        });
+
+        Convert.ToHexString(result).Should().BeEquivalentTo("54FCEAB299BAEAA3A122127465737420746578749A9979410000000000002940010801020304");
+    }
+
+    [Fact]
+    public void SerializeFixed()
+    {
+        FixedSerializer serializer = new FixedSerializer();
+
+        var result = serializer.Serialize(new byte[] { 1, 2, 3, 4 });
+
+        Convert.ToHexString(result).Should().BeEquivalentTo("0801020304");
+    }
+
+    [Fact]
+    public void SerializeRecordWithComplexTypes()
+    {
+        RecordWithComplexTypesSerializer serializer = new RecordWithComplexTypesSerializer();
+
+        var result = serializer.Serialize(new RecordWithComplexTypes
+        {
+            InnerRecord = new InnerRecord
+            {
+                Field1 = "teststring",
+                Field2 = 124
+            },
+            Doubles = new List<double> { 1.2d, 3.4d, 12.6d },
+            InnerRecords = new[]
+            {
                  new InnerRecord
                  {
-                     Field2 = 2,
-                     Field1 = "holiwis"
+                     Field1 = "teststring",
+                     Field2 = 124
                  },
                  new InnerRecord
                  {
-                     Field2 = 2,
-                     Field1 = "holiwis"
+                     Field1 = "teststring",
+                     Field2 = 124
                  }
-             });
+             },
+            NullableFloat = 12.6f,
+            MapField = new Dictionary<string, InnerRecord>
+             {
+                 {
+                     "key1",
+                     new InnerRecord
+                     {
+                         Field1 = "teststring",
+                         Field2 = 124
+                     }
+                 },
+                 {
+                     "key2",
+                     new InnerRecord
+                     {
+                         Field1 = "teststring",
+                         Field2 = 124
+                     }
+                 }
+             }
+        });
 
-            Convert.ToHexString(result).Should().BeEquivalentTo("040E686F6C69776973040E686F6C697769730400");
-        }
+        Convert.ToHexString(result).Should().BeEquivalentTo("1474657374737472696E67F801041474657374737472696E67F8011474657374737472696E67F8010006333333333333F33F3333333333330B40333333333333294000029A99494104086B6579311474657374737472696E67F801086B6579321474657374737472696E67F80100");
+    }
 
-        [Fact]
-        public void SeralizeRecordWithPrimitiveTypes()
-        {
-            ClassWithPrimitivesSerializer serializer = new ClassWithPrimitivesSerializer();
+    [Fact]
+    public void SerializeArrayOfRecordsWithComplextTypes()
+    {
+        ArrayOfRecordWithComplexTypesSerializer serializer = new ArrayOfRecordWithComplexTypesSerializer();
 
-            var result = serializer.Serialize(new ClassWithPrimitives
+        var result = serializer.Serialize(
+            new List<RecordWithComplexTypes>
             {
-                BoolField = true,
-                BytesField = new byte[] { 1, 2, 3, 4 },
-                DoubleField = 12.5d,
-                FloatField = 15.6f,
-                IntegerField = 42,
-                LongField = 1234346567567563454,
-                StringField = "test text"
-            });
-
-            Convert.ToHexString(result).Should().BeEquivalentTo("54FCEAB299BAEAA3A122127465737420746578749A9979410000000000002940010801020304");
-        }
-
-        [Fact]
-        public void SerializeFixed()
-        {
-            FixedSerializer serializer = new FixedSerializer();
-
-            var result = serializer.Serialize(new byte[] { 1, 2, 3, 4 });
-
-            Convert.ToHexString(result).Should().BeEquivalentTo("0801020304");
-        }
-
-        [Fact]
-        public void SerializeRecordWithComplexTypes()
-        {
-            RecordWithComplexTypesSerializer serializer = new RecordWithComplexTypesSerializer();
-
-            var result = serializer.Serialize(new RecordWithComplexTypes
-            {
-                InnerRecord = new InnerRecord
-                {
-                    Field1 = "teststring",
-                    Field2 = 124
-                },
-                Doubles = new List<double> { 1.2d, 3.4d, 12.6d },
-                InnerRecords = new[]
-                {
+             new RecordWithComplexTypes
+             {
+                 InnerRecord = new InnerRecord
+                 {
+                     Field1 = "teststring",
+                     Field2 = 124
+                 },
+                 Doubles = new List<double> { 1.2d, 3.4d, 12.6d },
+                 InnerRecords = new[]
+                 {
                      new InnerRecord
                      {
                          Field1 = "teststring",
@@ -120,8 +188,8 @@ namespace DotNetAvroSerializer.Write.Tests
                          Field2 = 124
                      }
                  },
-                NullableFloat = 12.6f,
-                MapField = new Dictionary<string, InnerRecord>
+                 NullableFloat = 12.6f,
+                 MapField = new Dictionary<string, InnerRecord>
                  {
                      {
                          "key1",
@@ -140,110 +208,56 @@ namespace DotNetAvroSerializer.Write.Tests
                          }
                      }
                  }
-            });
-
-            Convert.ToHexString(result).Should().BeEquivalentTo("1474657374737472696E67F801041474657374737472696E67F8011474657374737472696E67F8010006333333333333F33F3333333333330B40333333333333294000029A99494104086B6579311474657374737472696E67F801086B6579321474657374737472696E67F80100");
-        }
-
-        [Fact]
-        public void SerializeArrayOfRecordsWithComplextTypes()
-        {
-            ArrayOfRecordWithComplexTypesSerializer serializer = new ArrayOfRecordWithComplexTypesSerializer();
-
-            var result = serializer.Serialize(
-                new List<RecordWithComplexTypes>
-                {
-                 new RecordWithComplexTypes
+             },
+             new RecordWithComplexTypes
+             {
+                 InnerRecord = new InnerRecord
                  {
-                     InnerRecord = new InnerRecord
+                     Field1 = "teststring",
+                     Field2 = 124
+                 },
+                 Doubles = new List<double> { 1.2d, 3.4d, 12.6d },
+                 InnerRecords = new[]
+                 {
+                     new InnerRecord
                      {
                          Field1 = "teststring",
                          Field2 = 124
                      },
-                     Doubles = new List<double> { 1.2d, 3.4d, 12.6d },
-                     InnerRecords = new[]
+                     new InnerRecord
                      {
-                         new InnerRecord
-                         {
-                             Field1 = "teststring",
-                             Field2 = 124
-                         },
-                         new InnerRecord
-                         {
-                             Field1 = "teststring",
-                             Field2 = 124
-                         }
-                     },
-                     NullableFloat = 12.6f,
-                     MapField = new Dictionary<string, InnerRecord>
-                     {
-                         {
-                             "key1",
-                             new InnerRecord
-                             {
-                                 Field1 = "teststring",
-                                 Field2 = 124
-                             }
-                         },
-                         {
-                             "key2",
-                             new InnerRecord
-                             {
-                                 Field1 = "teststring",
-                                 Field2 = 124
-                             }
-                         }
+                         Field1 = "teststring",
+                         Field2 = 124
                      }
                  },
-                 new RecordWithComplexTypes
+                 NullableFloat = 12.6f,
+                 MapField = new Dictionary<string, InnerRecord>
                  {
-                     InnerRecord = new InnerRecord
                      {
-                         Field1 = "teststring",
-                         Field2 = 124
-                     },
-                     Doubles = new List<double> { 1.2d, 3.4d, 12.6d },
-                     InnerRecords = new[]
-                     {
-                         new InnerRecord
-                         {
-                             Field1 = "teststring",
-                             Field2 = 124
-                         },
+                         "key1",
                          new InnerRecord
                          {
                              Field1 = "teststring",
                              Field2 = 124
                          }
                      },
-                     NullableFloat = 12.6f,
-                     MapField = new Dictionary<string, InnerRecord>
                      {
+                         "key2",
+                         new InnerRecord
                          {
-                             "key1",
-                             new InnerRecord
-                             {
-                                 Field1 = "teststring",
-                                 Field2 = 124
-                             }
-                         },
-                         {
-                             "key2",
-                             new InnerRecord
-                             {
-                                 Field1 = "teststring",
-                                 Field2 = 124
-                             }
+                             Field1 = "teststring",
+                             Field2 = 124
                          }
                      }
                  }
-                });
+             }
+            });
 
-            Convert.ToHexString(result).Should().BeEquivalentTo("041474657374737472696E67F801041474657374737472696E67F8011474657374737472696E67F8010006333333333333F33F3333333333330B40333333333333294000029A99494104086B6579311474657374737472696E67F801086B6579321474657374737472696E67F801001474657374737472696E67F801041474657374737472696E67F8011474657374737472696E67F8010006333333333333F33F3333333333330B40333333333333294000029A99494104086B6579311474657374737472696E67F801086B6579321474657374737472696E67F8010000");
-        }
+        Convert.ToHexString(result).Should().BeEquivalentTo("041474657374737472696E67F801041474657374737472696E67F8011474657374737472696E67F8010006333333333333F33F3333333333330B40333333333333294000029A99494104086B6579311474657374737472696E67F801086B6579321474657374737472696E67F801001474657374737472696E67F801041474657374737472696E67F8011474657374737472696E67F8010006333333333333F33F3333333333330B40333333333333294000029A99494104086B6579311474657374737472696E67F801086B6579321474657374737472696E67F8010000");
     }
+}
 
-    [AvroSchema(@"{
+[AvroSchema(@"{
          ""type"": ""record"",
          ""name"" : ""recordWithOverridenNames"",
          ""fields"": [
@@ -253,12 +267,12 @@ namespace DotNetAvroSerializer.Write.Tests
              }
          ]
      }")]
-    public partial class RecordWitOverridenFieldNamesSerializer : AvroSerializer<RecordWithOverridenNames>
-    {
+public partial class RecordWitOverridenFieldNamesSerializer : AvroSerializer<RecordWithOverridenNames>
+{
 
-    }
+}
 
-    [AvroSchema(@"{
+[AvroSchema(@"{
          ""type"": ""array"",
          ""items"": {
              ""type"": ""record"",
@@ -310,11 +324,12 @@ namespace DotNetAvroSerializer.Write.Tests
              ]
          }
      }")]
-    public partial class ArrayOfRecordWithComplexTypesSerializer : AvroSerializer<IEnumerable<RecordWithComplexTypes>>
-    {
+public partial class ArrayOfRecordWithComplexTypesSerializer : AvroSerializer<IEnumerable<RecordWithComplexTypes>>
+{
 
-    }
-    [AvroSchema(@"{
+}
+
+[AvroSchema(@"{
          ""type"": ""array"",
          ""items"": {
              ""name"": ""InnerRecord"",
@@ -331,12 +346,12 @@ namespace DotNetAvroSerializer.Write.Tests
              ]
          } 
      }")]
-    public partial class ArrayOfRecordsSerializer : AvroSerializer<IEnumerable<InnerRecord>>
-    {
+public partial class ArrayOfRecordsSerializer : AvroSerializer<IEnumerable<InnerRecord>>
+{
 
-    }
+}
 
-    [AvroSchema(@"{
+[AvroSchema(@"{
          ""type"": ""record"",
          ""name"" : ""recordWithComplexTypes"",
          ""fields"" :[
@@ -385,36 +400,42 @@ namespace DotNetAvroSerializer.Write.Tests
              }
          ]
      }")]
-    public partial class RecordWithComplexTypesSerializer : AvroSerializer<RecordWithComplexTypes>
-    {
+public partial class RecordWithComplexTypesSerializer : AvroSerializer<RecordWithComplexTypes>
+{
 
-    }
+}
 
-    [AvroSchema(@"{ ""type"": ""fixed"", ""size"" : 4, ""name"": ""sixteenLenght"" }")]
-    public partial class FixedSerializer : AvroSerializer<byte[]>
-    {
+[AvroSchema(@"{ ""type"": ""fixed"", ""size"" : 4, ""name"": ""sixteenLenght"" }")]
+public partial class FixedSerializer : AvroSerializer<byte[]>
+{
 
-    }
+}
 
-    [AvroSchema(@"{ ""type"" : ""map"", ""values"": ""int"" }")]
-    public partial class MapSerializer : AvroSerializer<IDictionary<string, int>>
-    {
+[AvroSchema(@"{ ""type"" : ""map"", ""values"": ""int"" }")]
+public partial class IDictionaryMapSerializer : AvroSerializer<IDictionary<string, int>>
+{
 
-    }
+}
 
-    [AvroSchema(@"{ ""type"" : ""array"", ""items"": ""int"" }")]
-    public partial class IntArraySerializer : AvroSerializer<int[]>
-    {
+[AvroSchema(@"{ ""type"" : ""map"", ""values"": ""int"" }")]
+public partial class DictionaryMapSerializer : AvroSerializer<Dictionary<string, int>>
+{
 
-    }
+}
 
-    [AvroSchema(@"{ ""type"": ""enum"", ""name"": ""foo"", ""symbols"": [ ""Value1"", ""Value2"", ""Value3"" ]}")]
-    public partial class EnumSerializer : AvroSerializer<TestEnum>
-    {
+[AvroSchema(@"{ ""type"" : ""array"", ""items"": ""int"" }")]
+public partial class IntArraySerializer : AvroSerializer<int[]>
+{
 
-    }
+}
 
-    [AvroSchema(@"
+[AvroSchema(@"{ ""type"": ""enum"", ""name"": ""foo"", ""symbols"": [ ""Value1"", ""Value2"", ""Value3"" ]}")]
+public partial class EnumSerializer : AvroSerializer<TestEnum>
+{
+
+}
+
+[AvroSchema(@"
      {
          ""type"": ""record"",
          ""name"" : ""classWithPrimitivesSerializer"",
@@ -449,15 +470,14 @@ namespace DotNetAvroSerializer.Write.Tests
              }
          ]
      }")]
-    public partial class ClassWithPrimitivesSerializer : AvroSerializer<ClassWithPrimitives>
-    {
+public partial class ClassWithPrimitivesSerializer : AvroSerializer<ClassWithPrimitives>
+{
 
-    }
+}
 
-    public enum TestEnum
-    {
-        Value1,
-        Value2,
-        Value3
-    }
+public enum TestEnum
+{
+    Value1,
+    Value2,
+    Value3
 }

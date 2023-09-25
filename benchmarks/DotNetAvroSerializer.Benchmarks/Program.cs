@@ -1,7 +1,7 @@
-﻿using DotNetAvroSerializer.Benchmarks.Serializers;
-using BenchmarkDotNet.Attributes;
+﻿using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Running;
 using DotNetAvroSerializer.Benchmarks.Models;
+using DotNetAvroSerializer.Benchmarks.Serializers;
 
 BenchmarkRunner.Run<AvroSerializersBenchmarks>();
 
@@ -30,7 +30,6 @@ public class AvroSerializersBenchmarks
             StringField = "test text"
         });
     }
-
 
     [Benchmark]
     public byte[] AvroSerializerRecordWithComplexTypes()

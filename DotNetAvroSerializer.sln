@@ -15,15 +15,18 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DotNetAvroSerializer.Write.
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".repo", ".repo", "{0871CC56-D238-4517-9019-92E9FE21DC7D}"
 	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
 		.gitattributes = .gitattributes
 		.gitignore = .gitignore
 		LICENSE.md = LICENSE.md
 		README.md = README.md
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotNetAvroSerializer", "src\DotNetAvroSerializer\DotNetAvroSerializer.csproj", "{8DE0217B-F37C-479F-BC78-0EA5895A8FAD}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DotNetAvroSerializer", "src\DotNetAvroSerializer\DotNetAvroSerializer.csproj", "{8DE0217B-F37C-479F-BC78-0EA5895A8FAD}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotNetAvroSerializer.Generators", "src\DotNetAvroSerializer.Generators\DotNetAvroSerializer.Generators.csproj", "{6F2820E4-039C-4DC7-858D-1D6369AB49F9}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DotNetAvroSerializer.Generators", "src\DotNetAvroSerializer.Generators\DotNetAvroSerializer.Generators.csproj", "{6F2820E4-039C-4DC7-858D-1D6369AB49F9}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DotNetAvroSerializer.Generators.Tests", "tests\DotNetAvroSerializer.Generators.Tests\DotNetAvroSerializer.Generators.Tests.csproj", "{C1D537F3-6F4A-4F93-8959-147F3ADEAAA3}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -47,6 +50,10 @@ Global
 		{6F2820E4-039C-4DC7-858D-1D6369AB49F9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6F2820E4-039C-4DC7-858D-1D6369AB49F9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6F2820E4-039C-4DC7-858D-1D6369AB49F9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C1D537F3-6F4A-4F93-8959-147F3ADEAAA3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C1D537F3-6F4A-4F93-8959-147F3ADEAAA3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C1D537F3-6F4A-4F93-8959-147F3ADEAAA3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C1D537F3-6F4A-4F93-8959-147F3ADEAAA3}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -56,6 +63,7 @@ Global
 		{AD5A36E3-930B-4633-AD8E-E0C442355369} = {1D44F55D-A7EB-4C5A-9E06-AEAC301B1454}
 		{8DE0217B-F37C-479F-BC78-0EA5895A8FAD} = {889A8BF9-4712-4207-B972-585A3B939828}
 		{6F2820E4-039C-4DC7-858D-1D6369AB49F9} = {889A8BF9-4712-4207-B972-585A3B939828}
+		{C1D537F3-6F4A-4F93-8959-147F3ADEAAA3} = {1D44F55D-A7EB-4C5A-9E06-AEAC301B1454}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {22F6DE55-AE4C-45DA-A7E2-DAECBF43E0C6}

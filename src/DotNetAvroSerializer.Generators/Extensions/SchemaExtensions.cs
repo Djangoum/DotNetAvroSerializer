@@ -1,10 +1,10 @@
+using System;
+using System.Linq;
+using System.Runtime.CompilerServices;
 using Avro;
 using DotNetAvroSerializer.Generators.Exceptions;
 using DotNetAvroSerializer.Generators.Models;
 using DotNetAvroSerializer.Generators.SerializationGenerators;
-using System;
-using System.Linq;
-using System.Runtime.CompilerServices;
 
 namespace DotNetAvroSerializer.Generators.Extensions;
 
@@ -35,7 +35,7 @@ internal static class SchemaExtensions
     private static void Generate(this Field field, AvroGenerationContext ctx)
     {
         var recordTypeMetadata = ctx.SerializableTypeMetadata as RecordSerializableTypeMetadata;
-        var property = recordTypeMetadata!.Fields.FirstOrDefault(f => 
+        var property = recordTypeMetadata!.Fields.FirstOrDefault(f =>
             f.Name.Equals(field.Name, StringComparison.InvariantCultureIgnoreCase)
             || f.Names.Contains(field.Name)
         );
@@ -43,9 +43,9 @@ internal static class SchemaExtensions
         if (property is null)
             throw new AvroGeneratorException($"Property {field.Name} not found in {recordTypeMetadata}");
 
-        field.Schema.Generate(ctx with { Schema = field.Schema, SerializableTypeMetadata = property.InnerSerializableType , SourceAccessor = $"{ctx.SourceAccessor}.{property.Name}"  });
+        field.Schema.Generate(ctx with { Schema = field.Schema, SerializableTypeMetadata = property.InnerSerializableType, SourceAccessor = $"{ctx.SourceAccessor}.{property.Name}" });
     }
-    
+
     internal static void Generate(this Schema schema, AvroGenerationContext context)
     {
         Action<AvroGenerationContext> generator = schema switch
@@ -58,7 +58,7 @@ internal static class SchemaExtensions
             MapSchema recordSchema => recordSchema.Generate,
             LogicalSchema recordSchema => recordSchema.Generate,
             PrimitiveSchema recordSchema => recordSchema.Generate,
-            
+
             _ => throw new UnreachableException()
         };
 

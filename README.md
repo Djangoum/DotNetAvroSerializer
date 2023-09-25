@@ -31,18 +31,19 @@ public partial class IntSerializer : AvroSerializer<int>
 
 }
 ```
+
 Generated code looks like this
 ```csharp
 public partial class IntSerializer
 {
-    public byte[] Serialize(int source)
+    public override byte[] Serialize(int source)
     {
         var outputStream = new MemoryStream();
         SerializeToStream(outputStream, source);
         return outputStream.ToArray();
     }
 
-    public void SerializeToStream(Stream outputStream, int source)
+    public override void SerializeToStream(Stream outputStream, int source)
     {
         IntSchema.Write(outputStream, source);
     }
@@ -125,31 +126,31 @@ Generated code looks like this
 ```csharp
 public partial class RecordWithComplexTypesSerializer
 {
-    public byte[] Serialize(global::ConsoleApp9.Serializers.RecordWithComplexTypes source)
+    public override byte[] Serialize(global::Serializers.RecordWithComplexTypes source)
     {
         var outputStream = new MemoryStream();
         SerializeToStream(outputStream, source);
         return outputStream.ToArray();
     }
 
-    public void SerializeToStream(Stream outputStream, global::ConsoleApp9.Serializers.RecordWithComplexTypes source)
+    public override void SerializeToStream(Stream outputStream, global::Serializers.RecordWithComplexTypes source)
     {
         StringSchema.Write(outputStream, source.InnerRecord.Field1);
         IntSchema.Write(outputStream, source.InnerRecord.Field2);
         if (source.InnerRecords.Count() > 0)
             LongSchema.Write(outputStream, (long)source.InnerRecords.Count());
-        foreach (var item in source.InnerRecords)
+        foreach (var itemsourceInnerRecords in source.InnerRecords)
         {
-            StringSchema.Write(outputStream, item.Field1);
-            IntSchema.Write(outputStream, item.Field2);
+            StringSchema.Write(outputStream, itemsourceInnerRecords.Field1);
+            IntSchema.Write(outputStream, itemsourceInnerRecords.Field2);
         }
 
         LongSchema.Write(outputStream, 0L);
         if (source.Doubles.Count() > 0)
             LongSchema.Write(outputStream, (long)source.Doubles.Count());
-        foreach (var item in source.Doubles)
+        foreach (var itemsourceDoubles in source.Doubles)
         {
-            DoubleSchema.Write(outputStream, item);
+            DoubleSchema.Write(outputStream, itemsourceDoubles);
         }
 
         LongSchema.Write(outputStream, 0L);
@@ -166,11 +167,11 @@ public partial class RecordWithComplexTypesSerializer
 
         if (source.MapField.Count() > 0)
             LongSchema.Write(outputStream, source.MapField.Count());
-        foreach (var item in source.MapField)
+        foreach (var itemsourceMapField in source.MapField)
         {
-            StringSchema.Write(outputStream, item.Key);
-            StringSchema.Write(outputStream, item.Value.Field1);
-            IntSchema.Write(outputStream, item.Value.Field2);
+            StringSchema.Write(outputStream, itemsourceMapField.Key);
+            StringSchema.Write(outputStream, itemsourceMapField.Value.Field1);
+            IntSchema.Write(outputStream, itemsourceMapField.Value.Field2);
         }
 
         LongSchema.Write(outputStream, 0L);

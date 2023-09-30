@@ -5,7 +5,7 @@
 		<TargetFrameworks>net7.0;net6.0</TargetFrameworks>
 		<Nullable>enable</Nullable>
 		<Authors>Ariel Amor García</Authors>
-		<Version>0.1.4</Version>
+    <Version>0.1.6</Version>
 		<Description>
 			Dotnet AvroSerializer is a cutting-edge Avro serialization library for .NET, driven by the power of source generators. Please note that this library is currently under active development and is not yet published.
 		</Description>
@@ -26,11 +26,12 @@
 		<None Include="../../README.md" Pack="true" PackagePath="" />
 	</ItemGroup>
 
-	<ItemGroup>
-	  <PackageReference Update="PolySharp" Version="1.13.2">
-	    <PrivateAssets>all</PrivateAssets>
-	    <IncludeAssets>build; analyzers</IncludeAssets>
-	  </PackageReference>
-	</ItemGroup>
-	
+  <ItemGroup>
+    <ProjectReference
+      Include="..\DotNetAvroSerializer.Generators/DotNetAvroSerializer.Generators.csproj"
+      PrivateAssets="contentfiles;build"
+      SetTargetFramework="TargetFramework=netstandard2.0"
+    />
+  </ItemGroup>
+
 </Project>

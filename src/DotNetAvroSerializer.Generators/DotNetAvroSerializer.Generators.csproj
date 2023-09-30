@@ -1,21 +1,12 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<PackageId>DotnetAvroSerializer.Generators</PackageId>
 		<TargetFramework>netstandard2.0</TargetFramework>
 		<LangVersion>Latest</LangVersion>
 		<BuildOutputTargetFolder>analyzers</BuildOutputTargetFolder>
     <AnalyzerRoslynVersion>4.0</AnalyzerRoslynVersion>
     <EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
 		<IncludeBuildOutput>false</IncludeBuildOutput>
-		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-		<EnablePackageValidation>true</EnablePackageValidation>
-    <Version>0.1.6</Version>
-		<PackageProjectUrl>https://github.com/Djangoum/DotNetAvroSerializer</PackageProjectUrl>
-		<Description>
-			Dotnet AvroSerializer is a cutting-edge Avro serialization library for .NET, driven by the power of source generators. Please note that this library is currently under active development and is not yet published.
-		</Description>
-    	<PackageLicenseExpression>MIT</PackageLicenseExpression>
 	</PropertyGroup>
 
 	<ItemGroup>
@@ -26,13 +17,13 @@
 	<ItemGroup>
 		<None Include="$(OutputPath)\$(AssemblyName).dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
 	</ItemGroup>
-			
+
 	<ItemGroup>
       <PackageReference Include="Apache.Avro" Version="1.11.2" PrivateAssets="all" GeneratePathProperty="true" />
       <None Include="$(PKGApache_Avro)\lib\netstandard2.0\*.dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
    </ItemGroup>
-	
-	<ItemGroup>
+
+  <ItemGroup>
       <PackageReference Include="Newtonsoft.Json" Version="13.0.1" PrivateAssets="all" GeneratePathProperty="true" />
       <None Include="$(PkgNewtonsoft_Json)\lib\netstandard2.0\*.dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
    </ItemGroup>
@@ -48,12 +39,12 @@
 		</ItemGroup>
 	</Target>
 
-	<PropertyGroup>
-		<PackageReadmeFile>README.md</PackageReadmeFile>
-	</PropertyGroup>
-
-	<ItemGroup>
-		<!-- Add a README.md next to the csproj -->
-		<None Include="../../README.md" Pack="true" PackagePath="" />
-	</ItemGroup>
+  <ItemGroup>
+    <None
+      Include="$(OutputPath)\$(AssemblyName).dll"
+      Pack="true"
+      PackagePath="analyzers/dotnet/cs"
+      Visible="false"
+    />
+  </ItemGroup>
 </Project>

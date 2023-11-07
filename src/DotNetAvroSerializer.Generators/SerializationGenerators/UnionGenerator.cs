@@ -1,4 +1,4 @@
-﻿using System;
+    using System;
 using System.Collections.Generic;
 using System.Linq;
 using Avro;
@@ -42,9 +42,9 @@ internal static class UnionGenerator
                     SourceAccessor = $"(({unionTypeSerializableTypeMetadata.FullNameDisplay}){context.SourceAccessor})"
                 });
             }
-            else if (context.SerializableTypeMetadata is NullableSerializableTypeMetadata nullableSerializableTypeMetadata)
+            else if (context.SerializableTypeMetadata is NullableSerializableTypeMetadata or RecordSerializableTypeMetadata)
             {
-                var canSerializedCheck = GetCanSerializeCheck(schema, context.SourceAccessor, context.CustomLogicalTypesMetadata);
+                var canSerializedCheck = GetCanSerializeCheck(schema, context.SourceAccessor, context.CustomLogicalTypesMetadata, context.SerializableTypeMetadata.FullNameDisplay);
 
                 if (unionSchemaIndex == 0)
                 {
@@ -60,7 +60,7 @@ internal static class UnionGenerator
                 schema.Generate(context with
                 {
                     Schema = schema,
-                    SerializableTypeMetadata = nullableSerializableTypeMetadata.InnerNullableTypeSymbol
+                    SerializableTypeMetadata = context.SerializableTypeMetadata is NullableSerializableTypeMetadata nullableSerializableTypeMetadata ? nullableSerializableTypeMetadata.InnerNullableTypeSymbol : context.SerializableTypeMetadata
                 });
             }
 

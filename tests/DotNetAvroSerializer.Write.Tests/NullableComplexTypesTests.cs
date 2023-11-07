@@ -39,13 +39,43 @@ public class NullableComplexTypesTests
         Convert.ToHexString(result).Should().BeEquivalentTo(hexString);
     }
 
-    public static IEnumerable<object[]> SerializeEnumerable =>
-    new List<object[]>
+    [Theory]
+    [MemberData(nameof(SerializeNullableMap))]
+    public void SerializeNullableMapWithNullableRecord(Dictionary<string, UnionSideOne?> map, string hexString)
     {
-             new object[] { new int[] { 1, 2, 3, 4 }, "00080204060800" },
-             new object[] { null!, "02" }
-    };
+        var serializer = new NullableMapOfNullableRecords();
 
+        var result = serializer.Serialize(map);
+
+        Convert.ToHexString(result).Should().BeEquivalentTo(hexString);
+    }
+
+    public static IEnumerable<object[]> SerializeEnumerable =>
+        new List<object[]>
+        {
+            new object[] { new int[] { 1, 2, 3, 4 }, "00080204060800" },
+            new object[] { null!, "02" }
+        };
+
+    public static IEnumerable<object[]> SerializeNullableMap =>
+        new List<object[]>
+        {
+            new object[] { new Dictionary<string, UnionSideOne?>
+            {
+                { "item1", null }
+            }, "00020A6974656D310000" },
+            new object[] { new Dictionary<string, UnionSideOne?>
+            {
+                {
+                    "item1", new UnionSideOne
+                    {
+                        Name = "name",
+                        Id = 1
+                    }
+                }
+            }, "00020A6974656D310202086E616D6500" },
+            new object[] { null!, "02" }
+        };
 }
 
 [AvroSchema(@"{
@@ -86,6 +116,40 @@ public partial class NullableRecordSerializer : AvroSerializer<UnionSideOne>
          ]
      }")]
 public partial class NullableStringArrayAnnotatedEnumerable : AvroSerializer<IEnumerable<int>?>
+{
+
+}
+
+[AvroSchema(@"{
+    ""type"": [
+        {
+            ""type"": ""map"",
+            ""values"" : [
+                {
+                    ""type"" : ""null""
+                },
+                {
+                    ""type"": ""record"",
+                    ""name"" : ""unionSideOne"",
+                    ""fields"": [
+                        {
+                            ""name"": ""id"",
+                            ""type"": ""int""
+                        },
+                        {
+                            ""name"": ""name"",
+                            ""type"": ""string""
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            ""type"": ""null""
+        }
+    ]
+}")]
+public partial class NullableMapOfNullableRecords : AvroSerializer<Dictionary<string, UnionSideOne?>?>
 {
 
 }

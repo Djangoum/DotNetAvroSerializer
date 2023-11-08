@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using Avro;
@@ -69,7 +68,8 @@ internal static class UnionGenerator
             }
             else
             {
-                // TODO: generate diagnostics not type was found to satisfy the union schema.
+                throw new AvroGeneratorException(
+                    $"Union index {unionSchemaIndex} for schema {schema.Name} instead {context.SerializableTypeMetadata.FullNameDisplay}");
             }
         }
     }
@@ -88,7 +88,8 @@ internal static class UnionGenerator
                 "double" => $"DoubleSchema.CanSerialize({sourceAccesor})",
                 "float" => $"FloatSchema.CanSerialize({sourceAccesor})",
                 "null" => $"NullSchema.CanSerialize({sourceAccesor})",
-                _ => throw new Exception($"Required type was not satisfied to serialize {primitiveSchema.Name}")
+                _ => throw new AvroGeneratorException(
+                    $"Required type was not satisfied to serialize {primitiveSchema.Name}")
             },
             LogicalSchema logicalSchema => logicalSchema.LogicalTypeName switch
             {

@@ -99,7 +99,7 @@ public class NullableComplexTypesTests
             }
          ]
      }")]
-public partial class NullableRecordSerializer : AvroSerializer<UnionSideOne>
+public partial class NullableRecordSerializer : AvroSerializer<UnionSideOne?>
 {
 
 }

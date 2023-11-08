@@ -13,7 +13,8 @@ internal static class ArrayGenerator
         var schema = context.Schema as ArraySchema;
 
         if (context.SerializableTypeMetadata is not IterableSerializableTypeMetadata iterableSerializableTypeMetadata)
-            throw new AvroGeneratorException($"Array type for {schema!.Name} is not satisfied {context.SerializableTypeMetadata?.GetType().Name} provided, arrays must be arrays or anything that implements IEnumerable");
+            throw new AvroGeneratorException(
+                $"Array type for {schema!.Name} is not satisfied {context.SerializableTypeMetadata?.FullNameDisplay} provided, arrays must be arrays or anything that implements IEnumerable");
 
         context.SerializationCode.AppendLine($"if ({context.SourceAccessor}.Count() > 0) LongSchema.Write(outputStream, (long){context.SourceAccessor}.Count());");
         context.SerializationCode.AppendLine($"foreach(var item{VariableNamesHelpers.RemoveSpecialCharacters(context.SourceAccessor)} in {context.SourceAccessor})");

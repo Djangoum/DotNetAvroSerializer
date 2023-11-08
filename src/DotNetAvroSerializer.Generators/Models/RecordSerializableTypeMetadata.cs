@@ -6,6 +6,7 @@ namespace DotNetAvroSerializer.Generators.Models;
 
 internal class RecordSerializableTypeMetadata : SerializableTypeMetadata
 {
+
     public RecordSerializableTypeMetadata(ITypeSymbol typeSymbol, Compilation compilation)
         : base(typeSymbol)
     {

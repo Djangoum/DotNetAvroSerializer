@@ -1,4 +1,3 @@
-﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using Avro;
@@ -41,10 +40,12 @@ internal static class UnionGenerator
                     SerializableTypeMetadata = unionTypeSerializableTypeMetadata,
                     SourceAccessor = $"(({unionTypeSerializableTypeMetadata.FullNameDisplay}){context.SourceAccessor})"
                 });
+
+                context.SerializationCode.AppendLine("}");
             }
-            else if (context.SerializableTypeMetadata is NullableSerializableTypeMetadata nullableSerializableTypeMetadata)
+            else if (context.SerializableTypeMetadata is NullableSerializableTypeMetadata or RecordSerializableTypeMetadata { IsNullable: true } or DictionarySerializableTypeMetadata or IterableSerializableTypeMetadata)
             {
-                var canSerializedCheck = GetCanSerializeCheck(schema, context.SourceAccessor, context.CustomLogicalTypesMetadata);
+                var canSerializedCheck = GetCanSerializeCheck(schema, context.SourceAccessor, context.CustomLogicalTypesMetadata, context.SerializableTypeMetadata.FullNameDisplay);
 
                 if (unionSchemaIndex == 0)
                 {
@@ -60,11 +61,16 @@ internal static class UnionGenerator
                 schema.Generate(context with
                 {
                     Schema = schema,
-                    SerializableTypeMetadata = nullableSerializableTypeMetadata.InnerNullableTypeSymbol
+                    SerializableTypeMetadata = context.SerializableTypeMetadata is NullableSerializableTypeMetadata nullableSerializableTypeMetadata ? nullableSerializableTypeMetadata.InnerNullableTypeSymbol : context.SerializableTypeMetadata
                 });
-            }
 
-            context.SerializationCode.AppendLine("}");
+                context.SerializationCode.AppendLine("}");
+            }
+            else
+            {
+                throw new AvroGeneratorException(
+                    $"Union index {unionSchemaIndex} for schema {schema.Name} instead {context.SerializableTypeMetadata.FullNameDisplay}");
+            }
         }
     }
 
@@ -82,7 +88,8 @@ internal static class UnionGenerator
                 "double" => $"DoubleSchema.CanSerialize({sourceAccesor})",
                 "float" => $"FloatSchema.CanSerialize({sourceAccesor})",
                 "null" => $"NullSchema.CanSerialize({sourceAccesor})",
-                _ => throw new Exception($"Required type was not satisfied to serialize {primitiveSchema.Name}")
+                _ => throw new AvroGeneratorException(
+                    $"Required type was not satisfied to serialize {primitiveSchema.Name}")
             },
             LogicalSchema logicalSchema => logicalSchema.LogicalTypeName switch
             {

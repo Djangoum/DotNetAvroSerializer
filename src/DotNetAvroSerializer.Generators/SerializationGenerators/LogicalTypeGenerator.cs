@@ -40,7 +40,8 @@ internal static class LogicalTypeGenerator
             }
             else
             {
-                throw new AvroGeneratorException($"Logical type is not satisfied {context.SerializableTypeMetadata}");
+                throw new AvroGeneratorException(
+                    $"Logical type is not satisfied instead {context.SerializableTypeMetadata.FullNameDisplay} found");
             }
         }
         else if (context.CustomLogicalTypesMetadata.Any(a => a.Name.Equals(schema!.LogicalTypeName)))

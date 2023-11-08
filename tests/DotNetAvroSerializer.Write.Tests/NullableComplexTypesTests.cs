@@ -149,7 +149,7 @@ public partial class NullableStringArrayAnnotatedEnumerable : AvroSerializer<IEn
         }
     ]
 }")]
-public partial class NullableMapOfNullableRecords : AvroSerializer<Dictionary<string, UnionSideOne?>?>
+public partial class NullableMapOfNullableRecords : AvroSerializer<Dictionary<string, UnionSideOne?>>
 {
 
 }

@@ -6,7 +6,7 @@ namespace DotNetAvroSerializer.Generators.Models;
 
 internal class DictionarySerializableTypeMetadata : SerializableTypeMetadata
 {
-    public DictionarySerializableTypeMetadata(SerializableTypeMetadata valuesTypeMetadata, ISymbol dictionaryTypeSymbol)
+    public DictionarySerializableTypeMetadata(SerializableTypeMetadata valuesTypeMetadata, ITypeSymbol dictionaryTypeSymbol)
         : base(dictionaryTypeSymbol)
     {
         ValuesMetadata = valuesTypeMetadata;

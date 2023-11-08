@@ -5,16 +5,20 @@ namespace DotNetAvroSerializer.Generators.Models;
 
 internal abstract class SerializableTypeMetadata : IEquatable<SerializableTypeMetadata>
 {
-    protected SerializableTypeMetadata(ISymbol symbol)
+    protected SerializableTypeMetadata(ITypeSymbol typeSymbol)
     {
-        FullNameDisplay = symbol.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
-        StringRepresentation = symbol.ToString();
+        FullNameDisplay = typeSymbol.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
+        StringRepresentation = typeSymbol.ToString();
+
+        IsNullable = (typeSymbol.IsReferenceType && typeSymbol.NullableAnnotation is NullableAnnotation.None)
+            || typeSymbol.NullableAnnotation is NullableAnnotation.Annotated;
     }
 
     protected abstract SerializableTypeKind Kind { get; }
     internal bool IsValid { get; set; }
     internal string FullNameDisplay { get; }
     private string StringRepresentation { get; }
+    public bool IsNullable { get; set; }
 
     internal static SerializableTypeMetadata From(ITypeSymbol symbol, Compilation compilation)
     {

@@ -4,7 +4,7 @@ namespace DotNetAvroSerializer.Generators.Models;
 
 internal class LogicalTypeSerializableTypeMetadata : SerializableTypeMetadata
 {
-    public LogicalTypeSerializableTypeMetadata(ISymbol logicalTypeSymbol)
+    public LogicalTypeSerializableTypeMetadata(ITypeSymbol logicalTypeSymbol)
         : base(logicalTypeSymbol)
     {
         TypeName = logicalTypeSymbol.Name;

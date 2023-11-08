@@ -8,7 +8,7 @@ internal class UnionSerializableTypeMetadata : SerializableTypeMetadata
 {
     protected override SerializableTypeKind Kind => SerializableTypeKind.Union;
 
-    public UnionSerializableTypeMetadata(ISymbol typeSymbol, IEnumerable<SerializableTypeMetadata> unionTypes)
+    public UnionSerializableTypeMetadata(ITypeSymbol typeSymbol, IEnumerable<SerializableTypeMetadata> unionTypes)
         : base(typeSymbol)
     {
         UnionTypes = unionTypes;

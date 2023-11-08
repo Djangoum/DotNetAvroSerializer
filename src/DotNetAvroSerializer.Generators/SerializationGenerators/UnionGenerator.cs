@@ -1,4 +1,4 @@
-    using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Avro;
@@ -41,8 +41,10 @@ internal static class UnionGenerator
                     SerializableTypeMetadata = unionTypeSerializableTypeMetadata,
                     SourceAccessor = $"(({unionTypeSerializableTypeMetadata.FullNameDisplay}){context.SourceAccessor})"
                 });
+
+                context.SerializationCode.AppendLine("}");
             }
-            else if (context.SerializableTypeMetadata is NullableSerializableTypeMetadata or RecordSerializableTypeMetadata)
+            else if (context.SerializableTypeMetadata is NullableSerializableTypeMetadata or RecordSerializableTypeMetadata { IsNullable: true } or DictionarySerializableTypeMetadata or IterableSerializableTypeMetadata)
             {
                 var canSerializedCheck = GetCanSerializeCheck(schema, context.SourceAccessor, context.CustomLogicalTypesMetadata, context.SerializableTypeMetadata.FullNameDisplay);
 
@@ -62,9 +64,13 @@ internal static class UnionGenerator
                     Schema = schema,
                     SerializableTypeMetadata = context.SerializableTypeMetadata is NullableSerializableTypeMetadata nullableSerializableTypeMetadata ? nullableSerializableTypeMetadata.InnerNullableTypeSymbol : context.SerializableTypeMetadata
                 });
-            }
 
-            context.SerializationCode.AppendLine("}");
+                context.SerializationCode.AppendLine("}");
+            }
+            else
+            {
+                // TODO: generate diagnostics not type was found to satisfy the union schema.
+            }
         }
     }
 

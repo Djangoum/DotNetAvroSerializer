@@ -1,10 +1,10 @@
-﻿using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis;
 
 namespace DotNetAvroSerializer.Generators.Models;
 
 internal class EnumSerializableTypeMetadata : SerializableTypeMetadata
 {
-    public EnumSerializableTypeMetadata(ISymbol enumSymbol)
+    public EnumSerializableTypeMetadata(ITypeSymbol enumSymbol)
         : base(enumSymbol)
     {
 

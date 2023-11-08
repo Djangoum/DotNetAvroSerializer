@@ -11,7 +11,8 @@ internal static class EnumGenerator
         var schema = context.Schema as EnumSchema;
 
         if (context.SerializableTypeMetadata is not EnumSerializableTypeMetadata)
-            throw new AvroGeneratorException($"Enum type was not satisfied to serialize {schema!.Name}");
+            throw new AvroGeneratorException(
+                $"Enum type was not satisfied to serialize {schema!.Name} instead {context.SerializableTypeMetadata.FullNameDisplay} was found");
 
         context.PrivateFieldsCode.AppendLine(schema!.Name, $"private readonly string[] {schema.Name}Values = new string[] {{ \"{string.Join(@""",""", schema.Symbols)}\" }};");
 

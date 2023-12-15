@@ -5,6 +5,9 @@ Dotnet AvroSerializer
 
 Dotnet AvroSerializer is a cutting-edge Avro serialization library for .NET, driven by the power of source generators. Please note that this library is currently under active development and is not yet published.
 
+> [!WARNING]  
+> As of now, the library exclusively offers serialization capabilities and does not support deserialization. We are actively working on expanding its functionality to cover deserialization as well.
+
 ## How Dotnet Avro Serializer Works
 
 Install both serializer and generator package.

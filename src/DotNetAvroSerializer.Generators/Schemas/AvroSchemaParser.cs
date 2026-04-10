@@ -189,7 +189,7 @@ internal static class AvroSchemaParser
 
     private static Dictionary<string, string> ExtractRawProperties(JsonElement schemaObject)
     {
-        var properties = new Dictionary<string, string>(StringComparer.InvariantCultureIgnoreCase);
+        var properties = new Dictionary<string, string>(StringComparer.InvariantCulture);
 
         foreach (var property in schemaObject.EnumerateObject())
         {

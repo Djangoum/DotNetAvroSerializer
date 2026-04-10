@@ -52,7 +52,8 @@ public static class CustomLogicalTypesMetadataProcessor
                     convertToBaseTypeMethodParameters,
                     canSerializeMethodParameters
                 ));
-            };
+            }
+            ;
         }
 
         return (fullyQualifiedLogicalTypes, diagnosticsProduced);

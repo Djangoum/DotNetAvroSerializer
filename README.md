@@ -331,13 +331,22 @@ There are some rules that Dotnet Avro Serializer source generators expect in ord
 
 Find some benchmarks results here. 
 
-```
-|                               Method |     Mean |   Error |  StdDev |   Gen0 | Allocated |
-|------------------------------------- |---------:|--------:|--------:|-------:|----------:|
-|    AvroSerializerStringSerialization | 144.5 ns | 1.75 ns | 1.37 ns | 0.1004 |     840 B |
-|   AvroSerializerRecordWithPrimitives | 158.7 ns | 2.91 ns | 2.72 ns | 0.0753 |     632 B |
-| AvroSerializerRecordWithComplexTypes | 723.1 ns | 7.88 ns | 6.58 ns | 0.1869 |    1568 B |
-```
+| Method                               | Job      | Runtime  | Mean     | Error   | StdDev  | Ratio | RatioSD | Gen0   | Allocated | Alloc Ratio |
+|------------------------------------- |--------- |--------- |---------:|--------:|--------:|------:|--------:|-------:|----------:|------------:|
+| AvroSerializerStringSerialization    | .NET 7.0 | .NET 7.0 | 188.8 ns | 1.61 ns | 1.50 ns |  1.00 |    0.01 | 0.1070 |     840 B |        1.00 |
+| AvroSerializerStringSerialization    | .NET 8.0 | .NET 8.0 | 175.2 ns | 3.40 ns | 3.34 ns |  0.93 |    0.02 | 0.1070 |     840 B |        1.00 |
+| AvroSerializerStringSerialization    | .NET 9.0 | .NET 9.0 | 160.7 ns | 0.57 ns | 0.48 ns |  0.85 |    0.01 | 0.1070 |     840 B |        1.00 |
+|                                      |          |          |          |         |         |       |         |        |           |             |
+| AvroSerializerRecordWithPrimitives   | .NET 7.0 | .NET 7.0 | 190.0 ns | 1.02 ns | 0.80 ns |  1.00 |    0.01 | 0.0806 |     632 B |        1.00 |
+| AvroSerializerRecordWithPrimitives   | .NET 8.0 | .NET 8.0 | 167.6 ns | 0.54 ns | 0.45 ns |  0.88 |    0.00 | 0.0806 |     632 B |        1.00 |
+| AvroSerializerRecordWithPrimitives   | .NET 9.0 | .NET 9.0 | 165.4 ns | 0.41 ns | 0.34 ns |  0.87 |    0.00 | 0.0806 |     632 B |        1.00 |
+|                                      |          |          |          |         |         |       |         |        |           |             |
+| AvroSerializerRecordWithComplexTypes | .NET 7.0 | .NET 7.0 | 838.9 ns | 5.50 ns | 5.14 ns |  1.00 |    0.01 | 0.2022 |    1592 B |        1.00 |
+| AvroSerializerRecordWithComplexTypes | .NET 8.0 | .NET 8.0 | 743.6 ns | 4.32 ns | 3.83 ns |  0.89 |    0.01 | 0.2022 |    1592 B |        1.00 |
+| AvroSerializerRecordWithComplexTypes | .NET 9.0 | .NET 9.0 | 590.6 ns | 2.95 ns | 2.62 ns |  0.70 |    0.01 | 0.1965 |    1544 B |        0.97 |
+
+_NOTE: .NET 7 is no longer supported. Benchmark results are retained solely for comparison purposes as a baseline throughout the library's evolution._
+
 
 ## Important note 
 As of now, the library exclusively offers serialization capabilities and does not support deserialization. We are actively working on expanding its functionality to cover deserialization as well.

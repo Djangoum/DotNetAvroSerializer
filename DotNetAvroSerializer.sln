@@ -19,6 +19,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".repo", ".repo", "{0871CC56
 		.gitattributes = .gitattributes
 		.gitignore = .gitignore
 		LICENSE.md = LICENSE.md
+		.github\workflows\publish.yml = .github\workflows\publish.yml
 		README.md = README.md
 	EndProjectSection
 EndProject

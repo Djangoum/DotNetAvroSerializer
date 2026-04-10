@@ -30,7 +30,7 @@ internal class NullableSerializableTypeMetadata : SerializableTypeMetadata
         {
             INamedTypeSymbol { ConstructedFrom.SpecialType: SpecialType.System_Nullable_T } namedTypeSymbol
             when namedTypeSymbol.TypeArguments.Any() => namedTypeSymbol.TypeArguments.First(),
-            INamedTypeSymbol { SpecialType : SpecialType.System_Nullable_T } namedTypeSymbol
+            INamedTypeSymbol { SpecialType: SpecialType.System_Nullable_T } namedTypeSymbol
             when namedTypeSymbol.TypeArguments.Any() => namedTypeSymbol.TypeArguments.First(),
             INamedTypeSymbol => typeSymbol.WithNullableAnnotation(NullableAnnotation.None),
             IArrayTypeSymbol arrayTypeSymbol => arrayTypeSymbol.WithNullableAnnotation(NullableAnnotation.None),

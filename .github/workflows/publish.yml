@@ -14,7 +14,7 @@ env:
   DOTNET_SKIP_FIRST_TIME_EXPERIENCE: 1
   DOTNET_NOLOGO: true
   NuGetDirectory: ${{ github.workspace }}/nuget
-  DotNetVersion: '9.0.x'
+  DotNetVersion: '10.0.x'
 
 defaults:
   run:
@@ -28,7 +28,7 @@ jobs:
       with:
         fetch-depth: 0
 
-    - name: Setup .NET 9
+    - name: Setup .NET
       uses: actions/setup-dotnet@v4
       with:
         dotnet-version: ${{ env.DotNetVersion }}
@@ -49,7 +49,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
-    - name: Setup .NET 9
+    - name: Setup .NET
       uses: actions/setup-dotnet@v4
       with:
         dotnet-version: ${{ env.DotNetVersion }}
@@ -68,7 +68,7 @@ jobs:
         name: nuget
         path: ${{ env.NuGetDirectory }}
 
-    - name: Setup .NET 9
+    - name: Setup .NET
       uses: actions/setup-dotnet@v4
       with:
         dotnet-version: ${{ env.DotNetVersion }}

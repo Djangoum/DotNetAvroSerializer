@@ -34,8 +34,7 @@ jobs:
         dotnet-version: ${{ env.DotNetVersion }}
 
     - run: dotnet build --configuration Release
-    - run: dotnet pack ./src/DotNetAvroSerializer --configuration Release --output ${{ env.NuGetDirectory }}
-    - run: dotnet pack ./src/DotNetAvroSerializer.Generators --configuration Release --output ${{ env.NuGetDirectory }}
+    - run: dotnet pack ./src/DotNetAvroSerializer --configuration Release --no-build --output ${{ env.NuGetDirectory }}
 
     - name: Upload NuGet Artifacts
       uses: actions/upload-artifact@v4

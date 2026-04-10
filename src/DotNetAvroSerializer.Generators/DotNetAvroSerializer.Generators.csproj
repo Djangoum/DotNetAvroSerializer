@@ -4,11 +4,13 @@
     <PackageId>DotnetAvroSerializer.Generators</PackageId>
     <TargetFramework>netstandard2.0</TargetFramework>
     <LangVersion>Latest</LangVersion>
+    <IsRoslynComponent>true</IsRoslynComponent>
+    <IsPackable>false</IsPackable>
     <BuildOutputTargetFolder>analyzers</BuildOutputTargetFolder>
     <AnalyzerRoslynVersion>4.0</AnalyzerRoslynVersion>
     <EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
     <IncludeBuildOutput>false</IncludeBuildOutput>
-    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
     <EnablePackageValidation>true</EnablePackageValidation>
     <Version>0.1.8</Version>
     <PackageProjectUrl>https://github.com/Djangoum/DotNetAvroSerializer</PackageProjectUrl>

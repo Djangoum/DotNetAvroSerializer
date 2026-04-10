@@ -18,9 +18,9 @@ internal abstract class Schema
 
     protected void SetProperties(Dictionary<string, string> schemaProperties)
     {
-        foreach (var (key, value) in schemaProperties)
+        foreach (var schemaProperty in schemaProperties)
         {
-            properties[key] = value;
+            properties[schemaProperty.Key] = schemaProperty.Value;
         }
     }
 }

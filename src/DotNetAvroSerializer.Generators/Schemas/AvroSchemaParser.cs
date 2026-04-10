@@ -114,10 +114,11 @@ internal static class AvroSchemaParser
             ? namespaceElement.GetString()
             : enclosingNamespace;
 
-        var fullName = parserContext.GetFullName(nameElement.GetString(), schemaNamespace);
+        var name = nameElement.GetString();
+        var fullName = parserContext.GetFullName(name, schemaNamespace);
 
         var fields = new List<Field>();
-        var recordSchema = new RecordSchema(fullName, fields);
+        var recordSchema = new RecordSchema(GetSimpleName(name), fields);
         parserContext.RegisterNamedSchema(fullName, recordSchema);
 
         if (!schemaObject.TryGetProperty("fields", out var fieldsElement)
@@ -154,8 +155,9 @@ internal static class AvroSchemaParser
             ? namespaceElement.GetString()
             : enclosingNamespace;
 
-        var fullName = parserContext.GetFullName(nameElement.GetString(), schemaNamespace);
-        var schema = new EnumSchema(fullName, symbolsElement.EnumerateArray().Select(s => s.GetString()).ToArray());
+        var name = nameElement.GetString();
+        var fullName = parserContext.GetFullName(name, schemaNamespace);
+        var schema = new EnumSchema(GetSimpleName(name), symbolsElement.EnumerateArray().Select(s => s.GetString()).ToArray());
         parserContext.RegisterNamedSchema(fullName, schema);
         return schema;
     }
@@ -176,11 +178,14 @@ internal static class AvroSchemaParser
             ? namespaceElement.GetString()
             : enclosingNamespace;
 
-        var fullName = parserContext.GetFullName(nameElement.GetString(), schemaNamespace);
-        var schema = new FixedSchema(fullName, size);
+        var name = nameElement.GetString();
+        var fullName = parserContext.GetFullName(name, schemaNamespace);
+        var schema = new FixedSchema(GetSimpleName(name), size);
         parserContext.RegisterNamedSchema(fullName, schema);
         return schema;
     }
+
+    private static string GetSimpleName(string fullName) => fullName.Split('.').Last();
 
     private static Dictionary<string, string> ExtractRawProperties(JsonElement schemaObject)
     {

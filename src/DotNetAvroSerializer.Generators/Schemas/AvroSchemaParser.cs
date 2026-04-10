@@ -206,7 +206,7 @@ internal static class AvroSchemaParser
 
         public string GetFullName(string name, string schemaNamespace)
         {
-            if (name.Contains(".", StringComparison.InvariantCulture))
+            if (name.Contains(".", StringComparison.Ordinal))
                 return name;
 
             return string.IsNullOrWhiteSpace(schemaNamespace) ? name : $"{schemaNamespace}.{name}";
@@ -227,7 +227,7 @@ internal static class AvroSchemaParser
             if (namedSchemas.TryGetValue(typeName, out var directSchema))
                 return directSchema;
 
-            if (typeName.Contains(".", StringComparison.InvariantCulture))
+            if (typeName.Contains(".", StringComparison.Ordinal))
                 throw new InvalidOperationException($"Named schema {typeName} was not found");
 
             if (!string.IsNullOrWhiteSpace(enclosingNamespace))

@@ -1,5 +1,5 @@
 using System.Collections.Generic;
-using Avro;
+using DotNetAvroSerializer.Generators.Schemas;
 using Microsoft.CodeAnalysis;
 
 namespace DotNetAvroSerializer.Generators.Models;

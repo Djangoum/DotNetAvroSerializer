@@ -2,12 +2,12 @@ using System;
 using System.Collections.Immutable;
 using System.Linq;
 using System.Threading;
-using Avro;
 using DotNetAvroSerializer.Generators.Diagnostics;
 using DotNetAvroSerializer.Generators.Exceptions;
 using DotNetAvroSerializer.Generators.Extensions;
 using DotNetAvroSerializer.Generators.Helpers;
 using DotNetAvroSerializer.Generators.Models;
+using DotNetAvroSerializer.Generators.Schemas;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -113,7 +113,7 @@ public partial class AvroSerializerSourceGenerator : IIncrementalGenerator
 
         try
         {
-            schema = Schema.Parse(schemaString.ToString());
+            schema = AvroSchemaParser.Parse(schemaString.ToString());
         }
         catch (Exception ex)
         {

@@ -27,10 +27,24 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\DotNetAvroSerializer.Generators\DotNetAvroSerializer.Generators.csproj"
+                      ReferenceOutputAssembly="false"
+                      PrivateAssets="all" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Update="PolySharp" Version="1.13.*">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>build; analyzers</IncludeAssets>
     </PackageReference>
+    <PackageReference Include="Apache.Avro" Version="1.11.*" PrivateAssets="all" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.4" PrivateAssets="all" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\DotNetAvroSerializer.Generators\bin\$(Configuration)\netstandard2.0\DotNetAvroSerializer.Generators.dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
+    <None Include="$(NuGetPackageRoot)apache.avro\1.11.5\lib\netstandard2.0\Avro.dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
+    <None Include="$(NuGetPackageRoot)newtonsoft.json\13.0.4\lib\netstandard2.0\Newtonsoft.Json.dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
   </ItemGroup>
 
 </Project>

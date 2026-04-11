@@ -16,7 +16,7 @@ public static class DateSchema
     public static void Write(Stream outputStream, DateOnly? value)
     {
         if (value is null)
-            throw new AvroSerializationException("Cannot serialize null value to int");
+            throw new AvroSerializationException("Cannot serialize null value to date");
 
         Write(outputStream, value.Value);
     }
@@ -24,7 +24,7 @@ public static class DateSchema
     public static void Write(Stream outputStream, DateTime? value)
     {
         if (value is null)
-            throw new AvroSerializationException("Cannot serialize null value to int");
+            throw new AvroSerializationException("Cannot serialize null value to date");
 
         Write(outputStream, value.Value);
     }
@@ -42,7 +42,7 @@ public static class DateSchema
     public static Task WriteAsync(Stream outputStream, DateOnly? value, CancellationToken cancellationToken = default)
     {
         if (value is null)
-            throw new AvroSerializationException("Cannot serialize null value to int");
+            throw new AvroSerializationException("Cannot serialize null value to date");
 
         return WriteAsync(outputStream, value.Value, cancellationToken);
     }
@@ -50,7 +50,7 @@ public static class DateSchema
     public static Task WriteAsync(Stream outputStream, DateTime? value, CancellationToken cancellationToken = default)
     {
         if (value is null)
-            throw new AvroSerializationException("Cannot serialize null value to int");
+            throw new AvroSerializationException("Cannot serialize null value to date");
 
         return WriteAsync(outputStream, value.Value, cancellationToken);
     }

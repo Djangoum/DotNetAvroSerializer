@@ -13,7 +13,7 @@ public static class BooleanSchema
     public static void Write(Stream outputStream, bool? value)
     {
         if (value is null)
-            throw new AvroSerializationException("Cannot serialize null value to int");
+            throw new AvroSerializationException("Cannot serialize null value to boolean");
 
         Write(outputStream, value.Value);
     }
@@ -26,7 +26,7 @@ public static class BooleanSchema
     public static Task WriteAsync(Stream outputStream, bool? value, CancellationToken cancellationToken = default)
     {
         if (value is null)
-            throw new AvroSerializationException("Cannot serialize null value to int");
+            throw new AvroSerializationException("Cannot serialize null value to boolean");
 
         return WriteAsync(outputStream, value.Value, cancellationToken);
     }

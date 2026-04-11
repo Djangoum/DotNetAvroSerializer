@@ -17,7 +17,7 @@ public static class TimeMillisSchema
     public static void Write(Stream outputStream, TimeOnly? value)
     {
         if (value is null)
-            throw new AvroSerializationException("Cannot serialize null value to int");
+            throw new AvroSerializationException("Cannot serialize null value to time-millis");
 
         Write(outputStream, value.Value);
     }
@@ -33,7 +33,7 @@ public static class TimeMillisSchema
     public static Task WriteAsync(Stream outputStream, TimeOnly? value, CancellationToken cancellationToken = default)
     {
         if (value is null)
-            throw new AvroSerializationException("Cannot serialize null value to int");
+            throw new AvroSerializationException("Cannot serialize null value to time-millis");
 
         return WriteAsync(outputStream, value.Value, cancellationToken);
     }

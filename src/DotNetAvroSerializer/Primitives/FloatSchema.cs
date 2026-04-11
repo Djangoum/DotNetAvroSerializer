@@ -13,7 +13,7 @@ public static class FloatSchema
     public static void Write(Stream outputStream, float? value)
     {
         if (value is null)
-            throw new AvroSerializationException("Cannot serialize null value to int");
+            throw new AvroSerializationException("Cannot serialize null value to float");
 
         Write(outputStream, value.Value);
     }
@@ -31,7 +31,7 @@ public static class FloatSchema
     public static Task WriteAsync(Stream outputStream, float? value, CancellationToken cancellationToken = default)
     {
         if (value is null)
-            throw new AvroSerializationException("Cannot serialize null value to int");
+            throw new AvroSerializationException("Cannot serialize null value to float");
 
         return WriteAsync(outputStream, value.Value, cancellationToken);
     }

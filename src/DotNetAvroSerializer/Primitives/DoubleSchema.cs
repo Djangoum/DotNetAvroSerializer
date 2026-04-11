@@ -13,7 +13,7 @@ public class DoubleSchema
     public static void Write(Stream outputStream, double? value)
     {
         if (value is null)
-            throw new AvroSerializationException("Cannot serialize null value to int");
+            throw new AvroSerializationException("Cannot serialize null value to double");
 
         Write(outputStream, value.Value);
     }
@@ -31,7 +31,7 @@ public class DoubleSchema
     public static Task WriteAsync(Stream outputStream, double? value, CancellationToken cancellationToken = default)
     {
         if (value is null)
-            throw new AvroSerializationException("Cannot serialize null value to int");
+            throw new AvroSerializationException("Cannot serialize null value to double");
 
         return WriteAsync(outputStream, value.Value, cancellationToken);
     }

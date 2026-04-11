@@ -14,7 +14,7 @@ public static class UuidSchema
     public static void Write(Stream outputStream, Guid? value)
     {
         if (value is null)
-            throw new AvroSerializationException("Cannot serialize null value to int");
+            throw new AvroSerializationException("Cannot serialize null value to uuid");
 
         Write(outputStream, value.Value);
     }
@@ -27,7 +27,7 @@ public static class UuidSchema
     public static Task WriteAsync(Stream outputStream, Guid? value, CancellationToken cancellationToken = default)
     {
         if (value is null)
-            throw new AvroSerializationException("Cannot serialize null value to int");
+            throw new AvroSerializationException("Cannot serialize null value to uuid");
 
         return WriteAsync(outputStream, value.Value, cancellationToken);
     }

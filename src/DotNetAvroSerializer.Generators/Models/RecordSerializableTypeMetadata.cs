@@ -14,7 +14,7 @@ internal sealed record RecordSerializableTypeMetadata : SerializableTypeMetadata
         Fields = GetBaseTypesAndThis(typeSymbol)
             .SelectMany(t => t
                 .GetMembers()
-                .Where(s => s.Kind is SymbolKind.Property && s.DeclaredAccessibility == Accessibility.Public)
+                .Where(s => s.Kind is SymbolKind.Property && s.DeclaredAccessibility == Accessibility.Public && !s.IsStatic)
                 .Cast<IPropertySymbol>()
                 .Select(p => new FieldSerializableTypeMetadata(From(p.Type, compilation), p, p.Name)))
             .ToImmutableArray()

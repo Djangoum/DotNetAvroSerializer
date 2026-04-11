@@ -5,7 +5,6 @@ namespace DotNetAvroSerializer.Write.Tests;
 #pragma warning disable CA2007
 public class AsyncNullablePrimitivesTests
 {
-    // ── SerializeAsync ────────────────────────────────────────────────────────
 
     [Theory]
     [InlineData(326, "028C05")]
@@ -81,8 +80,6 @@ public class AsyncNullablePrimitivesTests
 
         Convert.ToHexString(result).Should().BeEquivalentTo(expected);
     }
-
-    // ── SerializeToStreamAsync ────────────────────────────────────────────────
 
     [Theory]
     [InlineData(326, "028C05")]

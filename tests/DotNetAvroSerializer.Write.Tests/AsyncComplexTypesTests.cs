@@ -6,7 +6,6 @@ namespace DotNetAvroSerializer.Write.Tests;
 #pragma warning disable CA2007
 public class AsyncComplexTypesTests
 {
-    // ── SerializeAsync ────────────────────────────────────────────────────────
 
     [Fact]
     public async Task SerializeArrayOfIntsAsync()
@@ -109,8 +108,6 @@ public class AsyncComplexTypesTests
 
         Convert.ToHexString(result).Should().BeEquivalentTo("1474657374737472696E67F801041474657374737472696E67F8011474657374737472696E67F8010006333333333333F33F3333333333330B40333333333333294000029A99494104086B6579311474657374737472696E67F801086B6579321474657374737472696E67F80100");
     }
-
-    // ── SerializeToStreamAsync ────────────────────────────────────────────────
 
     [Fact]
     public async Task SerializeArrayOfIntsToStreamAsync()

@@ -6,7 +6,6 @@ namespace DotNetAvroSerializer.Write.Tests;
 #pragma warning disable CA2007
 public class AsyncNullableComplexTypesTests
 {
-    // ── SerializeAsync ────────────────────────────────────────────────────────
 
     [Fact]
     public async Task SerializeNullableRecordValueAsync()
@@ -42,8 +41,6 @@ public class AsyncNullableComplexTypesTests
         Convert.ToHexString(result).Should().BeEquivalentTo(expected);
     }
 
-    // ── SerializeToStreamAsync ────────────────────────────────────────────────
-
     [Fact]
     public async Task SerializeNullableRecordValueToStreamAsync()
     {
@@ -73,8 +70,6 @@ public class AsyncNullableComplexTypesTests
 
         Convert.ToHexString(stream.ToArray()).Should().BeEquivalentTo("00080204060800");
     }
-
-    // ── MemberData ────────────────────────────────────────────────────────────
 
     public static IEnumerable<object[]> SerializeEnumerableData =>
         new List<object[]>

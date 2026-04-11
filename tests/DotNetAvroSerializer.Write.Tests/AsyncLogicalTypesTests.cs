@@ -5,7 +5,6 @@ namespace DotNetAvroSerializer.Write.Tests;
 #pragma warning disable CA2007
 public class AsyncLogicalTypesTests
 {
-    // ── SerializeAsync ────────────────────────────────────────────────────────
 
     [Fact]
     public async Task SerializeUuidAsync()
@@ -46,8 +45,6 @@ public class AsyncLogicalTypesTests
 
         Convert.ToHexString(result).Should().BeEquivalentTo("B0A787B2AE61");
     }
-
-    // ── SerializeToStreamAsync ────────────────────────────────────────────────
 
     [Fact]
     public async Task SerializeUuidToStreamAsync()

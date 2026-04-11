@@ -5,8 +5,6 @@ namespace DotNetAvroSerializer.Write.Tests;
 #pragma warning disable CA2007
 public class AsyncNullableLogicalTypesTests
 {
-    // ── SerializeAsync ────────────────────────────────────────────────────────
-
     [Theory]
     [InlineData(null, "00")]
     [InlineData("a826d88f-45af-4b8d-8fb5-57106261dde6", "024861383236643838662D343561662D346238642D386662352D353731303632363164646536")]
@@ -52,8 +50,6 @@ public class AsyncNullableLogicalTypesTests
         Convert.ToHexString(result).Should().BeEquivalentTo(expected);
     }
 
-    // ── SerializeToStreamAsync ────────────────────────────────────────────────
-
     [Fact]
     public async Task SerializeNullableUuidToStreamAsync()
     {
@@ -96,8 +92,6 @@ public class AsyncNullableLogicalTypesTests
 
         Convert.ToHexString(stream.ToArray()).Should().BeEquivalentTo("02E0D0DC44");
     }
-
-    // ── MemberData ────────────────────────────────────────────────────────────
 
     public static IEnumerable<object[]> TimestampData =>
         new List<object[]>

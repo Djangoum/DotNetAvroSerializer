@@ -6,7 +6,6 @@ namespace DotNetAvroSerializer.Write.Tests;
 #pragma warning disable CA2007
 public class AsyncComplexUnionsTests
 {
-    // ── SerializeAsync ────────────────────────────────────────────────────────
 
     [Theory]
     [MemberData(nameof(RecordsUnionTestData))]
@@ -19,8 +18,6 @@ public class AsyncComplexUnionsTests
         Convert.ToHexString(result).Should().BeEquivalentTo(expected);
     }
 
-    // ── SerializeToStreamAsync ────────────────────────────────────────────────
-
     [Theory]
     [MemberData(nameof(RecordsUnionTestData))]
     public async Task SerializeRecordsUnionToStreamAsync(UnionSideOne? sideOne, UnionSideTwo? sideTwo, string expected)
@@ -32,8 +29,6 @@ public class AsyncComplexUnionsTests
 
         Convert.ToHexString(stream.ToArray()).Should().BeEquivalentTo(expected);
     }
-
-    // ── MemberData ────────────────────────────────────────────────────────────
 
     public static IEnumerable<object[]> RecordsUnionTestData =>
         new List<object[]>

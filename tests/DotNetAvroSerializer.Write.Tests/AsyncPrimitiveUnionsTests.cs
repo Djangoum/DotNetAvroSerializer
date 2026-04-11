@@ -5,7 +5,6 @@ namespace DotNetAvroSerializer.Write.Tests;
 #pragma warning disable CA2007
 public class AsyncPrimitiveUnionsTests
 {
-    // ── SerializeAsync ────────────────────────────────────────────────────────
 
     [Theory]
     [InlineData(326, null, "008C05")]
@@ -126,8 +125,6 @@ public class AsyncPrimitiveUnionsTests
 
         Convert.ToHexString(result).Should().BeEquivalentTo(expected);
     }
-
-    // ── SerializeToStreamAsync ────────────────────────────────────────────────
 
     [Theory]
     [InlineData(326, null, "008C05")]

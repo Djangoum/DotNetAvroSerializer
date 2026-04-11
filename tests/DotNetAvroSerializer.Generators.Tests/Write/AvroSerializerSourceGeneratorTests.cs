@@ -1,6 +1,4 @@
-using System;
-using System.IO;
-using System.Linq;
+using System.Globalization;
 using DotNetAvroSerializer.Generators.Diagnostics;
 using DotNetAvroSerializer.Generators.Write;
 using FluentAssertions;
@@ -50,12 +48,12 @@ public partial class BrokenSerializer : AvroSerializer<int>
 
         diagnostics.Should().ContainSingle(d =>
             d.Id == DiagnosticsDescriptors.AvroSchemaIsNotValidDescriptor.Id
-            && d.GetMessage().Contains("Record schema BrokenRecord has no fields", StringComparison.Ordinal));
+            && d.GetMessage(CultureInfo.InvariantCulture).Contains("Record schema BrokenRecord has no fields", StringComparison.Ordinal));
     }
 
     private static CSharpCompilation CreateCompilation(string source)
     {
-        var references = ((string)AppContext.GetData("TRUSTED_PLATFORM_ASSEMBLIES"))
+        var references = (AppContext.GetData("TRUSTED_PLATFORM_ASSEMBLIES") as string)!
             .Split(Path.PathSeparator)
             .Select(path => MetadataReference.CreateFromFile(path));
 

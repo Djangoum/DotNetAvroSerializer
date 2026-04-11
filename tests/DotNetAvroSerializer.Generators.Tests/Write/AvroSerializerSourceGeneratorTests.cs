@@ -102,7 +102,7 @@ public partial class IntArraySerializer : AvroSerializer<int[]>
 
         var generatedSource = driver.GetRunResult().Results.Single().GeneratedSources.Single().SourceText.ToString();
 
-        generatedSource.Should().Contain("var countsource = GetCollectionCount(source);");
+        generatedSource.Should().Contain("var sourceCount = GetCollectionCount(source);");
         generatedSource.Should().NotContain(".Count()");
         generatedSource.Should().NotContain("using System.Linq;");
     }

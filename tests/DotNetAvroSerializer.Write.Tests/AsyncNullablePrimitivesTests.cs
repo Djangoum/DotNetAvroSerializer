@@ -12,7 +12,7 @@ public class AsyncNullablePrimitivesTests
     [InlineData(null, "00")]
     public async Task SerializeNullableIntAsync(int? input, string expected)
     {
-        var result = await new NullableIntegerSerializer().SerializeAsync(input);
+        var result = await new AsyncNullableIntegerSerializer().SerializeAsync(input);
 
         Convert.ToHexString(result).Should().BeEquivalentTo(expected);
     }
@@ -23,7 +23,7 @@ public class AsyncNullablePrimitivesTests
     [InlineData(null, "00")]
     public async Task SerializeNullableLongAsync(long? input, string expected)
     {
-        var result = await new NullableLongSerializer().SerializeAsync(input);
+        var result = await new AsyncNullableLongSerializer().SerializeAsync(input);
 
         Convert.ToHexString(result).Should().BeEquivalentTo(expected);
     }
@@ -33,7 +33,7 @@ public class AsyncNullablePrimitivesTests
     [InlineData(null, "00")]
     public async Task SerializeNullableStringAsync(string? input, string expected)
     {
-        var result = await new NullableStringSerializer().SerializeAsync(input);
+        var result = await new AsyncNullableStringSerializer().SerializeAsync(input);
 
         Convert.ToHexString(result).Should().BeEquivalentTo(expected);
     }
@@ -44,7 +44,7 @@ public class AsyncNullablePrimitivesTests
     [InlineData(null, "00")]
     public async Task SerializeNullableBoolAsync(bool? input, string expected)
     {
-        var result = await new NullableBooleanSerializer().SerializeAsync(input);
+        var result = await new AsyncNullableBooleanSerializer().SerializeAsync(input);
 
         Convert.ToHexString(result).Should().BeEquivalentTo(expected);
     }
@@ -55,7 +55,7 @@ public class AsyncNullablePrimitivesTests
     [InlineData(null, "00")]
     public async Task SerializeNullableDoubleAsync(double? input, string expected)
     {
-        var result = await new NullableDoubleSerializer().SerializeAsync(input);
+        var result = await new AsyncNullableDoubleSerializer().SerializeAsync(input);
 
         Convert.ToHexString(result).Should().BeEquivalentTo(expected);
     }
@@ -66,7 +66,7 @@ public class AsyncNullablePrimitivesTests
     [InlineData(null, "00")]
     public async Task SerializeNullableFloatAsync(float? input, string expected)
     {
-        var result = await new NullableFloatSerializer().SerializeAsync(input);
+        var result = await new AsyncNullableFloatSerializer().SerializeAsync(input);
 
         Convert.ToHexString(result).Should().BeEquivalentTo(expected);
     }
@@ -76,7 +76,7 @@ public class AsyncNullablePrimitivesTests
     [InlineData(null, "00")]
     public async Task SerializeNullableBytesAsync(byte[]? input, string expected)
     {
-        var result = await new NullableBytesSerializer().SerializeAsync(input);
+        var result = await new AsyncNullableBytesSerializer().SerializeAsync(input);
 
         Convert.ToHexString(result).Should().BeEquivalentTo(expected);
     }
@@ -88,7 +88,7 @@ public class AsyncNullablePrimitivesTests
     {
         using var stream = new MemoryStream();
 
-        await new NullableIntegerSerializer().SerializeToStreamAsync(stream, input);
+        await new AsyncNullableIntegerSerializer().SerializeToStreamAsync(stream, input);
 
         Convert.ToHexString(stream.ToArray()).Should().BeEquivalentTo(expected);
     }
@@ -100,7 +100,7 @@ public class AsyncNullablePrimitivesTests
     {
         using var stream = new MemoryStream();
 
-        await new NullableStringSerializer().SerializeToStreamAsync(stream, input);
+        await new AsyncNullableStringSerializer().SerializeToStreamAsync(stream, input);
 
         Convert.ToHexString(stream.ToArray()).Should().BeEquivalentTo(expected);
     }
@@ -112,9 +112,30 @@ public class AsyncNullablePrimitivesTests
     {
         using var stream = new MemoryStream();
 
-        await new NullableBooleanSerializer().SerializeToStreamAsync(stream, input);
+        await new AsyncNullableBooleanSerializer().SerializeToStreamAsync(stream, input);
 
         Convert.ToHexString(stream.ToArray()).Should().BeEquivalentTo(expected);
     }
 }
 #pragma warning restore CA2007
+
+[AvroSchema(@"{ ""type"": [""null"", ""int""] }")]
+public partial class AsyncNullableIntegerSerializer : AsyncAvroSerializer<int?> { }
+
+[AvroSchema(@"{ ""type"": [""null"", ""long""] }")]
+public partial class AsyncNullableLongSerializer : AsyncAvroSerializer<long?> { }
+
+[AvroSchema(@"{ ""type"": [ ""null"", ""string""] }")]
+public partial class AsyncNullableStringSerializer : AsyncAvroSerializer<string?> { }
+
+[AvroSchema(@"{ ""type"": [ ""null"", ""boolean"" ] }")]
+public partial class AsyncNullableBooleanSerializer : AsyncAvroSerializer<bool?> { }
+
+[AvroSchema(@"{ ""type"": [ ""null"", ""double"" ] }")]
+public partial class AsyncNullableDoubleSerializer : AsyncAvroSerializer<double?> { }
+
+[AvroSchema(@"{ ""type"": [ ""null"", ""bytes"" ] }")]
+public partial class AsyncNullableBytesSerializer : AsyncAvroSerializer<byte[]?> { }
+
+[AvroSchema(@"{ ""type"": [ ""null"", ""float"" ] }")]
+public partial class AsyncNullableFloatSerializer : AsyncAvroSerializer<float?> { }

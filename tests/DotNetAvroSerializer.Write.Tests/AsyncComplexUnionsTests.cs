@@ -13,7 +13,7 @@ public class AsyncComplexUnionsTests
     {
         Union<UnionSideOne, UnionSideTwo> union = sideOne is not null ? sideOne : sideTwo!;
 
-        var result = await new RecordsUnionSerializer().SerializeAsync(union);
+        var result = await new AsyncRecordsUnionSerializer().SerializeAsync(union);
 
         Convert.ToHexString(result).Should().BeEquivalentTo(expected);
     }
@@ -25,7 +25,7 @@ public class AsyncComplexUnionsTests
         Union<UnionSideOne, UnionSideTwo> union = sideOne is not null ? sideOne : sideTwo!;
         using var stream = new MemoryStream();
 
-        await new RecordsUnionSerializer().SerializeToStreamAsync(stream, union);
+        await new AsyncRecordsUnionSerializer().SerializeToStreamAsync(stream, union);
 
         Convert.ToHexString(stream.ToArray()).Should().BeEquivalentTo(expected);
     }
@@ -38,3 +38,37 @@ public class AsyncComplexUnionsTests
         };
 }
 #pragma warning restore CA2007
+
+[AvroSchema(@"{
+         ""type"": [
+             {
+                 ""type"": ""record"",
+                 ""name"" : ""unionSideOne"",
+                 ""fields"": [
+                     {
+                         ""name"": ""id"",
+                         ""type"": ""int""
+                     },
+                     {
+                         ""name"": ""name"",
+                         ""type"": ""string""
+                     }
+                 ]
+             },
+             {
+                 ""type"": ""record"",
+                 ""name"": ""unionSideTwo"",
+                 ""fields"": [
+                     {
+                         ""name"": ""identifier"",
+                         ""type"": ""int""
+                     },
+                     {
+                         ""name"": ""SecondName"",
+                         ""type"": ""string""
+                     }
+                 ]
+             }
+         ]
+     }")]
+public partial class AsyncRecordsUnionSerializer : AsyncAvroSerializer<Union<UnionSideOne, UnionSideTwo>> { }

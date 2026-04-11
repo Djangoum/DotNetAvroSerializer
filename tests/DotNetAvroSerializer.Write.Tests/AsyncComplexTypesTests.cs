@@ -18,7 +18,7 @@ public class AsyncComplexTypesTests
     [Fact]
     public async Task SerializeEnumAsync()
     {
-        var result = await new EnumSerializer().SerializeAsync(TestEnum.Value3);
+        var result = await new AsyncEnumSerializer().SerializeAsync(TestEnum.Value3);
 
         Convert.ToHexString(result).Should().BeEquivalentTo("04");
     }
@@ -64,7 +64,7 @@ public class AsyncComplexTypesTests
     [Fact]
     public async Task SerializeRecordWithPrimitiveTypesAsync()
     {
-        var result = await new ClassWithPrimitivesSerializer().SerializeAsync(new ClassWithPrimitives
+        var result = await new AsyncClassWithPrimitivesSerializer().SerializeAsync(new ClassWithPrimitives
         {
             BoolField = true,
             BytesField = new byte[] { 1, 2, 3, 4 },
@@ -81,7 +81,7 @@ public class AsyncComplexTypesTests
     [Fact]
     public async Task SerializeFixedAsync()
     {
-        var result = await new FixedSerializer().SerializeAsync(new byte[] { 1, 2, 3, 4 });
+        var result = await new AsyncFixedSerializer().SerializeAsync(new byte[] { 1, 2, 3, 4 });
 
         Convert.ToHexString(result).Should().BeEquivalentTo("0801020304");
     }
@@ -89,7 +89,7 @@ public class AsyncComplexTypesTests
     [Fact]
     public async Task SerializeRecordWithComplexTypesAsync()
     {
-        var result = await new RecordWithComplexTypesSerializer().SerializeAsync(new RecordWithComplexTypes
+        var result = await new AsyncRecordWithComplexTypesSerializer().SerializeAsync(new RecordWithComplexTypes
         {
             InnerRecord = new InnerRecord { Field1 = "teststring", Field2 = 124 },
             Doubles = new List<double> { 1.2d, 3.4d, 12.6d },
@@ -124,7 +124,7 @@ public class AsyncComplexTypesTests
     {
         using var stream = new MemoryStream();
 
-        await new EnumSerializer().SerializeToStreamAsync(stream, TestEnum.Value3);
+        await new AsyncEnumSerializer().SerializeToStreamAsync(stream, TestEnum.Value3);
 
         Convert.ToHexString(stream.ToArray()).Should().BeEquivalentTo("04");
     }
@@ -149,7 +149,7 @@ public class AsyncComplexTypesTests
     {
         using var stream = new MemoryStream();
 
-        await new ClassWithPrimitivesSerializer().SerializeToStreamAsync(stream, new ClassWithPrimitives
+        await new AsyncClassWithPrimitivesSerializer().SerializeToStreamAsync(stream, new ClassWithPrimitives
         {
             BoolField = true,
             BytesField = new byte[] { 1, 2, 3, 4 },
@@ -162,5 +162,142 @@ public class AsyncComplexTypesTests
 
         Convert.ToHexString(stream.ToArray()).Should().BeEquivalentTo("54FCEAB299BAEAA3A122127465737420746578749A9979410000000000002940010801020304");
     }
+
+    [Fact]
+    public async Task SerializeArrayOfRecordsWithComplexTypesAsync()
+    {
+        var result = await new ArrayOfRecordWithComplexTypesSerializer().SerializeAsync(
+            new List<RecordWithComplexTypes>
+            {
+                new RecordWithComplexTypes
+                {
+                    InnerRecord = new InnerRecord { Field1 = "teststring", Field2 = 124 },
+                    Doubles = new List<double> { 1.2d, 3.4d, 12.6d },
+                    InnerRecords = new[]
+                    {
+                        new InnerRecord { Field1 = "teststring", Field2 = 124 },
+                        new InnerRecord { Field1 = "teststring", Field2 = 124 }
+                    },
+                    NullableFloat = 12.6f,
+                    MapField = new Dictionary<string, InnerRecord>
+                    {
+                        { "key1", new InnerRecord { Field1 = "teststring", Field2 = 124 } },
+                        { "key2", new InnerRecord { Field1 = "teststring", Field2 = 124 } }
+                    }
+                },
+                new RecordWithComplexTypes
+                {
+                    InnerRecord = new InnerRecord { Field1 = "teststring", Field2 = 124 },
+                    Doubles = new List<double> { 1.2d, 3.4d, 12.6d },
+                    InnerRecords = new[]
+                    {
+                        new InnerRecord { Field1 = "teststring", Field2 = 124 },
+                        new InnerRecord { Field1 = "teststring", Field2 = 124 }
+                    },
+                    NullableFloat = 12.6f,
+                    MapField = new Dictionary<string, InnerRecord>
+                    {
+                        { "key1", new InnerRecord { Field1 = "teststring", Field2 = 124 } },
+                        { "key2", new InnerRecord { Field1 = "teststring", Field2 = 124 } }
+                    }
+                }
+            });
+
+        Convert.ToHexString(result).Should().BeEquivalentTo("041474657374737472696E67F801041474657374737472696E67F8011474657374737472696E67F8010006333333333333F33F3333333333330B40333333333333294000029A99494104086B6579311474657374737472696E67F801086B6579321474657374737472696E67F801001474657374737472696E67F801041474657374737472696E67F8011474657374737472696E67F8010006333333333333F33F3333333333330B40333333333333294000029A99494104086B6579311474657374737472696E67F801086B6579321474657374737472696E67F8010000");
+    }
 }
 #pragma warning restore CA2007
+
+[AvroSchema(@"{ ""type"": ""enum"", ""name"": ""foo"", ""symbols"": [ ""Value1"", ""Value2"", ""Value3"" ]}")]
+public partial class AsyncEnumSerializer : AsyncAvroSerializer<TestEnum> { }
+
+[AvroSchema(@"{ ""type"": ""fixed"", ""size"" : 4, ""name"": ""sixteenLength"" }")]
+public partial class AsyncFixedSerializer : AsyncAvroSerializer<byte[]> { }
+
+[AvroSchema(@"
+     {
+         ""type"": ""record"",
+         ""name"" : ""classWithPrimitivesSerializer"",
+         ""fields"" :[
+             { 
+                 ""name"": ""IntegerField"",
+                 ""type"": ""int""
+             },
+             {
+                 ""name"": ""LongField"",
+                 ""type"": ""long""
+             },
+             {
+                 ""name"": ""StringField"",
+                 ""type"": ""string""
+             },
+             {
+                 ""name"": ""FloatField"",
+                 ""type"": ""float""
+             },
+             {
+                 ""name"": ""DoubleField"",
+                 ""type"": ""double""
+             },
+             {
+                 ""name"": ""BoolField"",
+                 ""type"": ""boolean""
+             },
+             {
+                 ""name"": ""BytesField"",
+                 ""type"": ""bytes""
+             }
+         ]
+     }")]
+public partial class AsyncClassWithPrimitivesSerializer : AsyncAvroSerializer<ClassWithPrimitives> { }
+
+[AvroSchema(@"{
+         ""type"": ""record"",
+         ""name"" : ""recordWithComplexTypes"",
+         ""fields"" :[
+             {
+                 ""name"": ""InnerRecord"",
+                 ""type"": {
+                     ""name"": ""InnerRecord"",
+                     ""type"": ""record"",
+                     ""fields"": [
+                         {
+                             ""name"": ""Field1"",
+                             ""type"": ""string""
+                         },
+                         {
+                             ""name"": ""Field2"",
+                             ""type"": ""int""
+                         }
+                     ]
+                 } 
+             },
+             {
+                 ""name"": ""InnerRecords"",
+                 ""type"": {
+                     ""type"": ""array"",
+                     ""items"": ""InnerRecord""
+                 }
+             },
+             {
+                 ""name"": ""Doubles"",
+                 ""type"": {
+                     ""type"": ""array"",
+                     ""items"": ""double""
+                 }
+             },
+             {
+                 ""name"": ""NullableFloat"",
+                 ""type"": [ ""null"", ""float"" ]
+             },
+             {
+                 ""name"": ""MapField"",
+                 ""type"": {
+                     ""type"": ""map"",
+                     ""names"": ""dictionary"",
+                     ""values"": ""InnerRecord""
+                 }
+             }
+         ]
+     }")]
+public partial class AsyncRecordWithComplexTypesSerializer : AsyncAvroSerializer<RecordWithComplexTypes> { }

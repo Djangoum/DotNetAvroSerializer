@@ -247,6 +247,58 @@ public partial class IntArraySerializer : AsyncAvroSerializer<IAsyncEnumerable<i
     }
 
     [Fact]
+    public void Initialize_MustGenerateStreamedMapBlocksForAsyncSerializer()
+    {
+        const string source = """
+using System.Collections.Generic;
+using System.IO;
+using System.Threading;
+using System.Threading.Tasks;
+using DotNetAvroSerializer;
+
+namespace DotNetAvroSerializer
+{
+    public abstract class AsyncAvroSerializer<T>
+    {
+        public int AsyncArrayItemCountBlockSize { get; set; } = 1024;
+        public virtual Task<byte[]> SerializeAsync(T source, CancellationToken cancellationToken = default) => throw new System.NotImplementedException();
+        public virtual Task SerializeToStreamAsync(Stream outputStream, T source, CancellationToken cancellationToken = default) => throw new System.NotImplementedException();
+    }
+
+    [System.AttributeUsage(System.AttributeTargets.Class)]
+    public sealed class AvroSchemaAttribute : System.Attribute
+    {
+        public AvroSchemaAttribute(string schema, System.Type[] allowedCustomLogicalTypes = null)
+        {
+        }
+    }
+}
+
+namespace Sample;
+
+[AvroSchema("{\"type\":\"map\",\"values\":\"int\"}")]
+public partial class IntMapSerializer : AsyncAvroSerializer<Dictionary<string, int>>
+{
+}
+""";
+
+        var compilation = CreateCompilation(source);
+        GeneratorDriver driver = CSharpGeneratorDriver.Create(new AvroSerializerSourceGenerator().AsSourceGenerator());
+
+        driver = driver.RunGenerators(compilation);
+
+        var generatedSource = driver.GetRunResult().Results.Single().GeneratedSources.Single().SourceText.ToString();
+
+        generatedSource.Should().Contain("AsyncArrayItemCountBlockSize");
+        generatedSource.Should().Contain("new List<global::System.Collections.Generic.KeyValuePair<string,");
+        generatedSource.Should().Contain("if (sourceBatch.Count == sourceBlockSize)");
+        generatedSource.Should().Contain("await LongSchema.WriteAsync(outputStream, sourceBatch.Count, cancellationToken);");
+        generatedSource.Should().Contain("await LongSchema.WriteAsync(outputStream, 0L, cancellationToken);");
+        generatedSource.Should().NotContain("GetCollectionCount(source)");
+    }
+
+
+    [Fact]
     public void Initialize_MustEmitDiagnosticForInvalidSchema()
     {
         const string source = """

@@ -12,7 +12,7 @@ public class AsyncNullableLogicalTypesTests
     {
         var parsed = Guid.TryParse(uuidString, out var uuid);
 
-        var result = await new NullableUuidSerializer().SerializeAsync(parsed ? uuid : null);
+        var result = await new AsyncNullableUuidSerializer().SerializeAsync(parsed ? uuid : null);
 
         Convert.ToHexString(result).Should().BeEquivalentTo(expected);
     }
@@ -24,7 +24,7 @@ public class AsyncNullableLogicalTypesTests
     {
         var parsed = DateOnly.TryParse(dateString, out var date);
 
-        var result = await new NullableDateSerializer().SerializeAsync(parsed ? date : null);
+        var result = await new AsyncNullableDateSerializer().SerializeAsync(parsed ? date : null);
 
         Convert.ToHexString(result).Should().BeEquivalentTo(expected);
     }
@@ -36,7 +36,7 @@ public class AsyncNullableLogicalTypesTests
     {
         var parsed = TimeOnly.TryParse(timeString, out var time);
 
-        var result = await new NullableTimeMillisSerializer().SerializeAsync(parsed ? time : null);
+        var result = await new AsyncNullableTimeMillisSerializer().SerializeAsync(parsed ? time : null);
 
         Convert.ToHexString(result).Should().BeEquivalentTo(expected);
     }
@@ -45,7 +45,7 @@ public class AsyncNullableLogicalTypesTests
     [MemberData(nameof(TimestampData))]
     public async Task SerializeNullableTimestampMillisAsync(DateTime? input, string expected)
     {
-        var result = await new NullableTimestampMillisSerializer().SerializeAsync(input);
+        var result = await new AsyncNullableTimestampMillisSerializer().SerializeAsync(input);
 
         Convert.ToHexString(result).Should().BeEquivalentTo(expected);
     }
@@ -56,7 +56,7 @@ public class AsyncNullableLogicalTypesTests
         var uuid = new Guid("a826d88f-45af-4b8d-8fb5-57106261dde6");
         using var stream = new MemoryStream();
 
-        await new NullableUuidSerializer().SerializeToStreamAsync(stream, uuid);
+        await new AsyncNullableUuidSerializer().SerializeToStreamAsync(stream, uuid);
 
         Convert.ToHexString(stream.ToArray()).Should().BeEquivalentTo("024861383236643838662D343561662D346238642D386662352D353731303632363164646536");
     }
@@ -66,7 +66,7 @@ public class AsyncNullableLogicalTypesTests
     {
         using var stream = new MemoryStream();
 
-        await new NullableUuidSerializer().SerializeToStreamAsync(stream, null);
+        await new AsyncNullableUuidSerializer().SerializeToStreamAsync(stream, null);
 
         Convert.ToHexString(stream.ToArray()).Should().BeEquivalentTo("00");
     }
@@ -77,7 +77,7 @@ public class AsyncNullableLogicalTypesTests
         var date = new DateOnly(2023, 01, 02);
         using var stream = new MemoryStream();
 
-        await new NullableDateSerializer().SerializeToStreamAsync(stream, date);
+        await new AsyncNullableDateSerializer().SerializeToStreamAsync(stream, date);
 
         Convert.ToHexString(stream.ToArray()).Should().BeEquivalentTo("02BEAE02");
     }
@@ -88,7 +88,7 @@ public class AsyncNullableLogicalTypesTests
         var time = new TimeOnly(20, 01, 02);
         using var stream = new MemoryStream();
 
-        await new NullableTimeMillisSerializer().SerializeToStreamAsync(stream, time);
+        await new AsyncNullableTimeMillisSerializer().SerializeToStreamAsync(stream, time);
 
         Convert.ToHexString(stream.ToArray()).Should().BeEquivalentTo("02E0D0DC44");
     }
@@ -101,3 +101,15 @@ public class AsyncNullableLogicalTypesTests
         };
 }
 #pragma warning restore CA2007
+
+[AvroSchema(@"{ ""type"": [ ""null"", { ""type"": ""int"", ""logicalType"": ""date"" } ] }")]
+public partial class AsyncNullableDateSerializer : AsyncAvroSerializer<DateOnly?> { }
+
+[AvroSchema(@"{ ""type"": [ ""null"", { ""type"": ""long"", ""logicalType"": ""timestamp-millis"" } ] }")]
+public partial class AsyncNullableTimestampMillisSerializer : AsyncAvroSerializer<DateTime?> { }
+
+[AvroSchema(@"{ ""type"": [ ""null"", { ""type"" :""int"", ""logicalType"": ""time-millis"" } ] }")]
+public partial class AsyncNullableTimeMillisSerializer : AsyncAvroSerializer<TimeOnly?> { }
+
+[AvroSchema(@"{ ""type"": [ ""null"", { ""type"" : ""string"", ""logicalType"": ""uuid"" } ] }")]
+public partial class AsyncNullableUuidSerializer : AsyncAvroSerializer<Guid?> { }

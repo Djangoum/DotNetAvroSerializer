@@ -27,55 +27,6 @@ public class NullableComplexTypesTests
 
         Convert.ToHexString(result).Should().BeEquivalentTo("02");
     }
-
-    [Theory]
-    [MemberData(nameof(SerializeEnumerable))]
-    public void SerializeNullableArrayIEnumerable(IEnumerable<int>? enumerable, string hexString)
-    {
-        var serializer = new NullableStringArrayAnnotatedEnumerable();
-
-        var result = serializer.Serialize(enumerable);
-
-        Convert.ToHexString(result).Should().BeEquivalentTo(hexString);
-    }
-
-    [Theory]
-    [MemberData(nameof(SerializeNullableMap))]
-    public void SerializeNullableMapWithNullableRecord(Dictionary<string, UnionSideOne?> map, string hexString)
-    {
-        var serializer = new NullableMapOfNullableRecords();
-
-        var result = serializer.Serialize(map);
-
-        Convert.ToHexString(result).Should().BeEquivalentTo(hexString);
-    }
-
-    public static IEnumerable<object[]> SerializeEnumerable =>
-        new List<object[]>
-        {
-            new object[] { new int[] { 1, 2, 3, 4 }, "00080204060800" },
-            new object[] { null!, "02" }
-        };
-
-    public static IEnumerable<object[]> SerializeNullableMap =>
-        new List<object[]>
-        {
-            new object[] { new Dictionary<string, UnionSideOne?>
-            {
-                { "item1", null }
-            }, "00020A6974656D310000" },
-            new object[] { new Dictionary<string, UnionSideOne?>
-            {
-                {
-                    "item1", new UnionSideOne
-                    {
-                        Name = "name",
-                        Id = 1
-                    }
-                }
-            }, "00020A6974656D310202086E616D6500" },
-            new object[] { null!, "02" }
-        };
 }
 
 [AvroSchema(@"{
@@ -115,7 +66,7 @@ public partial class NullableRecordSerializer : AvroSerializer<UnionSideOne?>
             }
          ]
      }")]
-public partial class NullableStringArrayAnnotatedEnumerable : AvroSerializer<IEnumerable<int>?>
+public partial class NullableStringArrayAnnotatedEnumerable : AsyncAvroSerializer<IEnumerable<int>?>
 {
 
 }
@@ -149,7 +100,7 @@ public partial class NullableStringArrayAnnotatedEnumerable : AvroSerializer<IEn
         }
     ]
 }")]
-public partial class NullableMapOfNullableRecords : AvroSerializer<Dictionary<string, UnionSideOne?>>
+public partial class NullableMapOfNullableRecords : AsyncAvroSerializer<Dictionary<string, UnionSideOne?>>
 {
 
 }

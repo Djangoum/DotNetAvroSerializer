@@ -153,9 +153,9 @@ public partial class RecordWithComplexTypesSerializer
     {
         StringSchema.Write(outputStream, source.InnerRecord.Field1);
         IntSchema.Write(outputStream, source.InnerRecord.Field2);
-        var countsourceInnerRecords = GetCollectionCount(source.InnerRecords);
-        if (countsourceInnerRecords > 0)
-            LongSchema.Write(outputStream, countsourceInnerRecords);
+        var sourceInnerRecordsCount = GetCollectionCount(source.InnerRecords);
+        if (sourceInnerRecordsCount > 0)
+            LongSchema.Write(outputStream, sourceInnerRecordsCount);
         foreach (var itemsourceInnerRecords in source.InnerRecords)
         {
             StringSchema.Write(outputStream, itemsourceInnerRecords.Field1);
@@ -163,9 +163,9 @@ public partial class RecordWithComplexTypesSerializer
         }
 
         LongSchema.Write(outputStream, 0L);
-        var countsourceDoubles = GetCollectionCount(source.Doubles);
-        if (countsourceDoubles > 0)
-            LongSchema.Write(outputStream, countsourceDoubles);
+        var sourceDoublesCount = GetCollectionCount(source.Doubles);
+        if (sourceDoublesCount > 0)
+            LongSchema.Write(outputStream, sourceDoublesCount);
         foreach (var itemsourceDoubles in source.Doubles)
         {
             DoubleSchema.Write(outputStream, itemsourceDoubles);
@@ -183,9 +183,9 @@ public partial class RecordWithComplexTypesSerializer
             FloatSchema.Write(outputStream, source.NullableFloat);
         }
 
-        var countsourceMapField = GetCollectionCount(source.MapField);
-        if (countsourceMapField > 0)
-            LongSchema.Write(outputStream, countsourceMapField);
+        var sourceMapFieldCount = GetCollectionCount(source.MapField);
+        if (sourceMapFieldCount > 0)
+            LongSchema.Write(outputStream, sourceMapFieldCount);
         foreach (var itemsourceMapField in source.MapField)
         {
             StringSchema.Write(outputStream, itemsourceMapField.Key);

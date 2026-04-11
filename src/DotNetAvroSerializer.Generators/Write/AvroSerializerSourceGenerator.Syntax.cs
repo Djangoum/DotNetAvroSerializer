@@ -48,6 +48,11 @@ public partial class AvroSerializerSourceGenerator
 
                            private static long GetCollectionCount<T>(IEnumerable<T> source)
                            {
+                               if (source is null)
+                               {
+                                   throw new global::System.ArgumentNullException(nameof(source));
+                               }
+
                                if (source is ICollection<T> collection)
                                {
                                    return collection.Count;

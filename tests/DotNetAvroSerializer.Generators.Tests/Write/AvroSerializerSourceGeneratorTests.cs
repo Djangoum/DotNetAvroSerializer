@@ -297,6 +297,120 @@ public partial class IntMapSerializer : AsyncAvroSerializer<Dictionary<string, i
         generatedSource.Should().NotContain("GetCollectionCount(source)");
     }
 
+    [Fact]
+    public void Initialize_MustGenerateStreamedArrayBlocksForAsyncSerializer_WithComplexType()
+    {
+        const string source = """
+using System.Collections.Generic;
+using System.IO;
+using System.Threading;
+using System.Threading.Tasks;
+using DotNetAvroSerializer;
+
+namespace DotNetAvroSerializer
+{
+    public abstract class AsyncAvroSerializer<T>
+    {
+        public int AsyncArrayItemCountBlockSize { get; set; } = 1024;
+        public virtual Task<byte[]> SerializeAsync(T source, CancellationToken cancellationToken = default) => throw new System.NotImplementedException();
+        public virtual Task SerializeToStreamAsync(Stream outputStream, T source, CancellationToken cancellationToken = default) => throw new System.NotImplementedException();
+    }
+
+    [System.AttributeUsage(System.AttributeTargets.Class)]
+    public sealed class AvroSchemaAttribute : System.Attribute
+    {
+        public AvroSchemaAttribute(string schema, System.Type[] allowedCustomLogicalTypes = null)
+        {
+        }
+    }
+}
+
+namespace Sample;
+
+public class ItemRecord
+{
+    public int Id { get; set; }
+    public string Name { get; set; }
+}
+
+[AvroSchema("{\"type\":\"array\",\"items\":{\"type\":\"record\",\"name\":\"ItemRecord\",\"fields\":[{\"name\":\"id\",\"type\":\"int\"},{\"name\":\"name\",\"type\":\"string\"}]}}")]
+public partial class ItemArraySerializer : AsyncAvroSerializer<List<ItemRecord>>
+{
+}
+""";
+
+        var compilation = CreateCompilation(source);
+        GeneratorDriver driver = CSharpGeneratorDriver.Create(new AvroSerializerSourceGenerator().AsSourceGenerator());
+
+        driver = driver.RunGenerators(compilation);
+
+        var generatedSource = driver.GetRunResult().Results.Single().GeneratedSources.Single().SourceText.ToString();
+
+        generatedSource.Should().Contain("new List<global::Sample.ItemRecord>");
+        generatedSource.Should().Contain("if (sourceBatch.Count == sourceBlockSize)");
+        generatedSource.Should().Contain("await IntSchema.WriteAsync(outputStream, itemsourceInBlock.Id, cancellationToken);");
+        generatedSource.Should().Contain("await StringSchema.WriteAsync(outputStream, itemsourceInBlock.Name, cancellationToken);");
+        generatedSource.Should().Contain("await LongSchema.WriteAsync(outputStream, 0L, cancellationToken);");
+        generatedSource.Should().NotContain("GetCollectionCount(source)");
+    }
+
+    [Fact]
+    public void Initialize_MustGenerateStreamedMapBlocksForAsyncSerializer_WithComplexType()
+    {
+        const string source = """
+using System.Collections.Generic;
+using System.IO;
+using System.Threading;
+using System.Threading.Tasks;
+using DotNetAvroSerializer;
+
+namespace DotNetAvroSerializer
+{
+    public abstract class AsyncAvroSerializer<T>
+    {
+        public int AsyncArrayItemCountBlockSize { get; set; } = 1024;
+        public virtual Task<byte[]> SerializeAsync(T source, CancellationToken cancellationToken = default) => throw new System.NotImplementedException();
+        public virtual Task SerializeToStreamAsync(Stream outputStream, T source, CancellationToken cancellationToken = default) => throw new System.NotImplementedException();
+    }
+
+    [System.AttributeUsage(System.AttributeTargets.Class)]
+    public sealed class AvroSchemaAttribute : System.Attribute
+    {
+        public AvroSchemaAttribute(string schema, System.Type[] allowedCustomLogicalTypes = null)
+        {
+        }
+    }
+}
+
+namespace Sample;
+
+public class ItemRecord
+{
+    public int Id { get; set; }
+    public string Name { get; set; }
+}
+
+[AvroSchema("{\"type\":\"map\",\"values\":{\"type\":\"record\",\"name\":\"ItemRecord\",\"fields\":[{\"name\":\"id\",\"type\":\"int\"},{\"name\":\"name\",\"type\":\"string\"}]}}")]
+public partial class ItemMapSerializer : AsyncAvroSerializer<Dictionary<string, ItemRecord>>
+{
+}
+""";
+
+        var compilation = CreateCompilation(source);
+        GeneratorDriver driver = CSharpGeneratorDriver.Create(new AvroSerializerSourceGenerator().AsSourceGenerator());
+
+        driver = driver.RunGenerators(compilation);
+
+        var generatedSource = driver.GetRunResult().Results.Single().GeneratedSources.Single().SourceText.ToString();
+
+        generatedSource.Should().Contain("new List<global::System.Collections.Generic.KeyValuePair<string, global::Sample.ItemRecord>>");
+        generatedSource.Should().Contain("if (sourceBatch.Count == sourceBlockSize)");
+        generatedSource.Should().Contain("await IntSchema.WriteAsync(outputStream, itemsourceInBlock.Value.Id, cancellationToken);");
+        generatedSource.Should().Contain("await StringSchema.WriteAsync(outputStream, itemsourceInBlock.Value.Name, cancellationToken);");
+        generatedSource.Should().Contain("await LongSchema.WriteAsync(outputStream, 0L, cancellationToken);");
+        generatedSource.Should().NotContain("GetCollectionCount(source)");
+    }
+
 
     [Fact]
     public void Initialize_MustEmitDiagnosticForInvalidSchema()

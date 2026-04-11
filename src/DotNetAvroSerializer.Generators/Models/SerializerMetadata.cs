@@ -9,6 +9,7 @@ internal record SerializerMetadata(
     string SerializerNamespace,
     Schema AvroSchema,
     SerializableTypeMetadata SerializableTypeMetadata,
+    SerializerApiKind SerializerApiKind,
     EquatableArray<CustomLogicalTypeMetadata> CustomLogicalTypesMetadata,
     SmallLocation SerializerLocation)
 {

@@ -45,7 +45,10 @@ internal abstract record SerializableTypeMetadata
 
             if (IterableSerializableTypeMetadata.IsValidArrayType(symbol))
             {
-                return new IterableSerializableTypeMetadata(From(IterableSerializableTypeMetadata.GetIterableItemsTypeSymbol(symbol), compilation), symbol);
+                return new IterableSerializableTypeMetadata(
+                    From(IterableSerializableTypeMetadata.GetIterableItemsTypeSymbol(symbol), compilation),
+                    symbol,
+                    IterableSerializableTypeMetadata.IsAsyncEnumerableType(symbol));
             }
 
             if (EnumSerializableTypeMetadata.IsEnumType(symbol))

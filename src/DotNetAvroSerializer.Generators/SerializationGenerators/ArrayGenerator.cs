@@ -17,8 +17,11 @@ internal static class ArrayGenerator
                 $"Array type for {schema!.Name} is not satisfied {context.SerializableTypeMetadata?.FullNameDisplay} provided, arrays must be arrays or anything that implements IEnumerable");
 
         context.SerializationCode.AppendLine($"if ({context.SourceAccessor}.Count() > 0) LongSchema.Write(outputStream, (long){context.SourceAccessor}.Count());");
+        context.AsyncSerializationCode.AppendLine($"if ({context.SourceAccessor}.Count() > 0) await LongSchema.WriteAsync(outputStream, (long){context.SourceAccessor}.Count(), cancellationToken);");
         context.SerializationCode.AppendLine($"foreach(var item{VariableNamesHelpers.RemoveSpecialCharacters(context.SourceAccessor)} in {context.SourceAccessor})");
+        context.AsyncSerializationCode.AppendLine($"foreach(var item{VariableNamesHelpers.RemoveSpecialCharacters(context.SourceAccessor)} in {context.SourceAccessor})");
         context.SerializationCode.AppendLine("{");
+        context.AsyncSerializationCode.AppendLine("{");
 
         schema!.ItemSchema.Generate(context
             with
@@ -29,6 +32,8 @@ internal static class ArrayGenerator
         });
 
         context.SerializationCode.AppendLine("}");
+        context.AsyncSerializationCode.AppendLine("}");
         context.SerializationCode.AppendLine("LongSchema.Write(outputStream, 0L);");
+        context.AsyncSerializationCode.AppendLine("await LongSchema.WriteAsync(outputStream, 0L, cancellationToken);");
     }
 }

@@ -1,5 +1,7 @@
-﻿using System;
+using System;
 using System.IO;
+using System.Threading;
+using System.Threading.Tasks;
 using DotNetAvroSerializer.Exceptions;
 
 namespace DotNetAvroSerializer.Primitives;
@@ -24,5 +26,24 @@ public class DoubleSchema
             Array.Reverse(bytes);
         }
         outputStream.Write(bytes, 0, bytes.Length);
+    }
+
+    public static async Task WriteAsync(Stream outputStream, double? value, CancellationToken cancellationToken = default)
+    {
+        if (value is null)
+            throw new AvroSerializationException("Cannot serialize null value to int");
+
+        await WriteAsync(outputStream, value.Value, cancellationToken);
+    }
+
+    public static Task WriteAsync(Stream outputStream, double value, CancellationToken cancellationToken = default)
+    {
+        var bytes = BitConverter.GetBytes(value);
+        if (!BitConverter.IsLittleEndian)
+        {
+            Array.Reverse(bytes);
+        }
+
+        return outputStream.WriteAsync(bytes, 0, bytes.Length, cancellationToken);
     }
 }

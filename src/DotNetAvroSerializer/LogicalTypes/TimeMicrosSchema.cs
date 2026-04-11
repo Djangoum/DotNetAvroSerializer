@@ -1,5 +1,7 @@
-﻿using System;
+using System;
 using System.IO;
+using System.Threading;
+using System.Threading.Tasks;
 using DotNetAvroSerializer.Exceptions;
 using DotNetAvroSerializer.Primitives;
 
@@ -26,5 +28,21 @@ public static class TimeMicrosSchema
             throw new ArgumentOutOfRangeException(nameof(time), "A 'time-millis' value can only have the range '00:00:00' to '23:59:59'.");
 
         LongSchema.Write(outputStream, (time - UnixEpochTime).Ticks / 10);
+    }
+
+    public static async Task WriteAsync(Stream outputStream, TimeOnly? value, CancellationToken cancellationToken = default)
+    {
+        if (value is null)
+            throw new AvroSerializationException("Cannot serialize null value to int");
+
+        await WriteAsync(outputStream, value.Value, cancellationToken);
+    }
+
+    public static Task WriteAsync(Stream outputStream, TimeOnly time, CancellationToken cancellationToken = default)
+    {
+        if (time > MaxTime)
+            throw new ArgumentOutOfRangeException(nameof(time), "A 'time-millis' value can only have the range '00:00:00' to '23:59:59'.");
+
+        return LongSchema.WriteAsync(outputStream, (time - UnixEpochTime).Ticks / 10, cancellationToken);
     }
 }

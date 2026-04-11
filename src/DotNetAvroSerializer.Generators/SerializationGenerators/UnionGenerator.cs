@@ -26,13 +26,16 @@ internal static class UnionGenerator
                 if (unionSchemaIndex == 0)
                 {
                     context.SerializationCode.AppendLine($"if ({canSerializedCheck}) {{");
+                    context.AsyncSerializationCode.AppendLine($"if ({canSerializedCheck}) {{");
                 }
                 else
                 {
                     context.SerializationCode.AppendLine($"else if ({canSerializedCheck}) {{");
+                    context.AsyncSerializationCode.AppendLine($"else if ({canSerializedCheck}) {{");
                 }
 
                 context.SerializationCode.AppendLine($"IntSchema.Write(outputStream, {unionSchemaIndex});");
+                context.AsyncSerializationCode.AppendLine($"await IntSchema.WriteAsync(outputStream, {unionSchemaIndex}, cancellationToken);");
 
                 schema.Generate(context with
                 {
@@ -42,6 +45,7 @@ internal static class UnionGenerator
                 });
 
                 context.SerializationCode.AppendLine("}");
+                context.AsyncSerializationCode.AppendLine("}");
             }
             else if (context.SerializableTypeMetadata is NullableSerializableTypeMetadata or RecordSerializableTypeMetadata { IsNullable: true } or DictionarySerializableTypeMetadata or IterableSerializableTypeMetadata)
             {
@@ -50,13 +54,16 @@ internal static class UnionGenerator
                 if (unionSchemaIndex == 0)
                 {
                     context.SerializationCode.AppendLine($"if ({canSerializedCheck}) {{");
+                    context.AsyncSerializationCode.AppendLine($"if ({canSerializedCheck}) {{");
                 }
                 else
                 {
                     context.SerializationCode.AppendLine($"else if ({canSerializedCheck}) {{");
+                    context.AsyncSerializationCode.AppendLine($"else if ({canSerializedCheck}) {{");
                 }
 
                 context.SerializationCode.AppendLine($"IntSchema.Write(outputStream, {unionSchemaIndex});");
+                context.AsyncSerializationCode.AppendLine($"await IntSchema.WriteAsync(outputStream, {unionSchemaIndex}, cancellationToken);");
 
                 schema.Generate(context with
                 {
@@ -65,6 +72,7 @@ internal static class UnionGenerator
                 });
 
                 context.SerializationCode.AppendLine("}");
+                context.AsyncSerializationCode.AppendLine("}");
             }
             else
             {

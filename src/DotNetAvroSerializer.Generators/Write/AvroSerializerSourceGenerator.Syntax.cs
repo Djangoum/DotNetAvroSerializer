@@ -10,7 +10,7 @@ namespace DotNetAvroSerializer.Generators.Write;
 
 public partial class AvroSerializerSourceGenerator
 {
-    private SourceText GetGeneratedSerializationSource(string serializerNamespace, string serializerClassName, string serializableFullyQualifiedTypeName, string serializeCode, string privateMembersCode)
+    private SourceText GetGeneratedSerializationSource(string serializerNamespace, string serializerClassName, string serializableFullyQualifiedTypeName, string serializeCode, string serializeCodeAsync, string privateMembersCode)
     {
         return CSharpSyntaxTree.ParseText(
             CompilationUnit()
@@ -37,10 +37,20 @@ public partial class AvroSerializerSourceGenerator
                                 QualifiedName(
                                     IdentifierName("System"),
                                     IdentifierName("Linq"))),
-                            UsingDirective(
-                                QualifiedName(
-                                    IdentifierName("System"),
-                                    IdentifierName("IO")))}))
+                             UsingDirective(
+                                 QualifiedName(
+                                     IdentifierName("System"),
+                                     IdentifierName("IO"))),
+                             UsingDirective(
+                                 QualifiedName(
+                                     QualifiedName(
+                                         IdentifierName("System"),
+                                         IdentifierName("Threading")),
+                                     IdentifierName("Tasks"))),
+                             UsingDirective(
+                                 QualifiedName(
+                                     IdentifierName("System"),
+                                     IdentifierName("Threading")))}))
                 .WithMembers(
                     SingletonList<MemberDeclarationSyntax>(
                         NamespaceDeclaration(
@@ -54,13 +64,13 @@ public partial class AvroSerializerSourceGenerator
                                             Token(SyntaxKind.PublicKeyword),
                                             Token(SyntaxKind.PartialKeyword)}))
                                 .WithMembers(
-                                    List(GetMemberDeclarations(serializableFullyQualifiedTypeName, serializeCode, privateMembersCode)))))))
+                                    List(GetMemberDeclarations(serializableFullyQualifiedTypeName, serializeCode, serializeCodeAsync, privateMembersCode)))))))
                 .NormalizeWhitespace()
                 .ToFullString())
             .GetRoot().NormalizeWhitespace().GetText(Encoding.UTF8);
     }
 
-    private IEnumerable<MemberDeclarationSyntax> GetMemberDeclarations(string serializableFullyQualifiedTypeName, string serializeCode, string privateMembers)
+    private IEnumerable<MemberDeclarationSyntax> GetMemberDeclarations(string serializableFullyQualifiedTypeName, string serializeCode, string serializeCodeAsync, string privateMembers)
     {
         var memberDeclarations = new List<MemberDeclarationSyntax>
         {
@@ -155,7 +165,117 @@ public partial class AvroSerializerSourceGenerator
                             .WithType(
                                 IdentifierName(serializableFullyQualifiedTypeName))})))
             .WithBody(
-                Block(ParseStatement(serializeCode)))
+                Block(ParseStatement(serializeCode))),
+            MethodDeclaration(
+                ParseTypeName("Task<byte[]>"),
+                Identifier("SerializeAsync"))
+            .WithModifiers(
+                TokenList(
+                    new []
+                    {
+                        Token(SyntaxKind.PublicKeyword),
+                        Token(SyntaxKind.OverrideKeyword),
+                        Token(SyntaxKind.AsyncKeyword)
+                    })
+                )
+            .WithParameterList(
+                ParameterList(
+                    SeparatedList<ParameterSyntax>(
+                        new SyntaxNodeOrToken[]
+                        {
+                            Parameter(
+                                Identifier("source"))
+                            .WithType(
+                                IdentifierName(serializableFullyQualifiedTypeName)),
+                            Token(SyntaxKind.CommaToken),
+                            Parameter(
+                                Identifier("cancellationToken"))
+                            .WithType(
+                                IdentifierName("CancellationToken"))
+                            .WithDefault(
+                                EqualsValueClause(
+                                    LiteralExpression(
+                                        SyntaxKind.DefaultLiteralExpression)))
+                        })))
+            .WithBody(
+                Block(
+                    LocalDeclarationStatement(
+                        VariableDeclaration(
+                            IdentifierName(
+                                Identifier(
+                                    TriviaList(),
+                                    SyntaxKind.VarKeyword,
+                                    "var",
+                                    "var",
+                                    TriviaList())))
+                        .WithVariables(
+                            SingletonSeparatedList<VariableDeclaratorSyntax>(
+                                VariableDeclarator(
+                                    Identifier("outputStream"))
+                                .WithInitializer(
+                                    EqualsValueClause(
+                                        ObjectCreationExpression(
+                                            IdentifierName("MemoryStream"))
+                                        .WithArgumentList(
+                                            ArgumentList())))))),
+                    ExpressionStatement(
+                        AwaitExpression(
+                            InvocationExpression(
+                                IdentifierName("SerializeToStreamAsync"))
+                            .WithArgumentList(
+                                ArgumentList(
+                                    SeparatedList<ArgumentSyntax>(
+                                        new SyntaxNodeOrToken[]{
+                                            Argument(
+                                                IdentifierName("outputStream")),
+                                            Token(SyntaxKind.CommaToken),
+                                            Argument(
+                                                IdentifierName("source")),
+                                            Token(SyntaxKind.CommaToken),
+                                            Argument(
+                                                IdentifierName("cancellationToken"))}))))),
+                    ReturnStatement(
+                        InvocationExpression(
+                            MemberAccessExpression(
+                                SyntaxKind.SimpleMemberAccessExpression,
+                                IdentifierName("outputStream"),
+                                IdentifierName("ToArray")))))),
+            MethodDeclaration(
+                IdentifierName("Task"),
+                Identifier("SerializeToStreamAsync"))
+            .WithModifiers(
+                TokenList(
+                    new []
+                    {
+                        Token(SyntaxKind.PublicKeyword),
+                        Token(SyntaxKind.OverrideKeyword),
+                        Token(SyntaxKind.AsyncKeyword)
+                    })
+                )
+            .WithParameterList(
+                ParameterList(
+                    SeparatedList<ParameterSyntax>(
+                        new SyntaxNodeOrToken[]{
+                            Parameter(
+                                Identifier("outputStream"))
+                            .WithType(
+                                IdentifierName("Stream")),
+                            Token(SyntaxKind.CommaToken),
+                            Parameter(
+                                Identifier("source"))
+                            .WithType(
+                                IdentifierName(serializableFullyQualifiedTypeName)),
+                            Token(SyntaxKind.CommaToken),
+                            Parameter(
+                                Identifier("cancellationToken"))
+                            .WithType(
+                                IdentifierName("CancellationToken"))
+                            .WithDefault(
+                                EqualsValueClause(
+                                    LiteralExpression(
+                                        SyntaxKind.DefaultLiteralExpression)))})))
+            .WithBody(
+                Block(ParseStatement(serializeCodeAsync)))
         };
 
         if (!string.IsNullOrWhiteSpace(privateMembers))

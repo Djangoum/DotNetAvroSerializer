@@ -1,4 +1,6 @@
-﻿using System.IO;
+using System.IO;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace DotNetAvroSerializer.Primitives;
 
@@ -10,5 +12,11 @@ public class BytesSchema
     {
         LongSchema.Write(outputStream, value.Length);
         outputStream.Write(value, 0, value.Length);
+    }
+
+    public static async Task WriteAsync(Stream outputStream, byte[] value, CancellationToken cancellationToken = default)
+    {
+        await LongSchema.WriteAsync(outputStream, value.Length, cancellationToken);
+        await outputStream.WriteAsync(value, 0, value.Length, cancellationToken);
     }
 }

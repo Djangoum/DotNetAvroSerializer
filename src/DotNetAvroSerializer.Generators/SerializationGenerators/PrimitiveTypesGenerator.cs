@@ -26,6 +26,20 @@ internal static class PrimitiveTypesGenerator
             _ => throw new AvroGeneratorException($"Required type was not satisfied to serialize {schema!.Name}, {context.SerializableTypeMetadata} found")
         };
 
+        var serializerCallCodeAsync = schema!.Name switch
+        {
+            "boolean" when context.SerializableTypeMetadata is PrimitiveSerializableTypeMetadata { SpecialType: Microsoft.CodeAnalysis.SpecialType.System_Boolean } => $"await BooleanSchema.WriteAsync(outputStream, {context.SourceAccessor}, cancellationToken);",
+            "int" when context.SerializableTypeMetadata is PrimitiveSerializableTypeMetadata { SpecialType: Microsoft.CodeAnalysis.SpecialType.System_Int32 } => $"await IntSchema.WriteAsync(outputStream, {context.SourceAccessor}, cancellationToken);",
+            "long" when context.SerializableTypeMetadata is PrimitiveSerializableTypeMetadata { SpecialType: Microsoft.CodeAnalysis.SpecialType.System_Int64 } => $"await LongSchema.WriteAsync(outputStream, {context.SourceAccessor}, cancellationToken);",
+            "string" when context.SerializableTypeMetadata is PrimitiveSerializableTypeMetadata { SpecialType: Microsoft.CodeAnalysis.SpecialType.System_String } => $"await StringSchema.WriteAsync(outputStream, {context.SourceAccessor}, cancellationToken);",
+            "bytes" when context.SerializableTypeMetadata is IterableSerializableTypeMetadata { ItemsTypeMetadata: PrimitiveSerializableTypeMetadata { SpecialType: Microsoft.CodeAnalysis.SpecialType.System_Byte } } => $"await BytesSchema.WriteAsync(outputStream, {context.SourceAccessor}, cancellationToken);",
+            "double" when context.SerializableTypeMetadata is PrimitiveSerializableTypeMetadata { SpecialType: Microsoft.CodeAnalysis.SpecialType.System_Double } => $"await DoubleSchema.WriteAsync(outputStream, {context.SourceAccessor}, cancellationToken);",
+            "float" when context.SerializableTypeMetadata is PrimitiveSerializableTypeMetadata { SpecialType: Microsoft.CodeAnalysis.SpecialType.System_Single } => $"await FloatSchema.WriteAsync(outputStream, {context.SourceAccessor}, cancellationToken);",
+            "null" => $"await NullSchema.WriteAsync(outputStream, {context.SourceAccessor}, cancellationToken);",
+            _ => throw new AvroGeneratorException($"Required type was not satisfied to serialize {schema!.Name}, {context.SerializableTypeMetadata} found")
+        };
+
         context.SerializationCode.AppendLine(serializerCallCode);
+        context.AsyncSerializationCode.AppendLine(serializerCallCodeAsync);
     }
 }

@@ -20,10 +20,14 @@ internal static class MapGenerator
             throw new AvroGeneratorException($"Map keys have to be strings but {dictionaryTypeMetadata.KeysTypeName}");
 
         context.SerializationCode.AppendLine($"if ({context.SourceAccessor}.Count() > 0) LongSchema.Write(outputStream, {context.SourceAccessor}.Count());");
+        context.AsyncSerializationCode.AppendLine($"if ({context.SourceAccessor}.Count() > 0) await LongSchema.WriteAsync(outputStream, {context.SourceAccessor}.Count(), cancellationToken);");
         context.SerializationCode.AppendLine($"foreach(var item{VariableNamesHelpers.RemoveSpecialCharacters(context.SourceAccessor)} in {context.SourceAccessor})");
+        context.AsyncSerializationCode.AppendLine($"foreach(var item{VariableNamesHelpers.RemoveSpecialCharacters(context.SourceAccessor)} in {context.SourceAccessor})");
         context.SerializationCode.AppendLine("{");
+        context.AsyncSerializationCode.AppendLine("{");
 
         context.SerializationCode.AppendLine($"StringSchema.Write(outputStream, item{VariableNamesHelpers.RemoveSpecialCharacters(context.SourceAccessor)}.Key);");
+        context.AsyncSerializationCode.AppendLine($"await StringSchema.WriteAsync(outputStream, item{VariableNamesHelpers.RemoveSpecialCharacters(context.SourceAccessor)}.Key, cancellationToken);");
 
         schema!.ValueSchema.Generate(context with
         {
@@ -33,6 +37,8 @@ internal static class MapGenerator
         });
 
         context.SerializationCode.AppendLine("}");
+        context.AsyncSerializationCode.AppendLine("}");
         context.SerializationCode.AppendLine("LongSchema.Write(outputStream, 0L);");
+        context.AsyncSerializationCode.AppendLine("await LongSchema.WriteAsync(outputStream, 0L, cancellationToken);");
     }
 }

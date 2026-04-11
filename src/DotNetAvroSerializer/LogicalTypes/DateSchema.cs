@@ -1,5 +1,7 @@
-﻿using System;
+using System;
 using System.IO;
+using System.Threading;
+using System.Threading.Tasks;
 using DotNetAvroSerializer.Exceptions;
 using DotNetAvroSerializer.Primitives;
 
@@ -35,5 +37,31 @@ public static class DateSchema
     public static void Write(Stream outputStream, DateTime date)
     {
         Write(outputStream, DateOnly.FromDateTime(date));
+    }
+
+    public static async Task WriteAsync(Stream outputStream, DateOnly? value, CancellationToken cancellationToken = default)
+    {
+        if (value is null)
+            throw new AvroSerializationException("Cannot serialize null value to int");
+
+        await WriteAsync(outputStream, value.Value, cancellationToken);
+    }
+
+    public static async Task WriteAsync(Stream outputStream, DateTime? value, CancellationToken cancellationToken = default)
+    {
+        if (value is null)
+            throw new AvroSerializationException("Cannot serialize null value to int");
+
+        await WriteAsync(outputStream, value.Value, cancellationToken);
+    }
+
+    public static Task WriteAsync(Stream outputStream, DateOnly dateOnly, CancellationToken cancellationToken = default)
+    {
+        return IntSchema.WriteAsync(outputStream, dateOnly.DayNumber - UnixEpochDate.DayNumber, cancellationToken);
+    }
+
+    public static Task WriteAsync(Stream outputStream, DateTime date, CancellationToken cancellationToken = default)
+    {
+        return WriteAsync(outputStream, DateOnly.FromDateTime(date), cancellationToken);
     }
 }

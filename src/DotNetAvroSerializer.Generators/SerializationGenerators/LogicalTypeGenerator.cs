@@ -34,9 +34,24 @@ internal static class LogicalTypeGenerator
                 _ => null
             };
 
+            var serializerCallCodeAsync = schema.LogicalTypeName switch
+            {
+                "date" when logicalTypeName.TypeName.Equals(nameof(DateTime), StringComparison.InvariantCultureIgnoreCase)
+                           || logicalTypeName.TypeName.Equals(nameof(DateOnly), StringComparison.InvariantCultureIgnoreCase) => $"await DateSchema.WriteAsync(outputStream, {context.SourceAccessor}, cancellationToken);",
+                "uuid" when logicalTypeName.TypeName.Equals(nameof(Guid), StringComparison.InvariantCultureIgnoreCase) => $"await UuidSchema.WriteAsync(outputStream, {context.SourceAccessor}, cancellationToken);",
+                "time-millis" when logicalTypeName.TypeName.Equals(nameof(TimeOnly), StringComparison.InvariantCultureIgnoreCase) => $"await TimeMillisSchema.WriteAsync(outputStream, {context.SourceAccessor}, cancellationToken);",
+                "time-micros" when logicalTypeName.TypeName.Equals(nameof(TimeOnly), StringComparison.InvariantCultureIgnoreCase) => $"await TimeMicrosSchema.WriteAsync(outputStream, {context.SourceAccessor}, cancellationToken);",
+                "timestamp-millis" when logicalTypeName.TypeName.Equals(nameof(DateTime), StringComparison.InvariantCultureIgnoreCase) => $"await TimestampMillisSchema.WriteAsync(outputStream, {context.SourceAccessor}, cancellationToken);",
+                "timestamp-micros" when logicalTypeName.TypeName.Equals(nameof(DateTime), StringComparison.InvariantCultureIgnoreCase) => $"await TimestampMicrosSchema.WriteAsync(outputStream, {context.SourceAccessor}, cancellationToken);",
+                "local-timestamp-millis" when logicalTypeName.TypeName.Equals(nameof(DateTime), StringComparison.InvariantCultureIgnoreCase) => $"await TimestampMillisSchema.WriteAsync(outputStream, {context.SourceAccessor}, cancellationToken);",
+                "local-timestamp-micros" when logicalTypeName.TypeName.Equals(nameof(DateTime), StringComparison.InvariantCultureIgnoreCase) => $"await TimestampMicrosSchema.WriteAsync(outputStream, {context.SourceAccessor}, cancellationToken);",
+                _ => null
+            };
+
             if (serializerCallCode is not null)
             {
                 context.SerializationCode.AppendLine(serializerCallCode);
+                context.AsyncSerializationCode.AppendLine(serializerCallCodeAsync);
             }
             else
             {

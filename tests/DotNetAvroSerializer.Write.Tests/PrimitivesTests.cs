@@ -2,8 +2,44 @@ using FluentAssertions;
 
 namespace DotNetAvroSerializer.Write.Tests;
 
+#pragma warning disable CA2007
 public class PrimitivesTests
 {
+    [Fact]
+    public async Task SerializeStringToStreamAsync()
+    {
+        var serializer = new StringSerializer();
+        var tempPath = Path.Combine(Path.GetTempPath(), $"{Guid.NewGuid():N}.avro");
+
+        try
+        {
+            using (var outputStream = new FileStream(tempPath, FileMode.Create, FileAccess.Write, FileShare.None, 4096, useAsync: true))
+            {
+                await serializer.SerializeToStreamAsync(outputStream, "foo");
+            }
+
+            var bytes = File.ReadAllBytes(tempPath);
+            Convert.ToHexString(bytes).Should().BeEquivalentTo("06666F6F");
+        }
+        finally
+        {
+            if (File.Exists(tempPath))
+            {
+                File.Delete(tempPath);
+            }
+        }
+    }
+
+    [Fact]
+    public async Task SerializeStringAsync()
+    {
+        var serializer = new StringSerializer();
+
+        var result = await serializer.SerializeAsync("foo");
+
+        Convert.ToHexString(result).Should().BeEquivalentTo("06666F6F");
+    }
+
     [Theory]
     [InlineData("foo", "06666F6F")]
     [InlineData("Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur consectetur finibus tempus. Ut eros odio, auctor eu turpis quis, finibus sodales ipsum. Morbi at sollicitudin leo, ac tincidunt massa. Vivamus.", "A4034C6F72656D20697073756D20646F6C6F722073697420616D65742C20636F6E73656374657475722061646970697363696E6720656C69742E2043757261626974757220636F6E73656374657475722066696E696275732074656D7075732E2055742065726F73206F64696F2C20617563746F722065752074757270697320717569732C2066696E6962757320736F64616C657320697073756D2E204D6F72626920617420736F6C6C696369747564696E206C656F2C2061632074696E636964756E74206D617373612E20566976616D75732E")]
@@ -87,6 +123,7 @@ public class PrimitivesTests
         Convert.ToHexString(result).Should().BeEquivalentTo(hexString);
     }
 }
+#pragma warning restore CA2007
 
 [AvroSchema(@"{ ""type"": ""string"" }")]
 public partial class StringSerializer : AvroSerializer<string>

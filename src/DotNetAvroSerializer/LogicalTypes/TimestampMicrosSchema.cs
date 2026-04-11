@@ -1,5 +1,7 @@
-﻿using System;
+using System;
 using System.IO;
+using System.Threading;
+using System.Threading.Tasks;
 using DotNetAvroSerializer.Exceptions;
 using DotNetAvroSerializer.Primitives;
 
@@ -14,7 +16,7 @@ public static class TimestampMicrosSchema
     public static void Write(Stream outputStream, DateTime? value)
     {
         if (value is null)
-            throw new AvroSerializationException("Cannot serialize null value to int");
+            throw new AvroSerializationException("Cannot serialize null value to timestamp-micros");
 
         Write(outputStream, value.Value);
     }
@@ -22,5 +24,18 @@ public static class TimestampMicrosSchema
     public static void Write(Stream outputStream, DateTime date)
     {
         LongSchema.Write(outputStream, (date - UnixEpochDateTime).Ticks / 10);
+    }
+
+    public static Task WriteAsync(Stream outputStream, DateTime? value, CancellationToken cancellationToken = default)
+    {
+        if (value is null)
+            throw new AvroSerializationException("Cannot serialize null value to timestamp-micros");
+
+        return WriteAsync(outputStream, value.Value, cancellationToken);
+    }
+
+    public static Task WriteAsync(Stream outputStream, DateTime date, CancellationToken cancellationToken = default)
+    {
+        return LongSchema.WriteAsync(outputStream, (date - UnixEpochDateTime).Ticks / 10, cancellationToken);
     }
 }

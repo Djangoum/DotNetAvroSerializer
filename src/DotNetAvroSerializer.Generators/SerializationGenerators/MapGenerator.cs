@@ -19,20 +19,21 @@ internal static class MapGenerator
         if (!dictionaryTypeMetadata.KeysTypeName.Equals("string", StringComparison.InvariantCultureIgnoreCase))
             throw new AvroGeneratorException($"Map keys have to be strings but {dictionaryTypeMetadata.KeysTypeName}");
 
-        context.SerializationCode.AppendLine($"if ({context.SourceAccessor}.Count() > 0) LongSchema.Write(outputStream, {context.SourceAccessor}.Count());");
-        context.SerializationCode.AppendLine($"foreach(var item{VariableNamesHelpers.RemoveSpecialCharacters(context.SourceAccessor)} in {context.SourceAccessor})");
-        context.SerializationCode.AppendLine("{");
+        var itemVar = $"item{VariableNamesHelpers.RemoveSpecialCharacters(context.SourceAccessor)}";
 
-        context.SerializationCode.AppendLine($"StringSchema.Write(outputStream, item{VariableNamesHelpers.RemoveSpecialCharacters(context.SourceAccessor)}.Key);");
+        context.SerializationCode.AppendLine($"if ({context.SourceAccessor}.Count() > 0) {context.WriteCall("LongSchema", $"{context.SourceAccessor}.Count()")}");
+        context.SerializationCode.AppendLine($"foreach(var {itemVar} in {context.SourceAccessor})");
+        context.SerializationCode.AppendLine("{");
+        context.SerializationCode.AppendLine(context.WriteCall("StringSchema", $"{itemVar}.Key"));
 
         schema!.ValueSchema.Generate(context with
         {
             Schema = schema!.ValueSchema,
             SerializableTypeMetadata = dictionaryTypeMetadata.ValuesMetadata,
-            SourceAccessor = $"item{VariableNamesHelpers.RemoveSpecialCharacters(context.SourceAccessor)}.Value"
+            SourceAccessor = $"{itemVar}.Value"
         });
 
         context.SerializationCode.AppendLine("}");
-        context.SerializationCode.AppendLine("LongSchema.Write(outputStream, 0L);");
+        context.SerializationCode.AppendLine(context.WriteCall("LongSchema", "0L"));
     }
 }

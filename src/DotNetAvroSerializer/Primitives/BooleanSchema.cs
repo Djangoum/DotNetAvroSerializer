@@ -1,4 +1,7 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
+using System.Threading;
+using System.Threading.Tasks;
 using DotNetAvroSerializer.Exceptions;
 
 namespace DotNetAvroSerializer.Primitives;
@@ -10,7 +13,7 @@ public static class BooleanSchema
     public static void Write(Stream outputStream, bool? value)
     {
         if (value is null)
-            throw new AvroSerializationException("Cannot serialize null value to int");
+            throw new AvroSerializationException("Cannot serialize null value to boolean");
 
         Write(outputStream, value.Value);
     }
@@ -18,5 +21,19 @@ public static class BooleanSchema
     public static void Write(Stream outputStream, bool value)
     {
         outputStream.WriteByte((byte)(value ? 1 : 0));
+    }
+
+    public static Task WriteAsync(Stream outputStream, bool? value, CancellationToken cancellationToken = default)
+    {
+        if (value is null)
+            throw new AvroSerializationException("Cannot serialize null value to boolean");
+
+        return WriteAsync(outputStream, value.Value, cancellationToken);
+    }
+
+    public static Task WriteAsync(Stream outputStream, bool value, CancellationToken cancellationToken = default)
+    {
+        var byteBuffer = new[] { (byte)(value ? 1 : 0) };
+        return outputStream.WriteAsync(new ReadOnlyMemory<byte>(byteBuffer, 0, byteBuffer.Length), cancellationToken).AsTask();
     }
 }

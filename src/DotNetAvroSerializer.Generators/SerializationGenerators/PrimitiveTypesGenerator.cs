@@ -15,14 +15,14 @@ internal static class PrimitiveTypesGenerator
 
         var serializerCallCode = schema!.Name switch
         {
-            "boolean" when context.SerializableTypeMetadata is PrimitiveSerializableTypeMetadata { SpecialType: Microsoft.CodeAnalysis.SpecialType.System_Boolean } => $"BooleanSchema.Write(outputStream, {context.SourceAccessor});",
-            "int" when context.SerializableTypeMetadata is PrimitiveSerializableTypeMetadata { SpecialType: Microsoft.CodeAnalysis.SpecialType.System_Int32 } => $"IntSchema.Write(outputStream, {context.SourceAccessor});",
-            "long" when context.SerializableTypeMetadata is PrimitiveSerializableTypeMetadata { SpecialType: Microsoft.CodeAnalysis.SpecialType.System_Int64 } => $"LongSchema.Write(outputStream, {context.SourceAccessor});",
-            "string" when context.SerializableTypeMetadata is PrimitiveSerializableTypeMetadata { SpecialType: Microsoft.CodeAnalysis.SpecialType.System_String } => $"StringSchema.Write(outputStream, {context.SourceAccessor});",
-            "bytes" when context.SerializableTypeMetadata is IterableSerializableTypeMetadata { ItemsTypeMetadata: PrimitiveSerializableTypeMetadata { SpecialType: Microsoft.CodeAnalysis.SpecialType.System_Byte } } => $"BytesSchema.Write(outputStream, {context.SourceAccessor});",
-            "double" when context.SerializableTypeMetadata is PrimitiveSerializableTypeMetadata { SpecialType: Microsoft.CodeAnalysis.SpecialType.System_Double } => $"DoubleSchema.Write(outputStream, {context.SourceAccessor});",
-            "float" when context.SerializableTypeMetadata is PrimitiveSerializableTypeMetadata { SpecialType: Microsoft.CodeAnalysis.SpecialType.System_Single } => $"FloatSchema.Write(outputStream, {context.SourceAccessor});",
-            "null" => $"NullSchema.Write(outputStream, {context.SourceAccessor});",
+            "boolean" when context.SerializableTypeMetadata is PrimitiveSerializableTypeMetadata { SpecialType: Microsoft.CodeAnalysis.SpecialType.System_Boolean } => context.WriteCall("BooleanSchema", context.SourceAccessor),
+            "int" when context.SerializableTypeMetadata is PrimitiveSerializableTypeMetadata { SpecialType: Microsoft.CodeAnalysis.SpecialType.System_Int32 } => context.WriteCall("IntSchema", context.SourceAccessor),
+            "long" when context.SerializableTypeMetadata is PrimitiveSerializableTypeMetadata { SpecialType: Microsoft.CodeAnalysis.SpecialType.System_Int64 } => context.WriteCall("LongSchema", context.SourceAccessor),
+            "string" when context.SerializableTypeMetadata is PrimitiveSerializableTypeMetadata { SpecialType: Microsoft.CodeAnalysis.SpecialType.System_String } => context.WriteCall("StringSchema", context.SourceAccessor),
+            "bytes" when context.SerializableTypeMetadata is IterableSerializableTypeMetadata { ItemsTypeMetadata: PrimitiveSerializableTypeMetadata { SpecialType: Microsoft.CodeAnalysis.SpecialType.System_Byte } } => context.WriteCall("BytesSchema", context.SourceAccessor),
+            "double" when context.SerializableTypeMetadata is PrimitiveSerializableTypeMetadata { SpecialType: Microsoft.CodeAnalysis.SpecialType.System_Double } => context.WriteCall("DoubleSchema", context.SourceAccessor),
+            "float" when context.SerializableTypeMetadata is PrimitiveSerializableTypeMetadata { SpecialType: Microsoft.CodeAnalysis.SpecialType.System_Single } => context.WriteCall("FloatSchema", context.SourceAccessor),
+            "null" => context.WriteCall("NullSchema", context.SourceAccessor),
             _ => throw new AvroGeneratorException($"Required type was not satisfied to serialize {schema!.Name}, {context.SerializableTypeMetadata} found")
         };
 

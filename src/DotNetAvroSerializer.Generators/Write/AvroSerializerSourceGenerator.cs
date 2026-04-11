@@ -39,7 +39,7 @@ public partial class AvroSerializerSourceGenerator : IIncrementalGenerator
 
         context.RegisterSourceOutput(validSerializers, (ctx, serializerData) =>
         {
-            var (serializationCode, privateFieldsCode, diagnostic) = SerializationCodeGeneratorLoop(serializerData, serializerData.AvroSchema);
+            var (serializationCode, asyncSerializationCode, privateFieldsCode, diagnostic) = SerializationCodeGeneratorLoop(serializerData, serializerData.AvroSchema);
 
             if (diagnostic is not null)
             {
@@ -53,6 +53,7 @@ public partial class AvroSerializerSourceGenerator : IIncrementalGenerator
                         serializerData.SerializerClassName,
                         serializerData.SerializableTypeMetadata.FullNameDisplay,
                         serializationCode,
+                        asyncSerializationCode,
                         privateFieldsCode));
             }
         });
@@ -153,19 +154,21 @@ public partial class AvroSerializerSourceGenerator : IIncrementalGenerator
         return symbol;
     }
 
-    private static (string serializationCode, string privateFieldsCode, Diagnostic diagnostic) SerializationCodeGeneratorLoop(SerializerMetadata serializerMetadata, Schema schema)
+    private static (string serializationCode, string asyncSerializationCode, string privateFieldsCode, Diagnostic diagnostic) SerializationCodeGeneratorLoop(SerializerMetadata serializerMetadata, Schema schema)
     {
         try
         {
-            var generationContext = AvroGenerationContext.From(serializerMetadata, schema);
+            var syncContext = AvroGenerationContext.From(serializerMetadata, schema, SerializationMode.Sync);
+            schema.Generate(syncContext);
 
-            schema.Generate(generationContext);
+            var asyncContext = AvroGenerationContext.From(serializerMetadata, schema, SerializationMode.Async);
+            schema.Generate(asyncContext);
 
-            return (generationContext.SerializationCode.ToString(), generationContext.PrivateFieldsCode.ToString(), null);
+            return (syncContext.SerializationCode.ToString(), asyncContext.SerializationCode.ToString(), syncContext.PrivateFieldsCode.ToString(), null);
         }
         catch (AvroGeneratorException ex)
         {
-            return (string.Empty, string.Empty, Diagnostic.Create(DiagnosticsDescriptors.SerializableTypeMissMatchDescriptor, serializerMetadata.GetSerializerLocation(), ex.Message));
+            return (string.Empty, string.Empty, string.Empty, Diagnostic.Create(DiagnosticsDescriptors.SerializableTypeMissMatchDescriptor, serializerMetadata.GetSerializerLocation(), ex.Message));
         }
     }
 }

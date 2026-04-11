@@ -25,7 +25,7 @@ public static class TimeMicrosSchema
     public static void Write(Stream outputStream, TimeOnly time)
     {
         if (time > MaxTime)
-            throw new ArgumentOutOfRangeException(nameof(time), "A 'time-millis' value can only have the range '00:00:00' to '23:59:59'.");
+            throw new ArgumentOutOfRangeException(nameof(time), "A 'time-micros' value can only have the range '00:00:00' to '23:59:59'.");
 
         LongSchema.Write(outputStream, (time - UnixEpochTime).Ticks / 10);
     }
@@ -41,7 +41,7 @@ public static class TimeMicrosSchema
     public static Task WriteAsync(Stream outputStream, TimeOnly time, CancellationToken cancellationToken = default)
     {
         if (time > MaxTime)
-            throw new ArgumentOutOfRangeException(nameof(time), "A 'time-millis' value can only have the range '00:00:00' to '23:59:59'.");
+            throw new ArgumentOutOfRangeException(nameof(time), "A 'time-micros' value can only have the range '00:00:00' to '23:59:59'.");
 
         return LongSchema.WriteAsync(outputStream, (time - UnixEpochTime).Ticks / 10, cancellationToken);
     }

@@ -2,6 +2,7 @@ using FluentAssertions;
 
 namespace DotNetAvroSerializer.Write.Tests;
 
+#pragma warning disable CA2007
 public class PrimitivesTests
 {
     [Fact]
@@ -14,10 +15,10 @@ public class PrimitivesTests
         {
             using (var outputStream = new FileStream(tempPath, FileMode.Create, FileAccess.Write, FileShare.None, 4096, useAsync: true))
             {
-                await serializer.SerializeToStreamAsync(outputStream, "foo").ConfigureAwait(true);
+                await serializer.SerializeToStreamAsync(outputStream, "foo");
             }
 
-            var bytes = await File.ReadAllBytesAsync(tempPath).ConfigureAwait(true);
+            var bytes = File.ReadAllBytes(tempPath);
             Convert.ToHexString(bytes).Should().BeEquivalentTo("06666F6F");
         }
         finally
@@ -34,7 +35,7 @@ public class PrimitivesTests
     {
         var serializer = new StringSerializer();
 
-        var result = await serializer.SerializeAsync("foo").ConfigureAwait(true);
+        var result = await serializer.SerializeAsync("foo");
 
         Convert.ToHexString(result).Should().BeEquivalentTo("06666F6F");
     }
@@ -122,6 +123,7 @@ public class PrimitivesTests
         Convert.ToHexString(result).Should().BeEquivalentTo(hexString);
     }
 }
+#pragma warning restore CA2007
 
 [AvroSchema(@"{ ""type"": ""string"" }")]
 public partial class StringSerializer : AvroSerializer<string>

@@ -1,24 +1,23 @@
-using System;
 using Microsoft.CodeAnalysis;
 
 namespace DotNetAvroSerializer.Generators.Models;
 
-internal abstract class SerializableTypeMetadata : IEquatable<SerializableTypeMetadata>
+internal abstract record SerializableTypeMetadata
 {
+    private readonly string _stringRepresentation;
+
     protected SerializableTypeMetadata(ITypeSymbol typeSymbol)
     {
         FullNameDisplay = typeSymbol.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
-        StringRepresentation = typeSymbol.ToString();
+        _stringRepresentation = typeSymbol.ToString();
 
         IsNullable = (typeSymbol.IsReferenceType && typeSymbol.NullableAnnotation is NullableAnnotation.None)
             || typeSymbol.NullableAnnotation is NullableAnnotation.Annotated;
     }
 
-    protected abstract SerializableTypeKind Kind { get; }
-    internal bool IsValid { get; set; }
+    internal bool IsValid { get; init; }
     internal string FullNameDisplay { get; }
-    private string StringRepresentation { get; }
-    public bool IsNullable { get; set; }
+    public bool IsNullable { get; }
 
     internal static SerializableTypeMetadata From(ITypeSymbol symbol, Compilation compilation)
     {
@@ -65,8 +64,5 @@ internal abstract class SerializableTypeMetadata : IEquatable<SerializableTypeMe
         return null;
     }
 
-    public override string ToString() => StringRepresentation;
-
-    public virtual bool Equals(SerializableTypeMetadata other)
-        => other is not null && Kind == other.Kind && FullNameDisplay == other.FullNameDisplay;
+    public override string ToString() => _stringRepresentation;
 }

@@ -1,10 +1,9 @@
-using System;
 using System.Linq;
 using Microsoft.CodeAnalysis;
 
 namespace DotNetAvroSerializer.Generators.Models;
 
-internal class DictionarySerializableTypeMetadata : SerializableTypeMetadata
+internal sealed record DictionarySerializableTypeMetadata : SerializableTypeMetadata
 {
     public DictionarySerializableTypeMetadata(SerializableTypeMetadata valuesTypeMetadata, ITypeSymbol dictionaryTypeSymbol)
         : base(dictionaryTypeSymbol)
@@ -17,7 +16,6 @@ internal class DictionarySerializableTypeMetadata : SerializableTypeMetadata
         }
     }
 
-    protected override SerializableTypeKind Kind => SerializableTypeKind.Map;
     internal SerializableTypeMetadata ValuesMetadata { get; }
     internal string KeysTypeName { get; }
 
@@ -37,10 +35,4 @@ internal class DictionarySerializableTypeMetadata : SerializableTypeMetadata
 
         return null;
     }
-
-    public override bool Equals(SerializableTypeMetadata other)
-        => base.Equals(other)
-            && other is DictionarySerializableTypeMetadata dictionarySerializableType
-            && KeysTypeName.Equals(dictionarySerializableType.KeysTypeName, StringComparison.InvariantCultureIgnoreCase)
-            && ValuesMetadata.Equals(dictionarySerializableType.ValuesMetadata);
 }

@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using System.Text;
 using DotNetAvroSerializer.Generators.Helpers;
 using DotNetAvroSerializer.Generators.Schemas;
@@ -9,7 +8,7 @@ internal readonly record struct AvroGenerationContext(
     Schema Schema,
     StringBuilder SerializationCode,
     PrivateFieldsCode PrivateFieldsCode,
-    IEnumerable<CustomLogicalTypeMetadata> CustomLogicalTypesMetadata,
+    EquatableArray<CustomLogicalTypeMetadata> CustomLogicalTypesMetadata,
     SerializableTypeMetadata SerializableTypeMetadata,
     string SourceAccessor,
     SerializationMode Mode)

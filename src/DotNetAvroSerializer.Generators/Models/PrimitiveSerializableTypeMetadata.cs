@@ -2,7 +2,7 @@ using Microsoft.CodeAnalysis;
 
 namespace DotNetAvroSerializer.Generators.Models;
 
-internal class PrimitiveSerializableTypeMetadata : SerializableTypeMetadata
+internal sealed record PrimitiveSerializableTypeMetadata : SerializableTypeMetadata
 {
     public PrimitiveSerializableTypeMetadata(ITypeSymbol primitiveTypeSymbol)
         : base(primitiveTypeSymbol)
@@ -10,8 +10,6 @@ internal class PrimitiveSerializableTypeMetadata : SerializableTypeMetadata
         TypeName = primitiveTypeSymbol.Name;
         SpecialType = primitiveTypeSymbol.SpecialType;
     }
-
-    protected override SerializableTypeKind Kind => SerializableTypeKind.Primitive;
 
     internal string TypeName { get; }
     internal SpecialType SpecialType { get; }

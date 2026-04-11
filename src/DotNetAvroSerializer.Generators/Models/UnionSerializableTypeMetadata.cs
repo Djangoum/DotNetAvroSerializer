@@ -1,23 +1,23 @@
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
+using DotNetAvroSerializer.Generators.Helpers;
 using Microsoft.CodeAnalysis;
 
 namespace DotNetAvroSerializer.Generators.Models;
 
-internal class UnionSerializableTypeMetadata : SerializableTypeMetadata
+internal sealed record UnionSerializableTypeMetadata : SerializableTypeMetadata
 {
-    protected override SerializableTypeKind Kind => SerializableTypeKind.Union;
-
     public UnionSerializableTypeMetadata(ITypeSymbol typeSymbol, IEnumerable<SerializableTypeMetadata> unionTypes)
         : base(typeSymbol)
     {
-        UnionTypes = unionTypes;
+        UnionTypes = unionTypes.ToImmutableArray().AsEquatableArray();
     }
 
     internal static bool IsUnionType(ITypeSymbol typeSymbol)
         => typeSymbol is INamedTypeSymbol { Name: "Union" };
 
-    internal IEnumerable<SerializableTypeMetadata> UnionTypes { get; }
+    internal EquatableArray<SerializableTypeMetadata> UnionTypes { get; }
 
     internal static IEnumerable<SerializableTypeMetadata> GetInnerUnionTypeSymbols(ITypeSymbol typeSymbol, Compilation compilation)
     {
@@ -25,9 +25,4 @@ internal class UnionSerializableTypeMetadata : SerializableTypeMetadata
 
         return namedTypeSymbol!.TypeArguments.Select(a => From(a, compilation)).ToList();
     }
-
-    public override bool Equals(SerializableTypeMetadata other)
-        => base.Equals(other)
-            && other is UnionSerializableTypeMetadata unionSerializableTypeMetadata
-            && unionSerializableTypeMetadata.UnionTypes.SequenceEqual(UnionTypes);
 }

@@ -3,7 +3,7 @@ using Microsoft.CodeAnalysis;
 
 namespace DotNetAvroSerializer.Generators.Models;
 
-internal class NullableSerializableTypeMetadata : SerializableTypeMetadata
+internal sealed record NullableSerializableTypeMetadata : SerializableTypeMetadata
 {
     public NullableSerializableTypeMetadata(SerializableTypeMetadata nullableSerializableType, ITypeSymbol nullableSymbol)
         : base(nullableSymbol)
@@ -11,7 +11,6 @@ internal class NullableSerializableTypeMetadata : SerializableTypeMetadata
         InnerNullableTypeSymbol = nullableSerializableType;
     }
 
-    protected override SerializableTypeKind Kind => SerializableTypeKind.Nullable;
     internal SerializableTypeMetadata InnerNullableTypeSymbol { get; }
 
     internal static bool IsNullableType(ITypeSymbol typeSymbol)
@@ -36,9 +35,4 @@ internal class NullableSerializableTypeMetadata : SerializableTypeMetadata
             IArrayTypeSymbol arrayTypeSymbol => arrayTypeSymbol.WithNullableAnnotation(NullableAnnotation.None),
             _ => null
         };
-
-    public override bool Equals(SerializableTypeMetadata other)
-        => base.Equals(other)
-            && other is NullableSerializableTypeMetadata nullableSerializableType
-            && nullableSerializableType.InnerNullableTypeSymbol.Equals(nullableSerializableType.InnerNullableTypeSymbol);
 }

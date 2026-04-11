@@ -2,7 +2,7 @@ using Microsoft.CodeAnalysis;
 
 namespace DotNetAvroSerializer.Generators.Models;
 
-internal class LogicalTypeSerializableTypeMetadata : SerializableTypeMetadata
+internal sealed record LogicalTypeSerializableTypeMetadata : SerializableTypeMetadata
 {
     public LogicalTypeSerializableTypeMetadata(ITypeSymbol logicalTypeSymbol)
         : base(logicalTypeSymbol)
@@ -10,7 +10,6 @@ internal class LogicalTypeSerializableTypeMetadata : SerializableTypeMetadata
         TypeName = logicalTypeSymbol.Name;
     }
 
-    protected override SerializableTypeKind Kind => SerializableTypeKind.LogicalType;
     internal string TypeName { get; }
 
     internal static bool IsValidLogicalType(ITypeSymbol typeSymbol)

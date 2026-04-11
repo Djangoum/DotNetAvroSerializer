@@ -1,13 +1,11 @@
 using System.Text;
-using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.Text;
 
 namespace DotNetAvroSerializer.Generators.Write;
 
 public partial class AvroSerializerSourceGenerator
 {
-    private SourceText GetGeneratedSerializationSource(string serializerNamespace, string serializerClassName, string serializableFullyQualifiedTypeName, string serializeCode, string serializeCodeAsync, string privateMembersCode)
+    private static SourceText GetGeneratedSerializationSource(string serializerNamespace, string serializerClassName, string serializableFullyQualifiedTypeName, string serializeCode, string serializeCodeAsync, string privateMembersCode)
     {
         var privateMembers = string.IsNullOrWhiteSpace(privateMembersCode) ? string.Empty : $"\n{privateMembersCode}\n";
         var source = $$"""
@@ -77,9 +75,6 @@ public partial class AvroSerializerSourceGenerator
                        }
                        """;
 
-        return CSharpSyntaxTree.ParseText(source)
-            .GetCompilationUnitRoot()
-            .NormalizeWhitespace()
-            .GetText(Encoding.UTF8);
+        return SourceText.From(source, Encoding.UTF8);
     }
 }

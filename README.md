@@ -20,10 +20,12 @@ Dotnet Avro Serializer is a powerful tool that automates the creation of seriali
 
 Whenever avro serializer finds a **public partial class** inheriting **AvroSerializer<>** and have an **AvroSchema** attribute with a valid and corresponding avro schema it will generate serialization code. 
 
-Currently Dotnet Avro Serializer creates a couple of methods: 
+Currently Dotnet Avro Serializer generates the following APIs: 
 
 - **Serialize** : Takes an instance of the generic parameter provided to **AvroSerializer<>** and returns an array of bytes containing avro binary serialized data.
 - **SerializeToStream** : Takes a **Stream** and an instance of the generic parameter provided to **AvroSerializer<>**. Writes binary serialized data to the stream. 
+- **SerializeAsync** : Asynchronously serializes the source instance and returns a byte array.
+- **SerializeToStreamAsync** : Asynchronously writes serialized data to a target stream and supports cancellation.
 
 Simplest example of avro serializer would be serializing a primitive type like an int
 ```csharp
@@ -48,6 +50,18 @@ public partial class IntSerializer
     public override void SerializeToStream(Stream outputStream, int source)
     {
         IntSchema.Write(outputStream, source);
+    }
+
+    public override async Task<byte[]> SerializeAsync(int source, CancellationToken cancellationToken = default)
+    {
+        var outputStream = new MemoryStream();
+        await SerializeToStreamAsync(outputStream, source, cancellationToken);
+        return outputStream.ToArray();
+    }
+
+    public override async Task SerializeToStreamAsync(Stream outputStream, int source, CancellationToken cancellationToken = default)
+    {
+        await IntSchema.WriteAsync(outputStream, source, cancellationToken);
     }
 }
 ```
@@ -139,8 +153,9 @@ public partial class RecordWithComplexTypesSerializer
     {
         StringSchema.Write(outputStream, source.InnerRecord.Field1);
         IntSchema.Write(outputStream, source.InnerRecord.Field2);
-        if (source.InnerRecords.Count() > 0)
-            LongSchema.Write(outputStream, (long)source.InnerRecords.Count());
+        var sourceInnerRecordsCount = GetCollectionCount(source.InnerRecords);
+        if (sourceInnerRecordsCount > 0)
+            LongSchema.Write(outputStream, sourceInnerRecordsCount);
         foreach (var itemsourceInnerRecords in source.InnerRecords)
         {
             StringSchema.Write(outputStream, itemsourceInnerRecords.Field1);
@@ -148,8 +163,9 @@ public partial class RecordWithComplexTypesSerializer
         }
 
         LongSchema.Write(outputStream, 0L);
-        if (source.Doubles.Count() > 0)
-            LongSchema.Write(outputStream, (long)source.Doubles.Count());
+        var sourceDoublesCount = GetCollectionCount(source.Doubles);
+        if (sourceDoublesCount > 0)
+            LongSchema.Write(outputStream, sourceDoublesCount);
         foreach (var itemsourceDoubles in source.Doubles)
         {
             DoubleSchema.Write(outputStream, itemsourceDoubles);
@@ -167,8 +183,9 @@ public partial class RecordWithComplexTypesSerializer
             FloatSchema.Write(outputStream, source.NullableFloat);
         }
 
-        if (source.MapField.Count() > 0)
-            LongSchema.Write(outputStream, source.MapField.Count());
+        var sourceMapFieldCount = GetCollectionCount(source.MapField);
+        if (sourceMapFieldCount > 0)
+            LongSchema.Write(outputStream, sourceMapFieldCount);
         foreach (var itemsourceMapField in source.MapField)
         {
             StringSchema.Write(outputStream, itemsourceMapField.Key);
@@ -177,6 +194,13 @@ public partial class RecordWithComplexTypesSerializer
         }
 
         LongSchema.Write(outputStream, 0L);
+    }
+
+    public override async Task SerializeToStreamAsync(Stream outputStream, global::Serializers.RecordWithComplexTypes source, CancellationToken cancellationToken = default)
+    {
+        await StringSchema.WriteAsync(outputStream, source.InnerRecord.Field1, cancellationToken);
+        // ...
+        // Async implementation mirrors the sync method and uses *Schema.WriteAsync APIs.
     }
 }
 ```

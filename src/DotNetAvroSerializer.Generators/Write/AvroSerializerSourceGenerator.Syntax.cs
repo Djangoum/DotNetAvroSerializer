@@ -1,4 +1,6 @@
 using System.Text;
+using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.Text;
 
 namespace DotNetAvroSerializer.Generators.Write;
@@ -75,6 +77,9 @@ public partial class AvroSerializerSourceGenerator
                        }
                        """;
 
-        return SourceText.From(source, Encoding.UTF8);
+        return CSharpSyntaxTree.ParseText(source)
+            .GetCompilationUnitRoot()
+            .NormalizeWhitespace()
+            .GetText(Encoding.UTF8);
     }
 }

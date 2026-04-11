@@ -26,6 +26,6 @@ internal static class PrimitiveTypesGenerator
             _ => throw new AvroGeneratorException($"Required type was not satisfied to serialize {schema!.Name}, {context.SerializableTypeMetadata} found")
         };
 
-        context.SerializationCode.AppendLine(serializerCallCode);
+        context.SerializationCode.WriteLine(serializerCallCode);
     }
 }

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
@@ -34,6 +34,6 @@ public static class BooleanSchema
     public static Task WriteAsync(Stream outputStream, bool value, CancellationToken cancellationToken = default)
     {
         var byteBuffer = new[] { (byte)(value ? 1 : 0) };
-        return outputStream.WriteAsync(new ReadOnlyMemory<byte>(byteBuffer, 0, byteBuffer.Length), cancellationToken).AsTask();
+        return outputStream.WriteAsync(byteBuffer, cancellationToken).AsTask();
     }
 }

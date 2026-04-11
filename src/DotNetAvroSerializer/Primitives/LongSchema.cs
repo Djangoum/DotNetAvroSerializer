@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
@@ -50,6 +50,6 @@ public class LongSchema
         }
 
         buffer[length++] = (byte)n;
-        return outputStream.WriteAsync(new ReadOnlyMemory<byte>(buffer, 0, length), cancellationToken).AsTask();
+        return outputStream.WriteAsync(buffer.AsMemory(0, length), cancellationToken).AsTask();
     }
 }

@@ -1,27 +1,35 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 using DotNetAvroSerializer.Generators.Diagnostics;
+using DotNetAvroSerializer.Generators.Helpers;
 using DotNetAvroSerializer.Generators.Models;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using Microsoft.CodeAnalysis.Operations;
 
 namespace DotNetAvroSerializer.Generators.Write;
 
-public static class CustomLogicalTypesMetadataProcessor
+internal static class CustomLogicalTypesMetadataProcessor
 {
-    public static (IEnumerable<CustomLogicalTypeMetadata> fullyQualifiedLogicalTypes, IEnumerable<Diagnostic> diagnostics) GetCustomLogicalTypesMetadata(ExpressionSyntax customLogicalTypesDeclarationExpression, ClassDeclarationSyntax serializerSymbol, GeneratorSyntaxContext ctx)
+    internal static (EquatableArray<CustomLogicalTypeMetadata> fullyQualifiedLogicalTypes, IEnumerable<Diagnostic> diagnostics) GetCustomLogicalTypesMetadata(AttributeData avroSchemaAttribute, ClassDeclarationSyntax serializerSyntax)
     {
-        if (customLogicalTypesDeclarationExpression is null)
-            return (Array.Empty<CustomLogicalTypeMetadata>(), Array.Empty<Diagnostic>());
+        if (avroSchemaAttribute.ConstructorArguments.Length < 2)
+            return (ImmutableArray<CustomLogicalTypeMetadata>.Empty.AsEquatableArray(), Array.Empty<Diagnostic>());
 
-        var customLogicalTypesArray = ExtractCustomLogicalTypesArray(customLogicalTypesDeclarationExpression, ctx);
+        var logicalTypesArgument = avroSchemaAttribute.ConstructorArguments[1];
+        if (logicalTypesArgument.Kind != TypedConstantKind.Array || logicalTypesArgument.IsNull)
+            return (ImmutableArray<CustomLogicalTypeMetadata>.Empty.AsEquatableArray(), Array.Empty<Diagnostic>());
 
-        var fullyQualifiedLogicalTypes = new List<CustomLogicalTypeMetadata>(customLogicalTypesArray.Count());
+        var customLogicalTypeSymbols = logicalTypesArgument.Values
+            .Where(v => v.Kind == TypedConstantKind.Type && v.Value is INamedTypeSymbol)
+            .Select(v => (INamedTypeSymbol)v.Value)
+            .ToList();
+
+        var fullyQualifiedLogicalTypes = new List<CustomLogicalTypeMetadata>(customLogicalTypeSymbols.Count);
         var diagnosticsProduced = new List<Diagnostic>();
 
-        foreach (var customLogicalTypeSymbol in customLogicalTypesArray)
+        foreach (var customLogicalTypeSymbol in customLogicalTypeSymbols)
         {
             if (!customLogicalTypeSymbol.IsStatic)
             {
@@ -53,10 +61,9 @@ public static class CustomLogicalTypesMetadataProcessor
                     canSerializeMethodParameters
                 ));
             }
-            ;
         }
 
-        return (fullyQualifiedLogicalTypes, diagnosticsProduced);
+        return (fullyQualifiedLogicalTypes.ToImmutableArray().AsEquatableArray(), diagnosticsProduced);
     }
 
     private static bool DoesCustomLogicalTypeHaveLogicalTypeNameAttribute(INamedTypeSymbol customLogicalTypeSymbol) =>
@@ -95,14 +102,4 @@ public static class CustomLogicalTypesMetadataProcessor
                       && m.ReturnType.SpecialType is SpecialType.System_Boolean
                       && m.Parameters.Any()
                       && m.Parameters.First().Type.SpecialType is SpecialType.System_Object);
-
-    private static IEnumerable<INamedTypeSymbol> ExtractCustomLogicalTypesArray(ExpressionSyntax customLogicalTypesDeclarationExpression, GeneratorSyntaxContext ctx) =>
-        ctx
-            .SemanticModel
-            .GetOperation(customLogicalTypesDeclarationExpression)!
-            .ChildOperations
-            .FirstOrDefault(o => o.Kind == OperationKind.ArrayInitializer)
-            ?.ChildOperations
-            .Where(o => o.Kind == OperationKind.TypeOf)
-            .Select(o => (o as ITypeOfOperation)!.TypeOperand as INamedTypeSymbol);
 }

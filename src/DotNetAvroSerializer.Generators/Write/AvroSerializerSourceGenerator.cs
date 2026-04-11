@@ -8,21 +8,20 @@ using DotNetAvroSerializer.Generators.Helpers;
 using DotNetAvroSerializer.Generators.Models;
 using DotNetAvroSerializer.Generators.Schemas;
 using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Microsoft.CodeAnalysis.CSharp;
 
 namespace DotNetAvroSerializer.Generators.Write;
 
 [Generator]
 public partial class AvroSerializerSourceGenerator : IIncrementalGenerator
 {
-    private static bool IsSyntaxGenerationCandidate(SyntaxNode node) => node is ClassDeclarationSyntax c && (c.BaseList?.Types.First().Type.ToString().Contains("AvroSerializer") ?? false);
-
     public void Initialize(IncrementalGeneratorInitializationContext context)
     {
         IncrementalValuesProvider<(SerializerMetadata serializerMetadata, EquatableArray<Diagnostic> errors)> serializersMetadataWithErrors = context.SyntaxProvider
-            .CreateSyntaxProvider(
-                predicate: static (s, _) => IsSyntaxGenerationCandidate(s),
+            .ForAttributeWithMetadataName(
+                "DotNetAvroSerializer.AvroSchemaAttribute",
+                predicate: static (s, _) => s is ClassDeclarationSyntax,
                 transform: static (ctx, ct) => GetTargetDataForGeneration(ctx, ct));
 
         IncrementalValuesProvider<Diagnostic> errors =
@@ -59,10 +58,10 @@ public partial class AvroSerializerSourceGenerator : IIncrementalGenerator
         });
     }
 
-    private static (SerializerMetadata serializerMetadata, EquatableArray<Diagnostic> errors) GetTargetDataForGeneration(GeneratorSyntaxContext ctx, CancellationToken ct)
+    private static (SerializerMetadata serializerMetadata, EquatableArray<Diagnostic> errors) GetTargetDataForGeneration(GeneratorAttributeSyntaxContext ctx, CancellationToken ct)
     {
         var diagnostics = ImmutableArray<Diagnostic>.Empty;
-        var serializerSyntax = ctx.Node as ClassDeclarationSyntax;
+        var serializerSyntax = (ClassDeclarationSyntax)ctx.TargetNode;
 
         ct.ThrowIfCancellationRequested();
 
@@ -73,23 +72,19 @@ public partial class AvroSerializerSourceGenerator : IIncrementalGenerator
             return (null, diagnostics);
         }
 
-        var attribute = serializerSyntax
-            .AttributeLists
-            .SelectMany(x => x.Attributes)
-            .FirstOrDefault(attr => attr.Name.ToString() == "AvroSchema");
+        var avroSchemaAttribute = ctx.Attributes[0];
 
-        if (attribute is null)
+        var schemaStringConstant = avroSchemaAttribute.ConstructorArguments.Length > 0
+            ? avroSchemaAttribute.ConstructorArguments[0].Value?.ToString()
+            : null;
+
+        if (schemaStringConstant is null)
         {
-            diagnostics = diagnostics.Add(Diagnostic.Create(DiagnosticsDescriptors.MissingAvroSchemaDescriptor, serializerSyntax.GetLocation(), serializerSyntax.Identifier.ToString()));
+            diagnostics = diagnostics.Add(Diagnostic.Create(DiagnosticsDescriptors.MissingSchemaInAvroSchemaAttributeDescriptor, serializerSyntax.GetLocation(), serializerSyntax.Identifier.ToString()));
             return (null, diagnostics);
         }
 
-        var attributeSchemaText = attribute.ArgumentList?.Arguments.First()?.Expression;
-        var customLogicalTypes = attribute.ArgumentList?.Arguments.Count > 1
-            ? attribute.ArgumentList.Arguments.ElementAt(1).Expression
-            : null;
-
-        var (customLogicalTypeNames, logicalTypesDiagnostics) = CustomLogicalTypesMetadataProcessor.GetCustomLogicalTypesMetadata(customLogicalTypes, serializerSyntax, ctx);
+        var (customLogicalTypeNames, logicalTypesDiagnostics) = CustomLogicalTypesMetadataProcessor.GetCustomLogicalTypesMetadata(avroSchemaAttribute, serializerSyntax);
 
         if (logicalTypesDiagnostics.Any())
         {
@@ -97,23 +92,13 @@ public partial class AvroSerializerSourceGenerator : IIncrementalGenerator
             return (null, diagnostics);
         }
 
-        var schemaString = ctx
-            .SemanticModel
-            .GetConstantValue(attributeSchemaText);
-
         ct.ThrowIfCancellationRequested();
 
-        if (!schemaString.HasValue)
-        {
-            diagnostics = diagnostics.Add(Diagnostic.Create(DiagnosticsDescriptors.MissingSchemaInAvroSchemaAttributeDescriptor, serializerSyntax.GetLocation(), serializerSyntax.Identifier.ToString()));
-            return (null, diagnostics);
-        }
-
-        if (!AvroSchemaParser.TryParse(schemaString.ToString(), out var schema, out var schemaValidationError))
+        if (!AvroSchemaParser.TryParse(schemaStringConstant, out var schema, out var schemaValidationError))
         {
             diagnostics = diagnostics.Add(Diagnostic.Create(
                 DiagnosticsDescriptors.AvroSchemaIsNotValidDescriptor,
-                attributeSchemaText?.GetLocation() ?? serializerSyntax.GetLocation(),
+                serializerSyntax.GetLocation(),
                 serializerSyntax.Identifier.ToString(),
                 schemaValidationError));
             return (null, diagnostics);
@@ -132,15 +117,21 @@ public partial class AvroSerializerSourceGenerator : IIncrementalGenerator
 
         ct.ThrowIfCancellationRequested();
 
-        var serializerMetadata = new SerializerMetadata(serializerSyntax.Identifier.ToString(),
-            Namespaces.GetNamespace(serializerSyntax), schema, serializableTypeMetadata, customLogicalTypeNames);
+        var rawLocation = serializerSyntax.GetLocation();
+        var smallLocation = new SmallLocation(rawLocation.SourceTree?.FilePath, rawLocation.SourceSpan, rawLocation.GetLineSpan().Span);
 
-        serializerMetadata.ExtractLocation(serializerSyntax.GetLocation());
+        var serializerMetadata = new SerializerMetadata(
+            serializerSyntax.Identifier.ToString(),
+            Namespaces.GetNamespace(serializerSyntax),
+            schema,
+            serializableTypeMetadata,
+            customLogicalTypeNames,
+            smallLocation);
 
         return (serializerMetadata, diagnostics);
     }
 
-    private static ITypeSymbol GetSerializableTypeSymbol(ClassDeclarationSyntax serializerSyntax, GeneratorSyntaxContext ctx)
+    private static ITypeSymbol GetSerializableTypeSymbol(ClassDeclarationSyntax serializerSyntax, GeneratorAttributeSyntaxContext ctx)
     {
         var serializerGenericArgument = ((GenericNameSyntax)serializerSyntax.BaseList.Types.First().Type).TypeArgumentList.Arguments.First();
 

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.IO;
 using System.Text;
 using System.Threading;
@@ -21,6 +21,6 @@ public class StringSchema
     {
         var stringBytes = Encoding.UTF8.GetBytes(value);
         await LongSchema.WriteAsync(outputStream, stringBytes.Length, cancellationToken).ConfigureAwait(false);
-        await outputStream.WriteAsync(new ReadOnlyMemory<byte>(stringBytes, 0, stringBytes.Length), cancellationToken).ConfigureAwait(false);
+        await outputStream.WriteAsync(stringBytes, cancellationToken).ConfigureAwait(false);
     }
 }

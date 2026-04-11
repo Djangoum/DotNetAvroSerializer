@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
@@ -18,6 +18,6 @@ public class BytesSchema
     public static async Task WriteAsync(Stream outputStream, byte[] value, CancellationToken cancellationToken = default)
     {
         await LongSchema.WriteAsync(outputStream, value.Length, cancellationToken).ConfigureAwait(false);
-        await outputStream.WriteAsync(new ReadOnlyMemory<byte>(value, 0, value.Length), cancellationToken).ConfigureAwait(false);
+        await outputStream.WriteAsync(value, cancellationToken).ConfigureAwait(false);
     }
 }

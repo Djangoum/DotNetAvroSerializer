@@ -1,19 +1,17 @@
-using System.Collections.Generic;
+using DotNetAvroSerializer.Generators.Helpers;
 using DotNetAvroSerializer.Generators.Schemas;
 using Microsoft.CodeAnalysis;
 
 namespace DotNetAvroSerializer.Generators.Models;
 
-internal record SerializerMetadata(string SerializerClassName,
+internal record SerializerMetadata(
+    string SerializerClassName,
     string SerializerNamespace,
     Schema AvroSchema,
     SerializableTypeMetadata SerializableTypeMetadata,
-    IEnumerable<CustomLogicalTypeMetadata> CustomLogicalTypesMetadata)
+    EquatableArray<CustomLogicalTypeMetadata> CustomLogicalTypesMetadata,
+    SmallLocation SerializerLocation)
 {
-    private SmallLocation location;
-
-    public void ExtractLocation(Location serializerLocation)
-        => location = new SmallLocation(serializerLocation.SourceTree?.FilePath, serializerLocation.SourceSpan, serializerLocation.GetLineSpan().Span);
-
-    public Location GetSerializerLocation() => Location.Create(location.FilePath, location.TextSpan, location.LineSpan);
+    public Location GetSerializerLocation()
+        => Location.Create(SerializerLocation.FilePath, SerializerLocation.TextSpan, SerializerLocation.LineSpan);
 }

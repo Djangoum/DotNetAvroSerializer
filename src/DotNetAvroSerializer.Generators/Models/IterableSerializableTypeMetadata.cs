@@ -3,7 +3,7 @@ using Microsoft.CodeAnalysis;
 
 namespace DotNetAvroSerializer.Generators.Models;
 
-internal class IterableSerializableTypeMetadata : SerializableTypeMetadata
+internal sealed record IterableSerializableTypeMetadata : SerializableTypeMetadata
 {
     public IterableSerializableTypeMetadata(SerializableTypeMetadata itemsTypeMetadata, ITypeSymbol iterableSymbol)
         : base(iterableSymbol)
@@ -12,8 +12,6 @@ internal class IterableSerializableTypeMetadata : SerializableTypeMetadata
     }
 
     internal SerializableTypeMetadata ItemsTypeMetadata { get; }
-
-    protected override SerializableTypeKind Kind => SerializableTypeKind.Enumerable;
 
     internal static bool IsValidArrayType(ITypeSymbol symbol)
         => symbol is IArrayTypeSymbol
@@ -28,9 +26,4 @@ internal class IterableSerializableTypeMetadata : SerializableTypeMetadata
 
             _ => null
         };
-
-    public override bool Equals(SerializableTypeMetadata other)
-        => base.Equals(other)
-            && other is IterableSerializableTypeMetadata iterableSerializableType
-            && ItemsTypeMetadata.Equals(iterableSerializableType.ItemsTypeMetadata);
 }

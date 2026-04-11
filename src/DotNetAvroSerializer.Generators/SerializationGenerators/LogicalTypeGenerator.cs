@@ -36,7 +36,7 @@ internal static class LogicalTypeGenerator
 
             if (serializerCallCode is not null)
             {
-                context.SerializationCode.AppendLine(serializerCallCode);
+                context.SerializationCode.WriteLine(serializerCallCode);
             }
             else
             {

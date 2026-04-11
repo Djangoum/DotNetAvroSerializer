@@ -1,4 +1,4 @@
-﻿using DotNetAvroSerializer.Generators.Write;
+using DotNetAvroSerializer.Generators.Write;
 using Microsoft.CodeAnalysis;
 
 namespace DotNetAvroSerializer.Generators.Diagnostics;
@@ -101,5 +101,16 @@ public static class DiagnosticsDescriptors
             defaultSeverity: DiagnosticSeverity.Error,
             isEnabledByDefault: true,
             description: $"Logical types must have CanSerialize method."
+        );
+
+    public static DiagnosticDescriptor SerializerMustInheritFromAvroSerializerDescriptor =>
+        new DiagnosticDescriptor(
+            id: "AVRO00011",
+            title: "Serializer must inherit from AvroSerializer<T>",
+            messageFormat: $"{{0}} must inherit from DotNetAvroSerializer.AvroSerializer<T>",
+            category: typeof(AvroSerializerSourceGenerator).FullName,
+            defaultSeverity: DiagnosticSeverity.Error,
+            isEnabledByDefault: true,
+            description: $"Avro serializers must directly inherit from DotNetAvroSerializer.AvroSerializer<T>."
         );
 }

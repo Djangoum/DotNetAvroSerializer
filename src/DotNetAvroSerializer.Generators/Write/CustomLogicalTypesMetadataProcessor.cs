@@ -12,7 +12,7 @@ namespace DotNetAvroSerializer.Generators.Write;
 
 internal static class CustomLogicalTypesMetadataProcessor
 {
-    internal static (EquatableArray<CustomLogicalTypeMetadata> fullyQualifiedLogicalTypes, IEnumerable<Diagnostic> diagnostics) GetCustomLogicalTypesMetadata(AttributeData avroSchemaAttribute, ClassDeclarationSyntax serializerSyntax)
+    internal static (EquatableArray<CustomLogicalTypeMetadata> fullyQualifiedLogicalTypes, IEnumerable<Diagnostic> diagnostics) GetCustomLogicalTypesMetadata(AttributeData avroSchemaAttribute)
     {
         if (avroSchemaAttribute.ConstructorArguments.Length < 2)
             return (ImmutableArray<CustomLogicalTypeMetadata>.Empty.AsEquatableArray(), Array.Empty<Diagnostic>());

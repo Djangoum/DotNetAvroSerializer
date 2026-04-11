@@ -148,6 +148,51 @@ public partial class BrokenSerializer : AvroSerializer<int>
             && d.GetMessage(CultureInfo.InvariantCulture).Contains("Record schema BrokenRecord has no fields", StringComparison.Ordinal));
     }
 
+    [Fact]
+    public void Initialize_MustEmitDiagnosticWhenSerializerDoesNotInheritFromAvroSerializer()
+    {
+        const string source = """
+using DotNetAvroSerializer;
+
+namespace DotNetAvroSerializer
+{
+    public abstract class AvroSerializer<T>
+    {
+    }
+
+    [System.AttributeUsage(System.AttributeTargets.Class)]
+    public sealed class AvroSchemaAttribute : System.Attribute
+    {
+        public AvroSchemaAttribute(string schema, System.Type[] allowedCustomLogicalTypes = null)
+        {
+        }
+    }
+}
+
+namespace Sample;
+
+public abstract class OtherSerializer<T>
+{
+}
+
+[AvroSchema("{\"type\":\"int\"}")]
+public partial class InvalidSerializer : OtherSerializer<int>
+{
+}
+""";
+
+        var compilation = CreateCompilation(source);
+        GeneratorDriver driver = CSharpGeneratorDriver.Create(new AvroSerializerSourceGenerator().AsSourceGenerator());
+
+        driver = driver.RunGenerators(compilation);
+
+        var diagnostics = driver.GetRunResult().Results.Single().Diagnostics;
+
+        diagnostics.Should().ContainSingle(d =>
+            d.Id == DiagnosticsDescriptors.SerializerMustInheritFromAvroSerializerDescriptor.Id
+            && d.GetMessage(CultureInfo.InvariantCulture).Contains("InvalidSerializer", StringComparison.Ordinal));
+    }
+
 
     private static CSharpCompilation CreateCompilation(string source)
     {

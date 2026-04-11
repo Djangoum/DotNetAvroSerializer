@@ -29,6 +29,19 @@ public class AsyncComplexTypesTests
     }
 
     [Fact]
+    public async Task SerializeArrayOfIntsAsIAsyncEnumerableAsync_WithStreamingBlocks()
+    {
+        var serializer = new IntAsyncEnumerableSerializer
+        {
+            AsyncArrayItemCountBlockSize = 2
+        };
+
+        var result = await serializer.SerializeAsync(GetIntsAsyncEnumerable());
+
+        Convert.ToHexString(result).Should().BeEquivalentTo("04020404060800");
+    }
+
+    [Fact]
     public async Task SerializeEnumAsync()
     {
         var result = await new AsyncEnumSerializer().SerializeAsync(TestEnum.Value3);
@@ -106,6 +119,19 @@ public class AsyncComplexTypesTests
             new InnerRecord { Field1 = "holiwis", Field2 = 2 },
             new InnerRecord { Field1 = "holiwis", Field2 = 2 }
         });
+
+        Convert.ToHexString(result).Should().BeEquivalentTo("040E686F6C69776973040E686F6C6977697304020E686F6C697769730400");
+    }
+
+    [Fact]
+    public async Task SerializeArrayOfRecordsAsIAsyncEnumerableAsync_WithStreamingBlocks()
+    {
+        var serializer = new AsyncEnumerableOfRecordsSerializer
+        {
+            AsyncArrayItemCountBlockSize = 2
+        };
+
+        var result = await serializer.SerializeAsync(GetInnerRecordsAsyncEnumerable());
 
         Convert.ToHexString(result).Should().BeEquivalentTo("040E686F6C69776973040E686F6C6977697304020E686F6C697769730400");
     }
@@ -272,6 +298,26 @@ public class AsyncComplexTypesTests
 
         Convert.ToHexString(result).Should().BeEquivalentTo("041474657374737472696E67F801041474657374737472696E67F8011474657374737472696E67F8010006333333333333F33F3333333333330B40333333333333294000029A99494104086B6579311474657374737472696E67F801086B6579321474657374737472696E67F801001474657374737472696E67F801041474657374737472696E67F8011474657374737472696E67F8010006333333333333F33F3333333333330B40333333333333294000029A99494104086B6579311474657374737472696E67F801086B6579321474657374737472696E67F8010000");
     }
+
+    private static async IAsyncEnumerable<int> GetIntsAsyncEnumerable()
+    {
+        yield return 1;
+        await Task.Yield();
+        yield return 2;
+        await Task.Yield();
+        yield return 3;
+        await Task.Yield();
+        yield return 4;
+    }
+
+    private static async IAsyncEnumerable<InnerRecord> GetInnerRecordsAsyncEnumerable()
+    {
+        yield return new InnerRecord { Field1 = "holiwis", Field2 = 2 };
+        await Task.Yield();
+        yield return new InnerRecord { Field1 = "holiwis", Field2 = 2 };
+        await Task.Yield();
+        yield return new InnerRecord { Field1 = "holiwis", Field2 = 2 };
+    }
 }
 #pragma warning restore CA2007
 
@@ -387,3 +433,25 @@ public partial class AsyncRecordWithComplexTypesSerializer : AsyncAvroSerializer
          }
      }")]
 public partial class AsyncMapOfRecordsSerializer : AsyncAvroSerializer<Dictionary<string, InnerRecord>> { }
+
+[AvroSchema(@"{ ""type"": ""array"", ""items"": ""int"" }")]
+public partial class IntAsyncEnumerableSerializer : AsyncAvroSerializer<IAsyncEnumerable<int>> { }
+
+[AvroSchema(@"{
+         ""type"": ""array"",
+         ""items"": {
+             ""name"": ""InnerRecord"",
+             ""type"": ""record"",
+             ""fields"": [
+                 {
+                     ""name"": ""Field1"",
+                     ""type"": ""string""
+                 },
+                 {
+                     ""name"": ""Field2"",
+                     ""type"": ""int""
+                 }
+             ]
+         }
+     }")]
+public partial class AsyncEnumerableOfRecordsSerializer : AsyncAvroSerializer<IAsyncEnumerable<InnerRecord>> { }

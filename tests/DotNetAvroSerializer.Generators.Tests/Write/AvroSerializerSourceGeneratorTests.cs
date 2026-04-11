@@ -193,7 +193,7 @@ public partial class IntArraySerializer : AsyncAvroSerializer<int[]>
         var generatedSource = driver.GetRunResult().Results.Single().GeneratedSources.Single().SourceText.ToString();
 
         generatedSource.Should().Contain("AsyncArrayItemCountBlockSize");
-        generatedSource.Should().Contain("new List<global::System.Int32>");
+        generatedSource.Should().Contain("new List<int>");
         generatedSource.Should().Contain("if (sourceBatch.Count == sourceBlockSize)");
         generatedSource.Should().Contain("await LongSchema.WriteAsync(outputStream, sourceBatch.Count, cancellationToken);");
         generatedSource.Should().Contain("await LongSchema.WriteAsync(outputStream, 0L, cancellationToken);");

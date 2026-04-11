@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using System.Text;
-using Avro;
 using DotNetAvroSerializer.Generators.Helpers;
+using DotNetAvroSerializer.Generators.Schemas;
 
 namespace DotNetAvroSerializer.Generators.Models;
 

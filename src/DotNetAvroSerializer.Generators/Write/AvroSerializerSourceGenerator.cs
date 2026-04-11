@@ -1,13 +1,12 @@
-using System;
 using System.Collections.Immutable;
 using System.Linq;
 using System.Threading;
-using Avro;
 using DotNetAvroSerializer.Generators.Diagnostics;
 using DotNetAvroSerializer.Generators.Exceptions;
 using DotNetAvroSerializer.Generators.Extensions;
 using DotNetAvroSerializer.Generators.Helpers;
 using DotNetAvroSerializer.Generators.Models;
+using DotNetAvroSerializer.Generators.Schemas;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -109,15 +108,13 @@ public partial class AvroSerializerSourceGenerator : IIncrementalGenerator
             return (null, diagnostics);
         }
 
-        Schema schema;
-
-        try
+        if (!AvroSchemaParser.TryParse(schemaString.ToString(), out var schema, out var schemaValidationError))
         {
-            schema = Schema.Parse(schemaString.ToString());
-        }
-        catch (Exception ex)
-        {
-            diagnostics = diagnostics.Add(Diagnostic.Create(DiagnosticsDescriptors.AvroSchemaIsNotValidDescriptor, serializerSyntax.GetLocation(), serializerSyntax.Identifier.ToString(), ex.Message));
+            diagnostics = diagnostics.Add(Diagnostic.Create(
+                DiagnosticsDescriptors.AvroSchemaIsNotValidDescriptor,
+                attributeSchemaText?.GetLocation() ?? serializerSyntax.GetLocation(),
+                serializerSyntax.Identifier.ToString(),
+                schemaValidationError));
             return (null, diagnostics);
         }
 

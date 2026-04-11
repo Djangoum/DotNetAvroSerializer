@@ -1,7 +1,5 @@
 using System.Collections.Generic;
 using System.Linq;
-using Avro.Util;
-using DotNetAvroSerializer.Generators.Helpers;
 using Microsoft.CodeAnalysis;
 
 namespace DotNetAvroSerializer.Generators.Models;
@@ -37,8 +35,6 @@ public class CustomLogicalTypeMetadata
 
             return overridenName is not null ? overridenName.ToString() : p.Name;
         });
-
-        LogicalTypeFactory.Instance.Register(new CustomLogicalType(name));
     }
 
     public string Name { get; }

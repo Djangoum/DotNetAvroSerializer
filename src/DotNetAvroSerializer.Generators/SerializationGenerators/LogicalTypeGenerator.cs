@@ -1,10 +1,10 @@
 using System;
 using System.Linq;
-using Avro;
 using DotNetAvroSerializer.Generators.Exceptions;
 using DotNetAvroSerializer.Generators.Extensions;
 using DotNetAvroSerializer.Generators.Models;
 using DotNetAvroSerializer.Generators.Polyfills;
+using DotNetAvroSerializer.Generators.Schemas;
 
 namespace DotNetAvroSerializer.Generators.SerializationGenerators;
 
@@ -19,7 +19,7 @@ internal static class LogicalTypeGenerator
 
         if (context.SerializableTypeMetadata is LogicalTypeSerializableTypeMetadata logicalTypeName)
         {
-            var serializerCallCode = schema.LogicalType.Name switch
+            var serializerCallCode = schema.LogicalTypeName switch
             {
                 "date" when logicalTypeName.TypeName.Equals(nameof(DateTime), StringComparison.InvariantCultureIgnoreCase)
                            || logicalTypeName.TypeName.Equals(nameof(DateOnly), StringComparison.InvariantCultureIgnoreCase) => $"DateSchema.Write(outputStream, {context.SourceAccessor});",

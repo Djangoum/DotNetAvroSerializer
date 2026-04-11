@@ -1,9 +1,9 @@
 using System.Collections.Generic;
 using System.Linq;
-using Avro;
 using DotNetAvroSerializer.Generators.Exceptions;
 using DotNetAvroSerializer.Generators.Extensions;
 using DotNetAvroSerializer.Generators.Models;
+using DotNetAvroSerializer.Generators.Schemas;
 
 namespace DotNetAvroSerializer.Generators.SerializationGenerators;
 
@@ -13,9 +13,9 @@ internal static class UnionGenerator
     {
         var unionSchema = context.Schema as UnionSchema;
 
-        foreach (var schema in unionSchema!.Schemas)
+        for (var unionSchemaIndex = 0; unionSchemaIndex < unionSchema!.Schemas.Count; unionSchemaIndex++)
         {
-            var unionSchemaIndex = unionSchema.Schemas.IndexOf(schema);
+            var schema = unionSchema.Schemas[unionSchemaIndex];
 
             if (context.SerializableTypeMetadata is UnionSerializableTypeMetadata unionSerializableTypeMetadata)
             {

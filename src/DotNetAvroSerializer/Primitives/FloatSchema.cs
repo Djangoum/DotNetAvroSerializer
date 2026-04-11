@@ -44,6 +44,6 @@ public static class FloatSchema
             Array.Reverse(bytes);
         }
 
-        return outputStream.WriteAsync(new ReadOnlyMemory<byte>(bytes, 0, bytes.Length), cancellationToken).AsTask();
+        return outputStream.WriteAsync(bytes, cancellationToken).AsTask();
     }
 }

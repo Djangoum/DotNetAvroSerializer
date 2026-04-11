@@ -18,7 +18,9 @@ internal static class ArrayGenerator
 
         var itemVar = $"item{VariableNamesHelpers.RemoveSpecialCharacters(context.SourceAccessor)}";
 
-        context.SerializationCode.AppendLine($"if ({context.SourceAccessor}.Count() > 0) {context.WriteCall("LongSchema", $"(long){context.SourceAccessor}.Count()")}");
+        var countVar = $"count{VariableNamesHelpers.RemoveSpecialCharacters(context.SourceAccessor)}";
+        context.SerializationCode.AppendLine($"var {countVar} = GetCollectionCount({context.SourceAccessor});");
+        context.SerializationCode.AppendLine($"if ({countVar} > 0) {context.WriteCall("LongSchema", countVar)}");
         context.SerializationCode.AppendLine($"foreach(var {itemVar} in {context.SourceAccessor})");
         context.SerializationCode.AppendLine("{");
 

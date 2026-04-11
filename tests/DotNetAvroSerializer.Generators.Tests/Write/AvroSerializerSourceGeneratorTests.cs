@@ -56,6 +56,55 @@ public partial class IntSerializer : AvroSerializer<int>
         generatedSource.Should().Contain("public override async Task<byte[]> SerializeAsync");
         generatedSource.Should().Contain("public override async Task SerializeToStreamAsync");
         generatedSource.Should().Contain("await IntSchema.WriteAsync(outputStream, source, cancellationToken);");
+        generatedSource.Should().NotContain("using System.Linq;");
+    }
+
+    [Fact]
+    public void Initialize_MustGenerateCollectionCountWithoutLinqExtensions()
+    {
+        const string source = """
+using System.IO;
+using System.Threading;
+using System.Threading.Tasks;
+using DotNetAvroSerializer;
+
+namespace DotNetAvroSerializer
+{
+    public abstract class AvroSerializer<T>
+    {
+        public virtual byte[] Serialize(T source) => throw new System.NotImplementedException();
+        public virtual void SerializeToStream(Stream outputStream, T source) => throw new System.NotImplementedException();
+        public virtual Task<byte[]> SerializeAsync(T source, CancellationToken cancellationToken = default) => throw new System.NotImplementedException();
+        public virtual Task SerializeToStreamAsync(Stream outputStream, T source, CancellationToken cancellationToken = default) => throw new System.NotImplementedException();
+    }
+
+    [System.AttributeUsage(System.AttributeTargets.Class)]
+    public sealed class AvroSchemaAttribute : System.Attribute
+    {
+        public AvroSchemaAttribute(string schema, System.Type[] allowedCustomLogicalTypes = null)
+        {
+        }
+    }
+}
+
+namespace Sample;
+
+[AvroSchema("{\"type\":\"array\",\"items\":\"int\"}")]
+public partial class IntArraySerializer : AvroSerializer<int[]>
+{
+}
+""";
+
+        var compilation = CreateCompilation(source);
+        GeneratorDriver driver = CSharpGeneratorDriver.Create(new AvroSerializerSourceGenerator().AsSourceGenerator());
+
+        driver = driver.RunGenerators(compilation);
+
+        var generatedSource = driver.GetRunResult().Results.Single().GeneratedSources.Single().SourceText.ToString();
+
+        generatedSource.Should().Contain("var countsource = GetCollectionCount(source);");
+        generatedSource.Should().NotContain(".Count()");
+        generatedSource.Should().NotContain("using System.Linq;");
     }
 
     [Fact]

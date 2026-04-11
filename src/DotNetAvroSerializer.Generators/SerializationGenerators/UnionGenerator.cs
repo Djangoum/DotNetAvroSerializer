@@ -23,38 +23,40 @@ internal static class UnionGenerator
 
                 var canSerializedCheck = GetCanSerializeCheck(schema, $"{context.SourceAccessor}.GetUnionValue()", context.CustomLogicalTypesMetadata, unionTypeSerializableTypeMetadata.FullNameDisplay);
 
-                context.SerializationCode.AppendLine(unionSchemaIndex == 0
-                    ? $"if ({canSerializedCheck}) {{"
-                    : $"else if ({canSerializedCheck}) {{");
+                context.SerializationCode.WriteLine(unionSchemaIndex == 0
+                    ? $"if ({canSerializedCheck})"
+                    : $"else if ({canSerializedCheck})");
 
-                context.SerializationCode.AppendLine(context.WriteCall("IntSchema", unionSchemaIndex.ToString()));
-
-                schema.Generate(context with
+                using (context.SerializationCode.WriteBlock())
                 {
-                    Schema = schema,
-                    SerializableTypeMetadata = unionTypeSerializableTypeMetadata,
-                    SourceAccessor = $"(({unionTypeSerializableTypeMetadata.FullNameDisplay}){context.SourceAccessor})"
-                });
+                    context.SerializationCode.WriteLine(context.WriteCall("IntSchema", unionSchemaIndex.ToString()));
 
-                context.SerializationCode.AppendLine("}");
+                    schema.Generate(context with
+                    {
+                        Schema = schema,
+                        SerializableTypeMetadata = unionTypeSerializableTypeMetadata,
+                        SourceAccessor = $"(({unionTypeSerializableTypeMetadata.FullNameDisplay}){context.SourceAccessor})"
+                    });
+                }
             }
             else if (context.SerializableTypeMetadata is NullableSerializableTypeMetadata or RecordSerializableTypeMetadata { IsNullable: true } or DictionarySerializableTypeMetadata or IterableSerializableTypeMetadata)
             {
                 var canSerializedCheck = GetCanSerializeCheck(schema, context.SourceAccessor, context.CustomLogicalTypesMetadata, context.SerializableTypeMetadata.FullNameDisplay);
 
-                context.SerializationCode.AppendLine(unionSchemaIndex == 0
-                    ? $"if ({canSerializedCheck}) {{"
-                    : $"else if ({canSerializedCheck}) {{");
+                context.SerializationCode.WriteLine(unionSchemaIndex == 0
+                    ? $"if ({canSerializedCheck})"
+                    : $"else if ({canSerializedCheck})");
 
-                context.SerializationCode.AppendLine(context.WriteCall("IntSchema", unionSchemaIndex.ToString()));
-
-                schema.Generate(context with
+                using (context.SerializationCode.WriteBlock())
                 {
-                    Schema = schema,
-                    SerializableTypeMetadata = context.SerializableTypeMetadata is NullableSerializableTypeMetadata nullableSerializableTypeMetadata ? nullableSerializableTypeMetadata.InnerNullableTypeSymbol : context.SerializableTypeMetadata
-                });
+                    context.SerializationCode.WriteLine(context.WriteCall("IntSchema", unionSchemaIndex.ToString()));
 
-                context.SerializationCode.AppendLine("}");
+                    schema.Generate(context with
+                    {
+                        Schema = schema,
+                        SerializableTypeMetadata = context.SerializableTypeMetadata is NullableSerializableTypeMetadata nullableSerializableTypeMetadata ? nullableSerializableTypeMetadata.InnerNullableTypeSymbol : context.SerializableTypeMetadata
+                    });
+                }
             }
             else
             {

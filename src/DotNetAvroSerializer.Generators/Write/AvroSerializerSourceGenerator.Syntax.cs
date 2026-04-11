@@ -1,4 +1,5 @@
 using System.Text;
+using DotNetAvroSerializer.Generators.Helpers;
 using Microsoft.CodeAnalysis.Text;
 
 namespace DotNetAvroSerializer.Generators.Write;
@@ -7,74 +8,98 @@ public partial class AvroSerializerSourceGenerator
 {
     private static SourceText GetGeneratedSerializationSource(string serializerNamespace, string serializerClassName, string serializableFullyQualifiedTypeName, string serializeCode, string serializeCodeAsync, string privateMembersCode)
     {
-        var privateMembers = string.IsNullOrWhiteSpace(privateMembersCode) ? string.Empty : $"\n{privateMembersCode}\n";
-        var source = $$"""
-                       using DotNetAvroSerializer.Primitives;
-                       using DotNetAvroSerializer.LogicalTypes;
-                       using DotNetAvroSerializer.Exceptions;
-                       using DotNetAvroSerializer.ComplexTypes;
-                       using System.Collections.Generic;
-                       using System.IO;
-                       using System.Threading.Tasks;
-                       using System.Threading;
+        var writer = new IndentedTextWriter();
 
-                       namespace {{serializerNamespace}};
+        writer.WriteLine("using DotNetAvroSerializer.Primitives;");
+        writer.WriteLine("using DotNetAvroSerializer.LogicalTypes;");
+        writer.WriteLine("using DotNetAvroSerializer.Exceptions;");
+        writer.WriteLine("using DotNetAvroSerializer.ComplexTypes;");
+        writer.WriteLine("using System.Collections.Generic;");
+        writer.WriteLine("using System.IO;");
+        writer.WriteLine("using System.Threading.Tasks;");
+        writer.WriteLine("using System.Threading;");
+        writer.WriteLine();
+        writer.WriteLine($"namespace {serializerNamespace};");
+        writer.WriteLine();
+        writer.WriteLine($"public partial class {serializerClassName}");
 
-                       public partial class {{serializerClassName}}
-                       {
-                           public override byte[] Serialize({{serializableFullyQualifiedTypeName}} source)
-                           {
-                               var outputStream = new MemoryStream();
-                               SerializeToStream(outputStream, source);
-                               return outputStream.ToArray();
-                           }
+        using (writer.WriteBlock())
+        {
+            writer.WriteLine($"public override byte[] Serialize({serializableFullyQualifiedTypeName} source)");
+            using (writer.WriteBlock())
+            {
+                writer.WriteLine("var outputStream = new MemoryStream();");
+                writer.WriteLine("SerializeToStream(outputStream, source);");
+                writer.WriteLine("return outputStream.ToArray();");
+            }
 
-                           public override void SerializeToStream(Stream outputStream, {{serializableFullyQualifiedTypeName}} source)
-                           {
-                               {{serializeCode}}
-                           }
+            writer.WriteLine();
+            writer.WriteLine($"public override void SerializeToStream(Stream outputStream, {serializableFullyQualifiedTypeName} source)");
+            using (writer.WriteBlock())
+            {
+                writer.Write(serializeCode, isMultiline: true);
+            }
 
-                           public override async Task<byte[]> SerializeAsync({{serializableFullyQualifiedTypeName}} source, CancellationToken cancellationToken = default)
-                           {
-                               var outputStream = new MemoryStream();
-                               await SerializeToStreamAsync(outputStream, source, cancellationToken);
-                               return outputStream.ToArray();
-                           }
+            writer.WriteLine();
+            writer.WriteLine($"public override async Task<byte[]> SerializeAsync({serializableFullyQualifiedTypeName} source, CancellationToken cancellationToken = default)");
+            using (writer.WriteBlock())
+            {
+                writer.WriteLine("var outputStream = new MemoryStream();");
+                writer.WriteLine("await SerializeToStreamAsync(outputStream, source, cancellationToken);");
+                writer.WriteLine("return outputStream.ToArray();");
+            }
 
-                           public override async Task SerializeToStreamAsync(Stream outputStream, {{serializableFullyQualifiedTypeName}} source, CancellationToken cancellationToken = default)
-                           {
-                               {{serializeCodeAsync}}
-                           }
+            writer.WriteLine();
+            writer.WriteLine($"public override async Task SerializeToStreamAsync(Stream outputStream, {serializableFullyQualifiedTypeName} source, CancellationToken cancellationToken = default)");
+            using (writer.WriteBlock())
+            {
+                writer.Write(serializeCodeAsync, isMultiline: true);
+            }
 
-                           private static long GetCollectionCount<T>(IEnumerable<T> source)
-                           {
-                               if (source is null)
-                               {
-                                   throw new global::System.ArgumentNullException(nameof(source));
-                               }
+            writer.WriteLine();
+            writer.WriteLine("private static long GetCollectionCount<T>(IEnumerable<T> source)");
+            using (writer.WriteBlock())
+            {
+                writer.WriteLine("if (source is null)");
+                using (writer.WriteBlock())
+                {
+                    writer.WriteLine("throw new global::System.ArgumentNullException(nameof(source));");
+                }
 
-                               if (source is ICollection<T> collection)
-                               {
-                                   return collection.Count;
-                               }
+                writer.WriteLine();
+                writer.WriteLine("if (source is ICollection<T> collection)");
+                using (writer.WriteBlock())
+                {
+                    writer.WriteLine("return collection.Count;");
+                }
 
-                               if (source is IReadOnlyCollection<T> readOnlyCollection)
-                               {
-                                   return readOnlyCollection.Count;
-                               }
+                writer.WriteLine();
+                writer.WriteLine("if (source is IReadOnlyCollection<T> readOnlyCollection)");
+                using (writer.WriteBlock())
+                {
+                    writer.WriteLine("return readOnlyCollection.Count;");
+                }
 
-                               long count = 0;
+                writer.WriteLine();
+                writer.WriteLine("long count = 0;");
+                writer.WriteLine();
+                writer.WriteLine("foreach (var _ in source)");
+                using (writer.WriteBlock())
+                {
+                    writer.WriteLine("count++;");
+                }
 
-                               foreach (var _ in source)
-                               {
-                                   count++;
-                               }
+                writer.WriteLine();
+                writer.WriteLine("return count;");
+            }
 
-                               return count;
-                           }{{privateMembers}}
-                       }
-                       """;
+            if (!string.IsNullOrWhiteSpace(privateMembersCode))
+            {
+                writer.WriteLine();
+                writer.Write(privateMembersCode, isMultiline: true);
+            }
+        }
 
-        return SourceText.From(source, Encoding.UTF8);
+        return SourceText.From(writer.ToString().Trim(), Encoding.UTF8);
     }
 }

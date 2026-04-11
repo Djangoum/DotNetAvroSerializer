@@ -20,22 +20,24 @@ internal static class MapGenerator
             throw new AvroGeneratorException($"Map keys have to be strings but {dictionaryTypeMetadata.KeysTypeName}");
 
         var itemVar = $"item{VariableNamesHelpers.RemoveSpecialCharacters(context.SourceAccessor)}";
-
         var countVar = $"{VariableNamesHelpers.RemoveSpecialCharacters(context.SourceAccessor)}Count";
-        context.SerializationCode.AppendLine($"var {countVar} = GetCollectionCount({context.SourceAccessor});");
-        context.SerializationCode.AppendLine($"if ({countVar} > 0) {context.WriteCall("LongSchema", countVar)}");
-        context.SerializationCode.AppendLine($"foreach(var {itemVar} in {context.SourceAccessor})");
-        context.SerializationCode.AppendLine("{");
-        context.SerializationCode.AppendLine(context.WriteCall("StringSchema", $"{itemVar}.Key"));
 
-        schema!.ValueSchema.Generate(context with
+        context.SerializationCode.WriteLine($"var {countVar} = GetCollectionCount({context.SourceAccessor});");
+        context.SerializationCode.WriteLine($"if ({countVar} > 0) {context.WriteCall("LongSchema", countVar)}");
+        context.SerializationCode.WriteLine($"foreach(var {itemVar} in {context.SourceAccessor})");
+
+        using (context.SerializationCode.WriteBlock())
         {
-            Schema = schema!.ValueSchema,
-            SerializableTypeMetadata = dictionaryTypeMetadata.ValuesMetadata,
-            SourceAccessor = $"{itemVar}.Value"
-        });
+            context.SerializationCode.WriteLine(context.WriteCall("StringSchema", $"{itemVar}.Key"));
 
-        context.SerializationCode.AppendLine("}");
-        context.SerializationCode.AppendLine(context.WriteCall("LongSchema", "0L"));
+            schema!.ValueSchema.Generate(context with
+            {
+                Schema = schema!.ValueSchema,
+                SerializableTypeMetadata = dictionaryTypeMetadata.ValuesMetadata,
+                SourceAccessor = $"{itemVar}.Value"
+            });
+        }
+
+        context.SerializationCode.WriteLine(context.WriteCall("LongSchema", "0L"));
     }
 }

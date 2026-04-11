@@ -99,6 +99,7 @@ public partial class BrokenSerializer : AvroSerializer<int>
             && d.GetMessage(CultureInfo.InvariantCulture).Contains("Record schema BrokenRecord has no fields", StringComparison.Ordinal));
     }
 
+
     private static CSharpCompilation CreateCompilation(string source)
     {
         var references = (AppContext.GetData("TRUSTED_PLATFORM_ASSEMBLIES") as string)!

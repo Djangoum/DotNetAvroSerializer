@@ -28,12 +28,12 @@ public static class FloatSchema
         outputStream.Write(bytes, 0, bytes.Length);
     }
 
-    public static async Task WriteAsync(Stream outputStream, float? value, CancellationToken cancellationToken = default)
+    public static Task WriteAsync(Stream outputStream, float? value, CancellationToken cancellationToken = default)
     {
         if (value is null)
             throw new AvroSerializationException("Cannot serialize null value to int");
 
-        await WriteAsync(outputStream, value.Value, cancellationToken);
+        return WriteAsync(outputStream, value.Value, cancellationToken);
     }
 
     public static Task WriteAsync(Stream outputStream, float value, CancellationToken cancellationToken = default)
@@ -44,6 +44,6 @@ public static class FloatSchema
             Array.Reverse(bytes);
         }
 
-        return outputStream.WriteAsync(bytes, 0, bytes.Length, cancellationToken);
+        return outputStream.WriteAsync(new ReadOnlyMemory<byte>(bytes, 0, bytes.Length), cancellationToken).AsTask();
     }
 }

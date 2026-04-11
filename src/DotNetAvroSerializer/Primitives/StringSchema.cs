@@ -1,3 +1,4 @@
+﻿using System;
 using System.IO;
 using System.Text;
 using System.Threading;
@@ -19,7 +20,7 @@ public class StringSchema
     public static async Task WriteAsync(Stream outputStream, string value, CancellationToken cancellationToken = default)
     {
         var stringBytes = Encoding.UTF8.GetBytes(value);
-        await LongSchema.WriteAsync(outputStream, stringBytes.Length, cancellationToken);
-        await outputStream.WriteAsync(stringBytes, 0, stringBytes.Length, cancellationToken);
+        await LongSchema.WriteAsync(outputStream, stringBytes.Length, cancellationToken).ConfigureAwait(false);
+        await outputStream.WriteAsync(new ReadOnlyMemory<byte>(stringBytes, 0, stringBytes.Length), cancellationToken).ConfigureAwait(false);
     }
 }

@@ -26,12 +26,12 @@ public static class TimestampMicrosSchema
         LongSchema.Write(outputStream, (date - UnixEpochDateTime).Ticks / 10);
     }
 
-    public static async Task WriteAsync(Stream outputStream, DateTime? value, CancellationToken cancellationToken = default)
+    public static Task WriteAsync(Stream outputStream, DateTime? value, CancellationToken cancellationToken = default)
     {
         if (value is null)
             throw new AvroSerializationException("Cannot serialize null value to int");
 
-        await WriteAsync(outputStream, value.Value, cancellationToken);
+        return WriteAsync(outputStream, value.Value, cancellationToken);
     }
 
     public static Task WriteAsync(Stream outputStream, DateTime date, CancellationToken cancellationToken = default)

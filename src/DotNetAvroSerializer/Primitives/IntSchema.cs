@@ -1,3 +1,4 @@
+﻿using System;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
@@ -28,12 +29,12 @@ public static class IntSchema
         outputStream.WriteByte((byte)n);
     }
 
-    public static async Task WriteAsync(Stream outputStream, int? value, CancellationToken cancellationToken = default)
+    public static Task WriteAsync(Stream outputStream, int? value, CancellationToken cancellationToken = default)
     {
         if (value is null)
             throw new AvroSerializationException("Cannot serialize null value to int");
 
-        await WriteAsync(outputStream, value.Value, cancellationToken);
+        return WriteAsync(outputStream, value.Value, cancellationToken);
     }
 
     public static Task WriteAsync(Stream outputStream, int value, CancellationToken cancellationToken = default)
@@ -49,6 +50,6 @@ public static class IntSchema
         }
 
         buffer[length++] = (byte)n;
-        return outputStream.WriteAsync(buffer, 0, length, cancellationToken);
+        return outputStream.WriteAsync(new ReadOnlyMemory<byte>(buffer, 0, length), cancellationToken).AsTask();
     }
 }

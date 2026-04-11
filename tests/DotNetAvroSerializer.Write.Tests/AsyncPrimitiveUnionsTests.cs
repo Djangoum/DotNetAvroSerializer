@@ -15,7 +15,7 @@ public class AsyncPrimitiveUnionsTests
         if (intValue is null) union = longValue!.Value;
         else union = intValue.Value;
 
-        var result = await new IntegerLongSerializer().SerializeAsync(union);
+        var result = await new AsyncIntegerLongSerializer().SerializeAsync(union);
 
         Convert.ToHexString(result).Should().BeEquivalentTo(expected);
     }
@@ -29,7 +29,7 @@ public class AsyncPrimitiveUnionsTests
         if (longValue is null) union = stringValue!;
         else union = longValue.Value;
 
-        var result = await new LongStringSerializer().SerializeAsync(union);
+        var result = await new AsyncLongStringSerializer().SerializeAsync(union);
 
         Convert.ToHexString(result).Should().BeEquivalentTo(expected);
     }
@@ -43,7 +43,7 @@ public class AsyncPrimitiveUnionsTests
         if (boolValue is null) union = doubleValue!.Value;
         else union = boolValue.Value;
 
-        var result = await new BoolDoubleSerializer().SerializeAsync(union);
+        var result = await new AsyncBoolDoubleSerializer().SerializeAsync(union);
 
         Convert.ToHexString(result).Should().BeEquivalentTo(expected);
     }
@@ -57,7 +57,7 @@ public class AsyncPrimitiveUnionsTests
         if (bytesValue is null) union = intValue!.Value;
         else union = bytesValue;
 
-        var result = await new BytesIntSerializer().SerializeAsync(union);
+        var result = await new AsyncBytesIntSerializer().SerializeAsync(union);
 
         Convert.ToHexString(result).Should().BeEquivalentTo(expected);
     }
@@ -71,7 +71,7 @@ public class AsyncPrimitiveUnionsTests
         if (stringValue is null) union = floatValue!.Value;
         else union = stringValue;
 
-        var result = await new StringFloatSerializer().SerializeAsync(union);
+        var result = await new AsyncStringFloatSerializer().SerializeAsync(union);
 
         Convert.ToHexString(result).Should().BeEquivalentTo(expected);
     }
@@ -85,7 +85,7 @@ public class AsyncPrimitiveUnionsTests
         if (bytesValue is null) union = stringValue!;
         else union = bytesValue;
 
-        var result = await new BytesStringSerializer().SerializeAsync(union);
+        var result = await new AsyncBytesStringSerializer().SerializeAsync(union);
 
         Convert.ToHexString(result).Should().BeEquivalentTo(expected);
     }
@@ -104,7 +104,7 @@ public class AsyncPrimitiveUnionsTests
         else if (integer.HasValue) union = integer.Value;
         else union = longValue!.Value;
 
-        var result = await new BytesStringIntLongSerializer().SerializeAsync(union);
+        var result = await new AsyncBytesStringIntLongSerializer().SerializeAsync(union);
 
         Convert.ToHexString(result).Should().BeEquivalentTo(expected);
     }
@@ -121,7 +121,7 @@ public class AsyncPrimitiveUnionsTests
         else if (longValue.HasValue) union = longValue.Value;
         else union = Null.Instance;
 
-        var result = await new IntLongNullSerializer().SerializeAsync(union);
+        var result = await new AsyncIntLongNullSerializer().SerializeAsync(union);
 
         Convert.ToHexString(result).Should().BeEquivalentTo(expected);
     }
@@ -136,7 +136,7 @@ public class AsyncPrimitiveUnionsTests
         else union = intValue.Value;
         using var stream = new MemoryStream();
 
-        await new IntegerLongSerializer().SerializeToStreamAsync(stream, union);
+        await new AsyncIntegerLongSerializer().SerializeToStreamAsync(stream, union);
 
         Convert.ToHexString(stream.ToArray()).Should().BeEquivalentTo(expected);
     }
@@ -151,9 +151,33 @@ public class AsyncPrimitiveUnionsTests
         else union = boolValue.Value;
         using var stream = new MemoryStream();
 
-        await new BoolDoubleSerializer().SerializeToStreamAsync(stream, union);
+        await new AsyncBoolDoubleSerializer().SerializeToStreamAsync(stream, union);
 
         Convert.ToHexString(stream.ToArray()).Should().BeEquivalentTo(expected);
     }
 }
 #pragma warning restore CA2007
+
+[AvroSchema(@"{ ""type"": [""int"", ""long""] }")]
+public partial class AsyncIntegerLongSerializer : AsyncAvroSerializer<Union<int, long>> { }
+
+[AvroSchema(@"{ ""type"": [""long"", ""string""] }")]
+public partial class AsyncLongStringSerializer : AsyncAvroSerializer<Union<long, string>> { }
+
+[AvroSchema(@"{ ""type"": [ ""boolean"", ""double""] }")]
+public partial class AsyncBoolDoubleSerializer : AsyncAvroSerializer<Union<bool, double>> { }
+
+[AvroSchema(@"{ ""type"": [ ""bytes"", ""int"" ] }")]
+public partial class AsyncBytesIntSerializer : AsyncAvroSerializer<Union<byte[], int>> { }
+
+[AvroSchema(@"{ ""type"": [ ""string"", ""float"" ] }")]
+public partial class AsyncStringFloatSerializer : AsyncAvroSerializer<Union<string, float>> { }
+
+[AvroSchema(@"{ ""type"": [ ""bytes"", ""string"" ] }")]
+public partial class AsyncBytesStringSerializer : AsyncAvroSerializer<Union<byte[], string>> { }
+
+[AvroSchema(@"{ ""type"": [ ""bytes"", ""string"", ""int"", ""long"" ] }")]
+public partial class AsyncBytesStringIntLongSerializer : AsyncAvroSerializer<Union<byte[], string, int, long>> { }
+
+[AvroSchema(@"{ ""type"": [ ""int"", ""long"", ""null"" ] }")]
+public partial class AsyncIntLongNullSerializer : AsyncAvroSerializer<Union<int, long, Null>> { }

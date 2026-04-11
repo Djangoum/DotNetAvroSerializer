@@ -18,14 +18,14 @@ dotnet add package DotnetAvroSerializer
 
 Dotnet Avro Serializer is a powerful tool that automates the creation of serializers from Avro schemas and C# types. It streamlines the process of converting your C# objects into Avro binary serialized data effortlessly.
 
-Whenever avro serializer finds a **public partial class** inheriting **AvroSerializer<>** and have an **AvroSchema** attribute with a valid and corresponding avro schema it will generate serialization code. 
+Whenever avro serializer finds a **public partial class** inheriting **AvroSerializer<>** or **AsyncAvroSerializer<>** and have an **AvroSchema** attribute with a valid and corresponding avro schema it will generate serialization code.
 
-Currently Dotnet Avro Serializer generates the following APIs: 
+Currently Dotnet Avro Serializer generates APIs based on the base type:
 
-- **Serialize** : Takes an instance of the generic parameter provided to **AvroSerializer<>** and returns an array of bytes containing avro binary serialized data.
-- **SerializeToStream** : Takes a **Stream** and an instance of the generic parameter provided to **AvroSerializer<>**. Writes binary serialized data to the stream. 
-- **SerializeAsync** : Asynchronously serializes the source instance and returns a byte array.
-- **SerializeToStreamAsync** : Asynchronously writes serialized data to a target stream and supports cancellation.
+- **AvroSerializer<>** (sync): **Serialize**, **SerializeToStream**
+- **AsyncAvroSerializer<>** (async): **SerializeAsync**, **SerializeToStreamAsync**
+
+`IAsyncEnumerable<T>` is supported only for **AsyncAvroSerializer<>**.
 
 Simplest example of avro serializer would be serializing a primitive type like an int
 ```csharp
@@ -36,7 +36,7 @@ public partial class IntSerializer : AvroSerializer<int>
 }
 ```
 
-Generated code looks like this
+Generated code for a sync serializer looks like this
 ```csharp
 public partial class IntSerializer
 {
@@ -50,18 +50,6 @@ public partial class IntSerializer
     public override void SerializeToStream(Stream outputStream, int source)
     {
         IntSchema.Write(outputStream, source);
-    }
-
-    public override async Task<byte[]> SerializeAsync(int source, CancellationToken cancellationToken = default)
-    {
-        var outputStream = new MemoryStream();
-        await SerializeToStreamAsync(outputStream, source, cancellationToken);
-        return outputStream.ToArray();
-    }
-
-    public override async Task SerializeToStreamAsync(Stream outputStream, int source, CancellationToken cancellationToken = default)
-    {
-        await IntSchema.WriteAsync(outputStream, source, cancellationToken);
     }
 }
 ```

@@ -1,12 +1,13 @@
 using System.Text;
 using DotNetAvroSerializer.Generators.Helpers;
+using DotNetAvroSerializer.Generators.Models;
 using Microsoft.CodeAnalysis.Text;
 
 namespace DotNetAvroSerializer.Generators.Write;
 
 public partial class AvroSerializerSourceGenerator
 {
-    private static SourceText GetGeneratedSerializationSource(string serializerNamespace, string serializerClassName, string serializableFullyQualifiedTypeName, string serializeCode, string serializeCodeAsync, string privateMembersCode)
+    private static SourceText GetGeneratedSerializationSource(string serializerNamespace, string serializerClassName, string serializableFullyQualifiedTypeName, SerializerApiKind serializerApiKind, string serializeCode, string serializeCodeAsync, string privateMembersCode)
     {
         var writer = new IndentedTextWriter();
 
@@ -25,72 +26,76 @@ public partial class AvroSerializerSourceGenerator
 
         using (writer.WriteBlock())
         {
-            writer.WriteLine($"public override byte[] Serialize({serializableFullyQualifiedTypeName} source)");
-            using (writer.WriteBlock())
+            if (serializerApiKind is SerializerApiKind.Sync)
             {
-                writer.WriteLine("var outputStream = new MemoryStream();");
-                writer.WriteLine("SerializeToStream(outputStream, source);");
-                writer.WriteLine("return outputStream.ToArray();");
-            }
-
-            writer.WriteLine();
-            writer.WriteLine($"public override void SerializeToStream(Stream outputStream, {serializableFullyQualifiedTypeName} source)");
-            using (writer.WriteBlock())
-            {
-                writer.Write(serializeCode, isMultiline: true);
-            }
-
-            writer.WriteLine();
-            writer.WriteLine($"public override async Task<byte[]> SerializeAsync({serializableFullyQualifiedTypeName} source, CancellationToken cancellationToken = default)");
-            using (writer.WriteBlock())
-            {
-                writer.WriteLine("var outputStream = new MemoryStream();");
-                writer.WriteLine("await SerializeToStreamAsync(outputStream, source, cancellationToken);");
-                writer.WriteLine("return outputStream.ToArray();");
-            }
-
-            writer.WriteLine();
-            writer.WriteLine($"public override async Task SerializeToStreamAsync(Stream outputStream, {serializableFullyQualifiedTypeName} source, CancellationToken cancellationToken = default)");
-            using (writer.WriteBlock())
-            {
-                writer.Write(serializeCodeAsync, isMultiline: true);
-            }
-
-            writer.WriteLine();
-            writer.WriteLine("private static long GetCollectionCount<T>(IEnumerable<T> source)");
-            using (writer.WriteBlock())
-            {
-                writer.WriteLine("if (source is null)");
+                writer.WriteLine($"public override byte[] Serialize({serializableFullyQualifiedTypeName} source)");
                 using (writer.WriteBlock())
                 {
-                    writer.WriteLine("throw new global::System.ArgumentNullException(nameof(source));");
+                    writer.WriteLine("var outputStream = new MemoryStream();");
+                    writer.WriteLine("SerializeToStream(outputStream, source);");
+                    writer.WriteLine("return outputStream.ToArray();");
                 }
 
                 writer.WriteLine();
-                writer.WriteLine("if (source is ICollection<T> collection)");
+                writer.WriteLine($"public override void SerializeToStream(Stream outputStream, {serializableFullyQualifiedTypeName} source)");
                 using (writer.WriteBlock())
                 {
-                    writer.WriteLine("return collection.Count;");
+                    writer.Write(serializeCode, isMultiline: true);
                 }
 
                 writer.WriteLine();
-                writer.WriteLine("if (source is IReadOnlyCollection<T> readOnlyCollection)");
+                writer.WriteLine("private static long GetCollectionCount<T>(IEnumerable<T> source)");
                 using (writer.WriteBlock())
                 {
-                    writer.WriteLine("return readOnlyCollection.Count;");
+                    writer.WriteLine("if (source is null)");
+                    using (writer.WriteBlock())
+                    {
+                        writer.WriteLine("throw new global::System.ArgumentNullException(nameof(source));");
+                    }
+
+                    writer.WriteLine();
+                    writer.WriteLine("if (source is ICollection<T> collection)");
+                    using (writer.WriteBlock())
+                    {
+                        writer.WriteLine("return collection.Count;");
+                    }
+
+                    writer.WriteLine();
+                    writer.WriteLine("if (source is IReadOnlyCollection<T> readOnlyCollection)");
+                    using (writer.WriteBlock())
+                    {
+                        writer.WriteLine("return readOnlyCollection.Count;");
+                    }
+
+                    writer.WriteLine();
+                    writer.WriteLine("long count = 0;");
+                    writer.WriteLine();
+                    writer.WriteLine("foreach (var _ in source)");
+                    using (writer.WriteBlock())
+                    {
+                        writer.WriteLine("count++;");
+                    }
+
+                    writer.WriteLine();
+                    writer.WriteLine("return count;");
+                }
+            }
+            else
+            {
+                writer.WriteLine($"public override async Task<byte[]> SerializeAsync({serializableFullyQualifiedTypeName} source, CancellationToken cancellationToken = default)");
+                using (writer.WriteBlock())
+                {
+                    writer.WriteLine("var outputStream = new MemoryStream();");
+                    writer.WriteLine("await SerializeToStreamAsync(outputStream, source, cancellationToken);");
+                    writer.WriteLine("return outputStream.ToArray();");
                 }
 
                 writer.WriteLine();
-                writer.WriteLine("long count = 0;");
-                writer.WriteLine();
-                writer.WriteLine("foreach (var _ in source)");
+                writer.WriteLine($"public override async Task SerializeToStreamAsync(Stream outputStream, {serializableFullyQualifiedTypeName} source, CancellationToken cancellationToken = default)");
                 using (writer.WriteBlock())
                 {
-                    writer.WriteLine("count++;");
+                    writer.Write(serializeCodeAsync, isMultiline: true);
                 }
-
-                writer.WriteLine();
-                writer.WriteLine("return count;");
             }
 
             if (!string.IsNullOrWhiteSpace(privateMembersCode))

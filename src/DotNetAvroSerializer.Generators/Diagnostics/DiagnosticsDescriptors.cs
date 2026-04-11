@@ -106,11 +106,11 @@ public static class DiagnosticsDescriptors
     public static DiagnosticDescriptor SerializerMustInheritFromAvroSerializerDescriptor =>
         new DiagnosticDescriptor(
             id: "AVRO00011",
-            title: "Serializer must inherit from AvroSerializer<T>",
-            messageFormat: $"{{0}} must inherit from DotNetAvroSerializer.AvroSerializer<T>",
+            title: "Serializer must inherit from AvroSerializer<T> or AsyncAvroSerializer<T>",
+            messageFormat: $"{{0}} must inherit from DotNetAvroSerializer.AvroSerializer<T> or DotNetAvroSerializer.AsyncAvroSerializer<T>",
             category: typeof(AvroSerializerSourceGenerator).FullName,
             defaultSeverity: DiagnosticSeverity.Error,
             isEnabledByDefault: true,
-            description: $"Avro serializers must directly inherit from DotNetAvroSerializer.AvroSerializer<T>."
+            description: $"Avro serializers must directly inherit from DotNetAvroSerializer.AvroSerializer<T> or DotNetAvroSerializer.AsyncAvroSerializer<T>."
         );
 }

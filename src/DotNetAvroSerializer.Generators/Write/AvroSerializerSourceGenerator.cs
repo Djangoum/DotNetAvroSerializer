@@ -51,6 +51,7 @@ public partial class AvroSerializerSourceGenerator : IIncrementalGenerator
                         serializerData.SerializerNamespace,
                         serializerData.SerializerClassName,
                         serializerData.SerializableTypeMetadata.FullNameDisplay,
+                        serializerData.SerializerApiKind,
                         serializationCode,
                         asyncSerializationCode,
                         privateFieldsCode));
@@ -107,9 +108,9 @@ public partial class AvroSerializerSourceGenerator : IIncrementalGenerator
         ct.ThrowIfCancellationRequested();
 
         var serializerSymbol = (INamedTypeSymbol)ctx.TargetSymbol;
-        var serializableType = GetSerializableTypeSymbol(serializerSymbol, ctx.SemanticModel.Compilation);
+        var serializerTypeData = GetSerializerTypeData(serializerSymbol, ctx.SemanticModel.Compilation);
 
-        if (serializableType is null)
+        if (serializerTypeData is null)
         {
             diagnostics = diagnostics.Add(Diagnostic.Create(
                 DiagnosticsDescriptors.SerializerMustInheritFromAvroSerializerDescriptor,
@@ -118,6 +119,7 @@ public partial class AvroSerializerSourceGenerator : IIncrementalGenerator
             return (null, diagnostics);
         }
 
+        var (serializableType, serializerApiKind) = serializerTypeData.Value;
         var serializableTypeMetadata = SerializableTypeMetadata.From(serializableType, ctx.SemanticModel.Compilation);
 
         if (serializableTypeMetadata is null)
@@ -135,37 +137,62 @@ public partial class AvroSerializerSourceGenerator : IIncrementalGenerator
             Namespaces.GetNamespace(serializerSyntax),
             schema,
             serializableTypeMetadata,
+            serializerApiKind,
             customLogicalTypeNames,
             smallLocation);
 
         return (serializerMetadata, diagnostics);
     }
 
-    private static ITypeSymbol GetSerializableTypeSymbol(INamedTypeSymbol serializerSymbol, Compilation compilation)
+    private static (ITypeSymbol serializableType, SerializerApiKind serializerApiKind)? GetSerializerTypeData(INamedTypeSymbol serializerSymbol, Compilation compilation)
     {
         var avroSerializerType = compilation.GetTypeByMetadataName("DotNetAvroSerializer.AvroSerializer`1");
+        var asyncAvroSerializerType = compilation.GetTypeByMetadataName("DotNetAvroSerializer.AsyncAvroSerializer`1");
 
         if (serializerSymbol.BaseType is not { IsGenericType: true, TypeArguments.Length: 1 } baseType)
         {
             return null;
         }
 
-        return SymbolEqualityComparer.Default.Equals(baseType.OriginalDefinition, avroSerializerType)
-            ? baseType.TypeArguments[0]
-            : null;
+        if (SymbolEqualityComparer.Default.Equals(baseType.OriginalDefinition, avroSerializerType))
+        {
+            return (baseType.TypeArguments[0], SerializerApiKind.Sync);
+        }
+
+        if (SymbolEqualityComparer.Default.Equals(baseType.OriginalDefinition, asyncAvroSerializerType))
+        {
+            return (baseType.TypeArguments[0], SerializerApiKind.Async);
+        }
+
+        return null;
     }
 
     private static (string serializationCode, string asyncSerializationCode, string privateFieldsCode, Diagnostic diagnostic) SerializationCodeGeneratorLoop(SerializerMetadata serializerMetadata, Schema schema)
     {
         try
         {
-            var syncContext = AvroGenerationContext.From(serializerMetadata, schema, SerializationMode.Sync);
-            schema.Generate(syncContext);
+            var syncSerializationCode = string.Empty;
+            var asyncSerializationCode = string.Empty;
+            var privateFieldsCode = string.Empty;
 
-            var asyncContext = AvroGenerationContext.From(serializerMetadata, schema, SerializationMode.Async);
-            schema.Generate(asyncContext);
+            if (serializerMetadata.SerializerApiKind is SerializerApiKind.Sync)
+            {
+                var syncContext = AvroGenerationContext.From(serializerMetadata, schema, SerializationMode.Sync);
+                schema.Generate(syncContext);
 
-            return (syncContext.SerializationCode.ToString(), asyncContext.SerializationCode.ToString(), syncContext.PrivateFieldsCode.ToString(), null);
+                syncSerializationCode = syncContext.SerializationCode.ToString();
+                privateFieldsCode = syncContext.PrivateFieldsCode.ToString();
+            }
+            else
+            {
+                var asyncContext = AvroGenerationContext.From(serializerMetadata, schema, SerializationMode.Async);
+                schema.Generate(asyncContext);
+
+                asyncSerializationCode = asyncContext.SerializationCode.ToString();
+                privateFieldsCode = asyncContext.PrivateFieldsCode.ToString();
+            }
+
+            return (syncSerializationCode, asyncSerializationCode, privateFieldsCode, null);
         }
         catch (AvroGeneratorException ex)
         {

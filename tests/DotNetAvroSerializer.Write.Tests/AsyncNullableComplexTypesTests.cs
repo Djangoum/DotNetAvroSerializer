@@ -10,7 +10,7 @@ public class AsyncNullableComplexTypesTests
     [Fact]
     public async Task SerializeNullableRecordValueAsync()
     {
-        var result = await new NullableRecordSerializer().SerializeAsync(new UnionSideOne { Id = 1, Name = "name" });
+        var result = await new AsyncNullableRecordSerializer().SerializeAsync(new UnionSideOne { Id = 1, Name = "name" });
 
         Convert.ToHexString(result).Should().BeEquivalentTo("0002086E616D65");
     }
@@ -18,7 +18,7 @@ public class AsyncNullableComplexTypesTests
     [Fact]
     public async Task SerializeNullableRecordNullAsync()
     {
-        var result = await new NullableRecordSerializer().SerializeAsync(null);
+        var result = await new AsyncNullableRecordSerializer().SerializeAsync(null);
 
         Convert.ToHexString(result).Should().BeEquivalentTo("02");
     }
@@ -46,7 +46,7 @@ public class AsyncNullableComplexTypesTests
     {
         using var stream = new MemoryStream();
 
-        await new NullableRecordSerializer().SerializeToStreamAsync(stream, new UnionSideOne { Id = 1, Name = "name" });
+        await new AsyncNullableRecordSerializer().SerializeToStreamAsync(stream, new UnionSideOne { Id = 1, Name = "name" });
 
         Convert.ToHexString(stream.ToArray()).Should().BeEquivalentTo("0002086E616D65");
     }
@@ -56,7 +56,7 @@ public class AsyncNullableComplexTypesTests
     {
         using var stream = new MemoryStream();
 
-        await new NullableRecordSerializer().SerializeToStreamAsync(stream, null);
+        await new AsyncNullableRecordSerializer().SerializeToStreamAsync(stream, null);
 
         Convert.ToHexString(stream.ToArray()).Should().BeEquivalentTo("02");
     }
@@ -95,3 +95,26 @@ public class AsyncNullableComplexTypesTests
         };
 }
 #pragma warning restore CA2007
+
+[AvroSchema(@"{
+         ""type"": [
+             {
+                 ""type"": ""record"",
+                 ""name"" : ""unionSideOne"",
+                 ""fields"": [
+                     {
+                         ""name"": ""id"",
+                         ""type"": ""int""
+                     },
+                     {
+                         ""name"": ""name"",
+                         ""type"": ""string""
+                     }
+                 ]
+             },
+             {
+                ""type"": ""null""
+            }
+         ]
+     }")]
+public partial class AsyncNullableRecordSerializer : AsyncAvroSerializer<UnionSideOne?> { }

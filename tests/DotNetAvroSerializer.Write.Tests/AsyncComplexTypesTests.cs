@@ -16,6 +16,19 @@ public class AsyncComplexTypesTests
     }
 
     [Fact]
+    public async Task SerializeArrayOfIntsAsync_WithStreamingBlocks()
+    {
+        var serializer = new IntArraySerializer
+        {
+            AsyncArrayItemCountBlockSize = 2
+        };
+
+        var result = await serializer.SerializeAsync(new int[] { 1, 2, 3, 4 });
+
+        Convert.ToHexString(result).Should().BeEquivalentTo("04020404060800");
+    }
+
+    [Fact]
     public async Task SerializeEnumAsync()
     {
         var result = await new AsyncEnumSerializer().SerializeAsync(TestEnum.Value3);
@@ -50,6 +63,24 @@ public class AsyncComplexTypesTests
     }
 
     [Fact]
+    public async Task SerializeMapOfIntsWithDictionaryAsync_WithStreamingBlocks()
+    {
+        var serializer = new DictionaryMapSerializer
+        {
+            AsyncArrayItemCountBlockSize = 2
+        };
+
+        var result = await serializer.SerializeAsync(new Dictionary<string, int>
+        {
+            { "item1", 1 },
+            { "item2", 2 },
+            { "item3", 3 }
+        });
+
+        Convert.ToHexString(result).Should().BeEquivalentTo("040A6974656D31020A6974656D3204020A6974656D330600");
+    }
+
+    [Fact]
     public async Task SerializeArrayOfRecordsAsync()
     {
         var result = await new ArrayOfRecordsSerializer().SerializeAsync(new List<InnerRecord>
@@ -59,6 +90,42 @@ public class AsyncComplexTypesTests
         });
 
         Convert.ToHexString(result).Should().BeEquivalentTo("040E686F6C69776973040E686F6C697769730400");
+    }
+
+    [Fact]
+    public async Task SerializeArrayOfRecordsAsync_WithStreamingBlocks()
+    {
+        var serializer = new ArrayOfRecordsSerializer
+        {
+            AsyncArrayItemCountBlockSize = 2
+        };
+
+        var result = await serializer.SerializeAsync(new List<InnerRecord>
+        {
+            new InnerRecord { Field1 = "holiwis", Field2 = 2 },
+            new InnerRecord { Field1 = "holiwis", Field2 = 2 },
+            new InnerRecord { Field1 = "holiwis", Field2 = 2 }
+        });
+
+        Convert.ToHexString(result).Should().BeEquivalentTo("040E686F6C69776973040E686F6C6977697304020E686F6C697769730400");
+    }
+
+    [Fact]
+    public async Task SerializeMapOfRecordsAsync_WithStreamingBlocks()
+    {
+        var serializer = new AsyncMapOfRecordsSerializer
+        {
+            AsyncArrayItemCountBlockSize = 2
+        };
+
+        var result = await serializer.SerializeAsync(new Dictionary<string, InnerRecord>
+        {
+            { "item1", new InnerRecord { Field1 = "holiwis", Field2 = 2 } },
+            { "item2", new InnerRecord { Field1 = "holiwis", Field2 = 2 } },
+            { "item3", new InnerRecord { Field1 = "holiwis", Field2 = 2 } }
+        });
+
+        Convert.ToHexString(result).Should().BeEquivalentTo("040A6974656D310E686F6C69776973040A6974656D320E686F6C6977697304020A6974656D330E686F6C697769730400");
     }
 
     [Fact]
@@ -252,9 +319,9 @@ public partial class AsyncFixedSerializer : AsyncAvroSerializer<byte[]> { }
 public partial class AsyncClassWithPrimitivesSerializer : AsyncAvroSerializer<ClassWithPrimitives> { }
 
 [AvroSchema(@"{
-         ""type"": ""record"",
-         ""name"" : ""recordWithComplexTypes"",
-         ""fields"" :[
+          ""type"": ""record"",
+          ""name"" : ""recordWithComplexTypes"",
+          ""fields"" :[
              {
                  ""name"": ""InnerRecord"",
                  ""type"": {
@@ -298,6 +365,25 @@ public partial class AsyncClassWithPrimitivesSerializer : AsyncAvroSerializer<Cl
                      ""values"": ""InnerRecord""
                  }
              }
-         ]
-     }")]
+          ]
+      }")]
 public partial class AsyncRecordWithComplexTypesSerializer : AsyncAvroSerializer<RecordWithComplexTypes> { }
+
+[AvroSchema(@"{
+         ""type"" : ""map"",
+         ""values"": {
+             ""name"": ""InnerRecord"",
+             ""type"": ""record"",
+             ""fields"": [
+                 {
+                     ""name"": ""Field1"",
+                     ""type"": ""string""
+                 },
+                 {
+                     ""name"": ""Field2"",
+                     ""type"": ""int""
+                 }
+             ]
+         }
+     }")]
+public partial class AsyncMapOfRecordsSerializer : AsyncAvroSerializer<Dictionary<string, InnerRecord>> { }

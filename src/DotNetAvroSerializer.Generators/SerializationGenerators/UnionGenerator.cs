@@ -23,19 +23,11 @@ internal static class UnionGenerator
 
                 var canSerializedCheck = GetCanSerializeCheck(schema, $"{context.SourceAccessor}.GetUnionValue()", context.CustomLogicalTypesMetadata, unionTypeSerializableTypeMetadata.FullNameDisplay);
 
-                if (unionSchemaIndex == 0)
-                {
-                    context.SerializationCode.AppendLine($"if ({canSerializedCheck}) {{");
-                    context.AsyncSerializationCode.AppendLine($"if ({canSerializedCheck}) {{");
-                }
-                else
-                {
-                    context.SerializationCode.AppendLine($"else if ({canSerializedCheck}) {{");
-                    context.AsyncSerializationCode.AppendLine($"else if ({canSerializedCheck}) {{");
-                }
+                context.SerializationCode.AppendLine(unionSchemaIndex == 0
+                    ? $"if ({canSerializedCheck}) {{"
+                    : $"else if ({canSerializedCheck}) {{");
 
-                context.SerializationCode.AppendLine($"IntSchema.Write(outputStream, {unionSchemaIndex});");
-                context.AsyncSerializationCode.AppendLine($"await IntSchema.WriteAsync(outputStream, {unionSchemaIndex}, cancellationToken);");
+                context.SerializationCode.AppendLine(context.WriteCall("IntSchema", unionSchemaIndex.ToString()));
 
                 schema.Generate(context with
                 {
@@ -45,25 +37,16 @@ internal static class UnionGenerator
                 });
 
                 context.SerializationCode.AppendLine("}");
-                context.AsyncSerializationCode.AppendLine("}");
             }
             else if (context.SerializableTypeMetadata is NullableSerializableTypeMetadata or RecordSerializableTypeMetadata { IsNullable: true } or DictionarySerializableTypeMetadata or IterableSerializableTypeMetadata)
             {
                 var canSerializedCheck = GetCanSerializeCheck(schema, context.SourceAccessor, context.CustomLogicalTypesMetadata, context.SerializableTypeMetadata.FullNameDisplay);
 
-                if (unionSchemaIndex == 0)
-                {
-                    context.SerializationCode.AppendLine($"if ({canSerializedCheck}) {{");
-                    context.AsyncSerializationCode.AppendLine($"if ({canSerializedCheck}) {{");
-                }
-                else
-                {
-                    context.SerializationCode.AppendLine($"else if ({canSerializedCheck}) {{");
-                    context.AsyncSerializationCode.AppendLine($"else if ({canSerializedCheck}) {{");
-                }
+                context.SerializationCode.AppendLine(unionSchemaIndex == 0
+                    ? $"if ({canSerializedCheck}) {{"
+                    : $"else if ({canSerializedCheck}) {{");
 
-                context.SerializationCode.AppendLine($"IntSchema.Write(outputStream, {unionSchemaIndex});");
-                context.AsyncSerializationCode.AppendLine($"await IntSchema.WriteAsync(outputStream, {unionSchemaIndex}, cancellationToken);");
+                context.SerializationCode.AppendLine(context.WriteCall("IntSchema", unionSchemaIndex.ToString()));
 
                 schema.Generate(context with
                 {
@@ -72,7 +55,6 @@ internal static class UnionGenerator
                 });
 
                 context.SerializationCode.AppendLine("}");
-                context.AsyncSerializationCode.AppendLine("}");
             }
             else
             {

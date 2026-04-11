@@ -158,11 +158,13 @@ public partial class AvroSerializerSourceGenerator : IIncrementalGenerator
     {
         try
         {
-            var generationContext = AvroGenerationContext.From(serializerMetadata, schema);
+            var syncContext = AvroGenerationContext.From(serializerMetadata, schema, SerializationMode.Sync);
+            schema.Generate(syncContext);
 
-            schema.Generate(generationContext);
+            var asyncContext = AvroGenerationContext.From(serializerMetadata, schema, SerializationMode.Async);
+            schema.Generate(asyncContext);
 
-            return (generationContext.SerializationCode.ToString(), generationContext.AsyncSerializationCode.ToString(), generationContext.PrivateFieldsCode.ToString(), null);
+            return (syncContext.SerializationCode.ToString(), asyncContext.SerializationCode.ToString(), syncContext.PrivateFieldsCode.ToString(), null);
         }
         catch (AvroGeneratorException ex)
         {

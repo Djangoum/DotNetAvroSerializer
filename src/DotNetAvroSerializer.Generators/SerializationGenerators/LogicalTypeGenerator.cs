@@ -22,36 +22,21 @@ internal static class LogicalTypeGenerator
             var serializerCallCode = schema.LogicalTypeName switch
             {
                 "date" when logicalTypeName.TypeName.Equals(nameof(DateTime), StringComparison.InvariantCultureIgnoreCase)
-                           || logicalTypeName.TypeName.Equals(nameof(DateOnly), StringComparison.InvariantCultureIgnoreCase) => $"DateSchema.Write(outputStream, {context.SourceAccessor});",
-                "uuid" when logicalTypeName.TypeName.Equals(nameof(Guid), StringComparison.InvariantCultureIgnoreCase) => $"UuidSchema.Write(outputStream, {context.SourceAccessor});",
-                "time-millis" when logicalTypeName.TypeName.Equals(nameof(TimeOnly), StringComparison.InvariantCultureIgnoreCase) => $"TimeMillisSchema.Write(outputStream, {context.SourceAccessor});",
-                "time-micros" when logicalTypeName.TypeName.Equals(nameof(TimeOnly), StringComparison.InvariantCultureIgnoreCase) => $"TimeMicrosSchema.Write(outputStream, {context.SourceAccessor});",
-                "timestamp-millis" when logicalTypeName.TypeName.Equals(nameof(DateTime), StringComparison.InvariantCultureIgnoreCase) => $"TimestampMillisSchema.Write(outputStream, {context.SourceAccessor});",
-                "timestamp-micros" when logicalTypeName.TypeName.Equals(nameof(DateTime), StringComparison.InvariantCultureIgnoreCase) => $"TimestampMicrosSchema.Write(outputStream, {context.SourceAccessor});",
-                "local-timestamp-millis" when logicalTypeName.TypeName.Equals(nameof(DateTime), StringComparison.InvariantCultureIgnoreCase) => $"TimestampMillisSchema.Write(outputStream, {context.SourceAccessor});",
-                "local-timestamp-micros" when logicalTypeName.TypeName.Equals(nameof(DateTime), StringComparison.InvariantCultureIgnoreCase) => $"TimestampMicrosSchema.Write(outputStream, {context.SourceAccessor});",
+                            || logicalTypeName.TypeName.Equals(nameof(DateOnly), StringComparison.InvariantCultureIgnoreCase) => context.WriteCall("DateSchema", context.SourceAccessor),
+                "uuid" when logicalTypeName.TypeName.Equals(nameof(Guid), StringComparison.InvariantCultureIgnoreCase) => context.WriteCall("UuidSchema", context.SourceAccessor),
+                "time-millis" when logicalTypeName.TypeName.Equals(nameof(TimeOnly), StringComparison.InvariantCultureIgnoreCase) => context.WriteCall("TimeMillisSchema", context.SourceAccessor),
+                "time-micros" when logicalTypeName.TypeName.Equals(nameof(TimeOnly), StringComparison.InvariantCultureIgnoreCase) => context.WriteCall("TimeMicrosSchema", context.SourceAccessor),
+                "timestamp-millis" when logicalTypeName.TypeName.Equals(nameof(DateTime), StringComparison.InvariantCultureIgnoreCase) => context.WriteCall("TimestampMillisSchema", context.SourceAccessor),
+                "timestamp-micros" when logicalTypeName.TypeName.Equals(nameof(DateTime), StringComparison.InvariantCultureIgnoreCase) => context.WriteCall("TimestampMicrosSchema", context.SourceAccessor),
+                "local-timestamp-millis" when logicalTypeName.TypeName.Equals(nameof(DateTime), StringComparison.InvariantCultureIgnoreCase) => context.WriteCall("TimestampMillisSchema", context.SourceAccessor),
+                "local-timestamp-micros" when logicalTypeName.TypeName.Equals(nameof(DateTime), StringComparison.InvariantCultureIgnoreCase) => context.WriteCall("TimestampMicrosSchema", context.SourceAccessor),
 
-                _ => null
-            };
-
-            var serializerCallCodeAsync = schema.LogicalTypeName switch
-            {
-                "date" when logicalTypeName.TypeName.Equals(nameof(DateTime), StringComparison.InvariantCultureIgnoreCase)
-                           || logicalTypeName.TypeName.Equals(nameof(DateOnly), StringComparison.InvariantCultureIgnoreCase) => $"await DateSchema.WriteAsync(outputStream, {context.SourceAccessor}, cancellationToken);",
-                "uuid" when logicalTypeName.TypeName.Equals(nameof(Guid), StringComparison.InvariantCultureIgnoreCase) => $"await UuidSchema.WriteAsync(outputStream, {context.SourceAccessor}, cancellationToken);",
-                "time-millis" when logicalTypeName.TypeName.Equals(nameof(TimeOnly), StringComparison.InvariantCultureIgnoreCase) => $"await TimeMillisSchema.WriteAsync(outputStream, {context.SourceAccessor}, cancellationToken);",
-                "time-micros" when logicalTypeName.TypeName.Equals(nameof(TimeOnly), StringComparison.InvariantCultureIgnoreCase) => $"await TimeMicrosSchema.WriteAsync(outputStream, {context.SourceAccessor}, cancellationToken);",
-                "timestamp-millis" when logicalTypeName.TypeName.Equals(nameof(DateTime), StringComparison.InvariantCultureIgnoreCase) => $"await TimestampMillisSchema.WriteAsync(outputStream, {context.SourceAccessor}, cancellationToken);",
-                "timestamp-micros" when logicalTypeName.TypeName.Equals(nameof(DateTime), StringComparison.InvariantCultureIgnoreCase) => $"await TimestampMicrosSchema.WriteAsync(outputStream, {context.SourceAccessor}, cancellationToken);",
-                "local-timestamp-millis" when logicalTypeName.TypeName.Equals(nameof(DateTime), StringComparison.InvariantCultureIgnoreCase) => $"await TimestampMillisSchema.WriteAsync(outputStream, {context.SourceAccessor}, cancellationToken);",
-                "local-timestamp-micros" when logicalTypeName.TypeName.Equals(nameof(DateTime), StringComparison.InvariantCultureIgnoreCase) => $"await TimestampMicrosSchema.WriteAsync(outputStream, {context.SourceAccessor}, cancellationToken);",
                 _ => null
             };
 
             if (serializerCallCode is not null)
             {
                 context.SerializationCode.AppendLine(serializerCallCode);
-                context.AsyncSerializationCode.AppendLine(serializerCallCodeAsync);
             }
             else
             {

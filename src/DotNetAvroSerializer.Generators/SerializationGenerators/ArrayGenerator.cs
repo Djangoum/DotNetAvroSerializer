@@ -16,24 +16,20 @@ internal static class ArrayGenerator
             throw new AvroGeneratorException(
                 $"Array type for {schema!.Name} is not satisfied {context.SerializableTypeMetadata?.FullNameDisplay} provided, arrays must be arrays or anything that implements IEnumerable");
 
-        context.SerializationCode.AppendLine($"if ({context.SourceAccessor}.Count() > 0) LongSchema.Write(outputStream, (long){context.SourceAccessor}.Count());");
-        context.AsyncSerializationCode.AppendLine($"if ({context.SourceAccessor}.Count() > 0) await LongSchema.WriteAsync(outputStream, (long){context.SourceAccessor}.Count(), cancellationToken);");
-        context.SerializationCode.AppendLine($"foreach(var item{VariableNamesHelpers.RemoveSpecialCharacters(context.SourceAccessor)} in {context.SourceAccessor})");
-        context.AsyncSerializationCode.AppendLine($"foreach(var item{VariableNamesHelpers.RemoveSpecialCharacters(context.SourceAccessor)} in {context.SourceAccessor})");
-        context.SerializationCode.AppendLine("{");
-        context.AsyncSerializationCode.AppendLine("{");
+        var itemVar = $"item{VariableNamesHelpers.RemoveSpecialCharacters(context.SourceAccessor)}";
 
-        schema!.ItemSchema.Generate(context
-            with
+        context.SerializationCode.AppendLine($"if ({context.SourceAccessor}.Count() > 0) {context.WriteCall("LongSchema", $"(long){context.SourceAccessor}.Count()")}");
+        context.SerializationCode.AppendLine($"foreach(var {itemVar} in {context.SourceAccessor})");
+        context.SerializationCode.AppendLine("{");
+
+        schema!.ItemSchema.Generate(context with
         {
             Schema = schema!.ItemSchema,
-            SourceAccessor = $"item{VariableNamesHelpers.RemoveSpecialCharacters(context.SourceAccessor)}",
+            SourceAccessor = itemVar,
             SerializableTypeMetadata = iterableSerializableTypeMetadata.ItemsTypeMetadata
         });
 
         context.SerializationCode.AppendLine("}");
-        context.AsyncSerializationCode.AppendLine("}");
-        context.SerializationCode.AppendLine("LongSchema.Write(outputStream, 0L);");
-        context.AsyncSerializationCode.AppendLine("await LongSchema.WriteAsync(outputStream, 0L, cancellationToken);");
+        context.SerializationCode.AppendLine(context.WriteCall("LongSchema", "0L"));
     }
 }

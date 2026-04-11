@@ -16,11 +16,8 @@ internal static class EnumGenerator
 
         context.PrivateFieldsCode.AppendLine(schema!.Name, $"private readonly string[] {schema.Name}Values = new string[] {{ \"{string.Join(@""",""", schema.Symbols)}\" }};");
 
-        context.SerializationCode.AppendLine($@"var indexOfEnumValue = Array.IndexOf({schema.Name}Values, {context.SourceAccessor}.ToString());
-if (indexOfEnumValue < 0) throw new AvroSerializationException($""Enum value provided {{{context.SourceAccessor}}} not found in symbols for enum {schema.Name}"");
-IntSchema.Write(outputStream, indexOfEnumValue);");
-        context.AsyncSerializationCode.AppendLine($@"var indexOfEnumValue = Array.IndexOf({schema.Name}Values, {context.SourceAccessor}.ToString());
-if (indexOfEnumValue < 0) throw new AvroSerializationException($""Enum value provided {{{context.SourceAccessor}}} not found in symbols for enum {schema.Name}"");
-await IntSchema.WriteAsync(outputStream, indexOfEnumValue, cancellationToken);");
+        context.SerializationCode.AppendLine($"var indexOfEnumValue = Array.IndexOf({schema.Name}Values, {context.SourceAccessor}.ToString());");
+        context.SerializationCode.AppendLine($"if (indexOfEnumValue < 0) throw new AvroSerializationException($\"Enum value provided {{{context.SourceAccessor}}} not found in symbols for enum {schema.Name}\");");
+        context.SerializationCode.AppendLine(context.WriteCall("IntSchema", "indexOfEnumValue"));
     }
 }

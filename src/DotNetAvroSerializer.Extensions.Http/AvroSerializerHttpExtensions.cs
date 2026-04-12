@@ -3,7 +3,7 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using DotNetAvroSerializer;
 
-namespace DotNetAvroSerialiazer.Extensions.Http;
+namespace DotNetAvroSerializer.Extensions.Http;
 
 public static class AvroSerializerHttpExtensions
 {

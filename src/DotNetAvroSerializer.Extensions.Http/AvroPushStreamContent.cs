@@ -5,7 +5,7 @@ using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace DotNetAvroSerialiazer.Extensions.Http;
+namespace DotNetAvroSerializer.Extensions.Http;
 
 public sealed class AvroPushStreamContent : HttpContent
 {

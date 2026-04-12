@@ -26,7 +26,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\DotNetAvroSerializer\DotNetAvroSerializer.csproj" />
-    <ProjectReference Include="..\..\src\DotNetAvroSerialiazer.Extensions.Http\DotNetAvroSerialiazer.Extensions.Http.csproj" />
+    <ProjectReference Include="..\..\src\DotNetAvroSerializer.Extensions.Http\DotNetAvroSerializer.Extensions.Http.csproj" />
     <ProjectReference Include="..\..\src\DotNetAvroSerializer.Generators\DotNetAvroSerializer.Generators.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
   </ItemGroup>
 

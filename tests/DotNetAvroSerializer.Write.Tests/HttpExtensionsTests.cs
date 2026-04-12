@@ -1,4 +1,4 @@
-using DotNetAvroSerialiazer.Extensions.Http;
+using DotNetAvroSerializer.Extensions.Http;
 using DotNetAvroSerializer;
 using FluentAssertions;
 

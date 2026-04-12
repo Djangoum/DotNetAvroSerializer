@@ -1,0 +1,22 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <PackageId>DotNetAvroSerialiazer.Extensions.Http</PackageId>
+    <TargetFrameworks>net8.0;net9.0;net10.0</TargetFrameworks>
+    <Nullable>enable</Nullable>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <Authors>Ariel Amor García</Authors>
+    <Version>0.2.0</Version>
+    <Description>HTTP extensions for DotNetAvroSerializer with efficient push-stream Avro content.</Description>
+    <PackageTags>Avro,Serializer,Http,Extensions</PackageTags>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <PackageProjectUrl>https://github.com/Djangoum/DotNetAvroSerializer</PackageProjectUrl>
+    <EnablePackageValidation>true</EnablePackageValidation>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\DotNetAvroSerializer\DotNetAvroSerializer.csproj" />
+  </ItemGroup>
+
+</Project>

@@ -1,4 +1,3 @@
-using System.IO.Pipelines;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Running;
@@ -16,43 +15,128 @@ public enum BenchmarkPayloadSize
     Large
 }
 
-[MemoryDiagnoser]
-[SimpleJob(RuntimeMoniker.Net80, baseline: true)]
-[SimpleJob(RuntimeMoniker.Net90)]
-public class DotNetAvroSerializersBenchmarks
+public abstract class BenchmarkDataContext
 {
-    private readonly StringSerializer _stringSerializer = new();
-    private readonly ClassWithPrimitivesSerializer _primitivesSerializer = new();
-    private readonly RecordWithComplexTypesSerializer _complexSerializer = new();
-    private readonly PrimitiveUnionSerializer _primitiveUnionSerializer = new();
-    private readonly NullableStringUnionSerializer _nullableStringUnionSerializer = new();
-    private readonly LogicalTypeRecordSerializer _logicalTypeRecordSerializer = new();
-    private readonly NullableRegexStringSerializer _customLogicalTypeSerializer = new();
-    private readonly PooledByteBufferWriter _pooledWriter = new();
-
-    private string _stringValue = string.Empty;
-    private ClassWithPrimitives _primitivesValue = null!;
-    private RecordWithComplexTypes _complexValue = null!;
-    private Union<int, long> _primitiveUnionValue;
-    private string? _nullableStringUnionValue;
-    private LogicalTypeRecord _logicalTypeValue = null!;
-    private string? _customLogicalTypeValue;
-
     [Params(BenchmarkPayloadSize.Tiny, BenchmarkPayloadSize.Medium, BenchmarkPayloadSize.Large)]
     public BenchmarkPayloadSize Size { get; set; }
+
+    protected BenchmarkData Data { get; private set; } = null!;
 
     [GlobalSetup]
     public void Setup()
     {
-        var data = BenchmarkDataFactory.Create(Size);
-        _stringValue = data.StringValue;
-        _primitivesValue = data.PrimitivesValue;
-        _complexValue = data.ComplexValue;
-        _primitiveUnionValue = data.PrimitiveUnionValue;
-        _nullableStringUnionValue = data.NullableStringUnionValue;
-        _logicalTypeValue = data.LogicalTypeValue;
-        _customLogicalTypeValue = data.CustomLogicalTypeValue;
+        Data = BenchmarkDataFactory.Create(Size);
+        OnSetup(Data);
     }
+
+    protected virtual void OnSetup(BenchmarkData data)
+    {
+    }
+}
+
+[MemoryDiagnoser]
+[SimpleJob(RuntimeMoniker.Net90, baseline: true)]
+[SimpleJob(RuntimeMoniker.Net10_0)]
+public class StringSerializationBenchmarks : BenchmarkDataContext
+{
+    private readonly StringSerializer _dotNetSerializer = new();
+    private readonly ApacheAvroStringSerializer _apacheSerializer = new();
+
+    [Benchmark(Baseline = true)]
+    public void ApacheAvro_SerializeToStream()
+    {
+        using var output = new MemoryStream();
+        _apacheSerializer.SerializeToStream(output, Data.StringValue);
+    }
+
+    [Benchmark]
+    public void DotNetAvro_SerializeToStream()
+    {
+        using var output = new MemoryStream();
+        _dotNetSerializer.SerializeToStream(output, Data.StringValue);
+    }
+}
+
+[MemoryDiagnoser]
+[SimpleJob(RuntimeMoniker.Net90, baseline: true)]
+[SimpleJob(RuntimeMoniker.Net10_0)]
+public class PrimitiveUnionSerializationBenchmarks : BenchmarkDataContext
+{
+    private readonly PrimitiveUnionSerializer _dotNetSerializer = new();
+    private readonly ApacheAvroPrimitiveUnionSerializer _apacheSerializer = new();
+
+    [Benchmark(Baseline = true)]
+    public void ApacheAvro_SerializeToStream()
+    {
+        using var output = new MemoryStream();
+        _apacheSerializer.SerializeToStream(output, Data.PrimitiveUnionValue.GetUnionValue()!);
+    }
+
+    [Benchmark]
+    public void DotNetAvro_SerializeToStream()
+    {
+        using var output = new MemoryStream();
+        _dotNetSerializer.SerializeToStream(output, Data.PrimitiveUnionValue);
+    }
+}
+
+[MemoryDiagnoser]
+[SimpleJob(RuntimeMoniker.Net90, baseline: true)]
+[SimpleJob(RuntimeMoniker.Net10_0)]
+public class NullableUnionSerializationBenchmarks : BenchmarkDataContext
+{
+    private readonly NullableStringUnionSerializer _dotNetSerializer = new();
+    private readonly ApacheAvroNullableStringUnionSerializer _apacheSerializer = new();
+
+    [Benchmark(Baseline = true)]
+    public void ApacheAvro_SerializeToStream()
+    {
+        using var output = new MemoryStream();
+        _apacheSerializer.SerializeToStream(output, Data.NullableStringUnionValue);
+    }
+
+    [Benchmark]
+    public void DotNetAvro_SerializeToStream()
+    {
+        using var output = new MemoryStream();
+        _dotNetSerializer.SerializeToStream(output, Data.NullableStringUnionValue);
+    }
+}
+
+[MemoryDiagnoser]
+[SimpleJob(RuntimeMoniker.Net90, baseline: true)]
+[SimpleJob(RuntimeMoniker.Net10_0)]
+public class ComplexRecordSerializationBenchmarks : BenchmarkDataContext
+{
+    private readonly RecordWithComplexTypesSerializer _dotNetSerializer = new();
+    private readonly ApacheAvroComplexRecordSerializer _apacheSerializer = new();
+
+    [Benchmark(Baseline = true)]
+    public void ApacheAvro_SerializeToStream()
+    {
+        using var output = new MemoryStream();
+        _apacheSerializer.SerializeToStream(output, Data.ComplexValue);
+    }
+
+    [Benchmark]
+    public void DotNetAvro_SerializeToStream()
+    {
+        using var output = new MemoryStream();
+        _dotNetSerializer.SerializeToStream(output, Data.ComplexValue);
+    }
+}
+
+[MemoryDiagnoser]
+[SimpleJob(RuntimeMoniker.Net90, baseline: true)]
+[SimpleJob(RuntimeMoniker.Net10_0)]
+public class DotNetAvroOnlyBenchmarks : BenchmarkDataContext
+{
+    private readonly StringSerializer _stringSerializer = new();
+    private readonly ClassWithPrimitivesSerializer _primitivesSerializer = new();
+    private readonly RecordWithComplexTypesSerializer _complexSerializer = new();
+    private readonly LogicalTypeRecordSerializer _logicalTypeRecordSerializer = new();
+    private readonly NullableRegexStringSerializer _customLogicalTypeSerializer = new();
+    private readonly PooledByteBufferWriter _pooledWriter = new();
 
     [GlobalCleanup]
     public void Cleanup()
@@ -61,137 +145,38 @@ public class DotNetAvroSerializersBenchmarks
     }
 
     [Benchmark]
-    public byte[] DotNet_Serialize_String() => _stringSerializer.Serialize(_stringValue);
+    public byte[] DotNetAvro_Serialize_String() => _stringSerializer.Serialize(Data.StringValue);
 
     [Benchmark]
-    public void DotNet_SerializeToStream_String()
-    {
-        using var output = new MemoryStream();
-        _stringSerializer.SerializeToStream(output, _stringValue);
-    }
-
-    [Benchmark]
-    public void DotNet_SerializeToPooledBuffer_String()
+    public void DotNetAvro_SerializeToPooledBuffer_String()
     {
         _pooledWriter.Reset();
         using var output = new BufferWriterStream(_pooledWriter);
-        _stringSerializer.SerializeToStream(output, _stringValue);
+        _stringSerializer.SerializeToStream(output, Data.StringValue);
     }
 
     [Benchmark]
-    public void DotNet_SerializeToPipeWriter_String()
-    {
-        var pipe = new Pipe();
-        using var output = pipe.Writer.AsStream();
-        _stringSerializer.SerializeToStream(output, _stringValue);
-        output.Flush();
-        pipe.Reader.TryRead(out var result);
-        pipe.Reader.AdvanceTo(result.Buffer.End);
-    }
+    public byte[] DotNetAvro_Serialize_PrimitivesRecord() => _primitivesSerializer.Serialize(Data.PrimitivesValue);
 
     [Benchmark]
-    public byte[] DotNet_Serialize_PrimitivesRecord() => _primitivesSerializer.Serialize(_primitivesValue);
+    public byte[] DotNetAvro_Serialize_ComplexRecord() => _complexSerializer.Serialize(Data.ComplexValue);
 
     [Benchmark]
-    public byte[] DotNet_Serialize_ComplexRecord() => _complexSerializer.Serialize(_complexValue);
-
-    [Benchmark]
-    public void DotNet_SerializeToStream_ComplexRecord()
-    {
-        using var output = new MemoryStream();
-        _complexSerializer.SerializeToStream(output, _complexValue);
-    }
-
-    [Benchmark]
-    public void DotNet_SerializeToPooledBuffer_ComplexRecord()
+    public void DotNetAvro_SerializeToPooledBuffer_ComplexRecord()
     {
         _pooledWriter.Reset();
         using var output = new BufferWriterStream(_pooledWriter);
-        _complexSerializer.SerializeToStream(output, _complexValue);
+        _complexSerializer.SerializeToStream(output, Data.ComplexValue);
     }
 
     [Benchmark]
-    public void DotNet_SerializeToPipeWriter_ComplexRecord()
-    {
-        var pipe = new Pipe();
-        using var output = pipe.Writer.AsStream();
-        _complexSerializer.SerializeToStream(output, _complexValue);
-        output.Flush();
-        pipe.Reader.TryRead(out var result);
-        pipe.Reader.AdvanceTo(result.Buffer.End);
-    }
+    public byte[] DotNetAvro_Serialize_LogicalTypes() => _logicalTypeRecordSerializer.Serialize(Data.LogicalTypeValue);
 
     [Benchmark]
-    public byte[] DotNet_Serialize_PrimitiveUnion() => _primitiveUnionSerializer.Serialize(_primitiveUnionValue);
-
-    [Benchmark]
-    public byte[] DotNet_Serialize_NullableUnion() => _nullableStringUnionSerializer.Serialize(_nullableStringUnionValue);
-
-    [Benchmark]
-    public byte[] DotNet_Serialize_LogicalTypes() => _logicalTypeRecordSerializer.Serialize(_logicalTypeValue);
-
-    [Benchmark]
-    public byte[] DotNet_Serialize_CustomLogicalType() => _customLogicalTypeSerializer.Serialize(_customLogicalTypeValue);
+    public byte[] DotNetAvro_Serialize_CustomLogicalType() => _customLogicalTypeSerializer.Serialize(Data.CustomLogicalTypeValue);
 }
 
-[MemoryDiagnoser]
-[SimpleJob(RuntimeMoniker.Net80, baseline: true)]
-[SimpleJob(RuntimeMoniker.Net90)]
-public class ApacheAvroSerializersBenchmarks
-{
-    private readonly ApacheAvroStringSerializer _stringSerializer = new();
-    private readonly ApacheAvroPrimitiveUnionSerializer _primitiveUnionSerializer = new();
-    private readonly ApacheAvroNullableStringUnionSerializer _nullableUnionSerializer = new();
-    private readonly ApacheAvroComplexRecordSerializer _complexRecordSerializer = new();
-
-    private string _stringValue = string.Empty;
-    private object _primitiveUnionValue = 0;
-    private object? _nullableUnionValue;
-    private RecordWithComplexTypes _complexValue = null!;
-
-    [Params(BenchmarkPayloadSize.Tiny, BenchmarkPayloadSize.Medium, BenchmarkPayloadSize.Large)]
-    public BenchmarkPayloadSize Size { get; set; }
-
-    [GlobalSetup]
-    public void Setup()
-    {
-        var data = BenchmarkDataFactory.Create(Size);
-        _stringValue = data.StringValue;
-        _primitiveUnionValue = data.PrimitiveUnionValue.GetUnionValue()!;
-        _nullableUnionValue = data.NullableStringUnionValue;
-        _complexValue = data.ComplexValue;
-    }
-
-    [Benchmark]
-    public void ApacheAvro_SerializeToStream_String()
-    {
-        using var output = new MemoryStream();
-        _stringSerializer.SerializeToStream(output, _stringValue);
-    }
-
-    [Benchmark]
-    public void ApacheAvro_SerializeToStream_PrimitiveUnion()
-    {
-        using var output = new MemoryStream();
-        _primitiveUnionSerializer.SerializeToStream(output, _primitiveUnionValue);
-    }
-
-    [Benchmark]
-    public void ApacheAvro_SerializeToStream_NullableUnion()
-    {
-        using var output = new MemoryStream();
-        _nullableUnionSerializer.SerializeToStream(output, _nullableUnionValue);
-    }
-
-    [Benchmark]
-    public void ApacheAvro_SerializeToStream_ComplexRecord()
-    {
-        using var output = new MemoryStream();
-        _complexRecordSerializer.SerializeToStream(output, _complexValue);
-    }
-}
-
-file sealed class BenchmarkData
+public sealed class BenchmarkData
 {
     public required string StringValue { get; init; }
     public required ClassWithPrimitives PrimitivesValue { get; init; }
@@ -202,7 +187,7 @@ file sealed class BenchmarkData
     public required string CustomLogicalTypeValue { get; init; }
 }
 
-file static class BenchmarkDataFactory
+public static class BenchmarkDataFactory
 {
     public static BenchmarkData Create(BenchmarkPayloadSize size)
     {

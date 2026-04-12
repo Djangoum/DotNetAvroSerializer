@@ -67,7 +67,11 @@ public readonly struct Union<T1, T2, T3, T4, T5>
     public Union(T4 val) { _v1 = default; _v2 = default; _v3 = default; _v4 = val; _v5 = default; Index = 4; }
     public Union(T5 val) { _v1 = default; _v2 = default; _v3 = default; _v4 = default; _v5 = val; Index = 5; }
 
-    public T1? Value1 => _v1; public T2? Value2 => _v2; public T3? Value3 => _v3; public T4? Value4 => _v4; public T5? Value5 => _v5;
+    public T1? Value1 => _v1;
+    public T2? Value2 => _v2;
+    public T3? Value3 => _v3;
+    public T4? Value4 => _v4;
+    public T5? Value5 => _v5;
 
     public object? GetValue() => Index switch { 1 => _v1, 2 => _v2, 3 => _v3, 4 => _v4, 5 => _v5, _ => null };
 
@@ -90,7 +94,12 @@ public readonly struct Union<T1, T2, T3, T4, T5, T6>
     public Union(T5 val) { _v1 = default; _v2 = default; _v3 = default; _v4 = default; _v5 = val; _v6 = default; Index = 5; }
     public Union(T6 val) { _v1 = default; _v2 = default; _v3 = default; _v4 = default; _v5 = default; _v6 = val; Index = 6; }
 
-    public T1? Value1 => _v1; public T2? Value2 => _v2; public T3? Value3 => _v3; public T4? Value4 => _v4; public T5? Value5 => _v5; public T6? Value6 => _v6;
+    public T1? Value1 => _v1;
+    public T2? Value2 => _v2;
+    public T3? Value3 => _v3;
+    public T4? Value4 => _v4;
+    public T5? Value5 => _v5;
+    public T6? Value6 => _v6;
 
     public object? GetValue() => Index switch { 1 => _v1, 2 => _v2, 3 => _v3, 4 => _v4, 5 => _v5, 6 => _v6, _ => null };
 
@@ -115,7 +124,13 @@ public readonly struct Union<T1, T2, T3, T4, T5, T6, T7>
     public Union(T6 val) { _v1 = default; _v2 = default; _v3 = default; _v4 = default; _v5 = default; _v6 = val; _v7 = default; Index = 6; }
     public Union(T7 val) { _v1 = default; _v2 = default; _v3 = default; _v4 = default; _v5 = default; _v6 = default; _v7 = val; Index = 7; }
 
-    public T1? Value1 => _v1; public T2? Value2 => _v2; public T3? Value3 => _v3; public T4? Value4 => _v4; public T5? Value5 => _v5; public T6? Value6 => _v6; public T7? Value7 => _v7;
+    public T1? Value1 => _v1;
+    public T2? Value2 => _v2;
+    public T3? Value3 => _v3;
+    public T4? Value4 => _v4;
+    public T5? Value5 => _v5;
+    public T6? Value6 => _v6;
+    public T7? Value7 => _v7;
 
     public object? GetValue() => Index switch { 1 => _v1, 2 => _v2, 3 => _v3, 4 => _v4, 5 => _v5, 6 => _v6, 7 => _v7, _ => null };
 
@@ -142,7 +157,14 @@ public readonly struct Union<T1, T2, T3, T4, T5, T6, T7, T8>
     public Union(T7 val) { _v1 = default; _v2 = default; _v3 = default; _v4 = default; _v5 = default; _v6 = default; _v7 = val; _v8 = default; Index = 7; }
     public Union(T8 val) { _v1 = default; _v2 = default; _v3 = default; _v4 = default; _v5 = default; _v6 = default; _v7 = default; _v8 = val; Index = 8; }
 
-    public T1? Value1 => _v1; public T2? Value2 => _v2; public T3? Value3 => _v3; public T4? Value4 => _v4; public T5? Value5 => _v5; public T6? Value6 => _v6; public T7? Value7 => _v7; public T8? Value8 => _v8;
+    public T1? Value1 => _v1;
+    public T2? Value2 => _v2;
+    public T3? Value3 => _v3;
+    public T4? Value4 => _v4;
+    public T5? Value5 => _v5;
+    public T6? Value6 => _v6;
+    public T7? Value7 => _v7;
+    public T8? Value8 => _v8;
 
     public object? GetValue() => Index switch { 1 => _v1, 2 => _v2, 3 => _v3, 4 => _v4, 5 => _v5, 6 => _v6, 7 => _v7, 8 => _v8, _ => null };
 

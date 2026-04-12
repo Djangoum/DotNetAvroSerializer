@@ -61,7 +61,7 @@ internal static class UnionGenerator
 
                 var unionValueAccessor = $"unionValue{unionSchemaIndex + 1}";
                 context.SerializationCode.WriteLine(
-                    $"var {unionValueAccessor} = ({unionTypeSerializableTypeMetadata.FullNameDisplay}){context.SourceAccessor}.Value{unionSchemaIndex + 1}!;");
+                    $"var {unionValueAccessor} = ({unionTypeSerializableTypeMetadata.FullNameDisplay}){context.SourceAccessor}.Value{unionSchemaIndex + 1};");
 
                 schema.Generate(context with
                 {
@@ -77,7 +77,7 @@ internal static class UnionGenerator
                 {
                     context.SerializationCode.WriteLine("default:");
                     context.SerializationCode.WriteLine("{");
-                    context.SerializationCode.WriteLine($"throw new AvroSerializationException(\"Union index {{ {context.SourceAccessor}.Index }} is not valid for {context.SerializableTypeMetadata.FullNameDisplay}.\");");
+                    context.SerializationCode.WriteLine($"throw new AvroSerializationException($\"Union index {{{context.SourceAccessor}.Index}} is not valid for {context.SerializableTypeMetadata.FullNameDisplay}.\");");
                     context.SerializationCode.WriteLine("}");
                     context.SerializationCode.WriteLine("}");
                 }

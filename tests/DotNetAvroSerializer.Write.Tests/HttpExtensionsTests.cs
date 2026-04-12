@@ -4,6 +4,7 @@ using FluentAssertions;
 
 namespace DotNetAvroSerializer.Write.Tests;
 
+#pragma warning disable CA2007
 public class HttpExtensionsTests
 {
     [Fact]
@@ -73,3 +74,4 @@ public class HttpExtensionsTests
         }
     }
 }
+#pragma warning restore CA2007

@@ -59,15 +59,15 @@ internal static class UnionGenerator
                 context.SerializationCode.WriteLine("{");
                 context.SerializationCode.WriteLine(context.WriteCall("IntSchema", unionSchemaIndex.ToString()));
 
-                var unionValueAccessor = $"unionValue{unionSchemaIndex + 1}";
+                var unionValueVariableName = $"unionValue{unionSchemaIndex + 1}";
                 context.SerializationCode.WriteLine(
-                    $"var {unionValueAccessor} = ({unionTypeSerializableTypeMetadata.FullNameDisplay}){context.SourceAccessor}.Value{unionSchemaIndex + 1};");
+                    $"var {unionValueVariableName} = ({unionTypeSerializableTypeMetadata.FullNameDisplay}){context.SourceAccessor}.Value{unionSchemaIndex + 1};");
 
                 schema.Generate(context with
                 {
                     Schema = schema,
                     SerializableTypeMetadata = unionTypeSerializableTypeMetadata,
-                    SourceAccessor = unionValueAccessor
+                    SourceAccessor = unionValueVariableName
                 });
 
                 context.SerializationCode.WriteLine("break;");

@@ -22,6 +22,7 @@ public partial class AvroSerializerSourceGenerator
         writer.WriteLine();
         writer.WriteLine($"namespace {serializerNamespace};");
         writer.WriteLine();
+        writer.WriteLine("[global::System.CodeDom.Compiler.GeneratedCodeAttribute(\"DotNetAvroSerializer\", \"1.0.0.0\")]");
         writer.WriteLine($"public partial class {serializerClassName}");
 
         using (writer.WriteBlock())

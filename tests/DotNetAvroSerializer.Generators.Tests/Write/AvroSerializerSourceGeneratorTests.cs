@@ -57,6 +57,7 @@ public partial class IntSerializer : AvroSerializer<int>
         generatedSource.Should().Contain("/// <exception cref=\"System.ArgumentNullException\">Thrown when <paramref name=\"outputStream\"/> is <see langword=\"null\"/>.</exception>");
         generatedSource.Should().Contain("/// <exception cref=\"AvroSerializationException\">Thrown when serialization fails because the source value does not match the configured Avro schema.</exception>");
         generatedSource.Should().Contain("/// <exception cref=\"System.ArgumentNullException\">Thrown when <paramref name=\"source\"/> is <see langword=\"null\"/>.</exception>");
+        generatedSource.Should().Contain("[global::System.CodeDom.Compiler.GeneratedCodeAttribute(\"DotNetAvroSerializer\", \"1.0.0.0\")]");
         generatedSource.Should().NotContain("public override async Task<byte[]> SerializeAsync");
         generatedSource.Should().NotContain("public override async Task SerializeToStreamAsync");
         generatedSource.Should().NotContain("using System.Linq;");
@@ -112,6 +113,7 @@ public partial class IntSerializer : AsyncAvroSerializer<int>
         generatedSource.Should().Contain("/// A final zero-sized block is written to mark the end of the collection.");
         generatedSource.Should().Contain("/// <exception cref=\"System.ArgumentNullException\">Thrown when <paramref name=\"outputStream\"/> is <see langword=\"null\"/>.</exception>");
         generatedSource.Should().Contain("/// <exception cref=\"AvroSerializationException\">Thrown when serialization fails because the source value does not match the configured Avro schema, or when async collection block size is invalid.</exception>");
+        generatedSource.Should().Contain("[global::System.CodeDom.Compiler.GeneratedCodeAttribute(\"DotNetAvroSerializer\", \"1.0.0.0\")]");
         generatedSource.Should().NotContain("public override byte[] Serialize");
         generatedSource.Should().NotContain("public override void SerializeToStream");
     }

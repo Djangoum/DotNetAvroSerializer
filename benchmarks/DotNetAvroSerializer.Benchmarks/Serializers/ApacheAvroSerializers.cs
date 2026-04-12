@@ -94,7 +94,7 @@ public sealed class ApacheAvroComplexRecordSerializer
 
     private static GenericRecord ToInnerRecord(InnerRecord source)
     {
-        var innerRecordSchema = (RecordSchema)ParsedSchema.GetField("InnerRecord").Schema;
+        var innerRecordSchema = (RecordSchema)ParsedSchema.Fields.Single(field => field.Name.Equals("InnerRecord")).Schema;
         var record = new GenericRecord(innerRecordSchema);
         record.Add("Field1", source.Field1);
         record.Add("Field2", source.Field2);

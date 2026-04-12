@@ -1,4 +1,5 @@
 using System.Text.RegularExpressions;
+using DotNetAvroSerializer;
 using DotNetAvroSerializer.Benchmarks.Models;
 
 namespace DotNetAvroSerializer.Benchmarks.Serializers;

@@ -2,6 +2,7 @@ using System.IO.Pipelines;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Running;
+using DotNetAvroSerializer;
 using DotNetAvroSerializer.Benchmarks.BufferWriters;
 using DotNetAvroSerializer.Benchmarks.Models;
 using DotNetAvroSerializer.Benchmarks.Serializers;
@@ -156,7 +157,7 @@ public class ApacheAvroSerializersBenchmarks
     {
         var data = BenchmarkDataFactory.Create(Size);
         _stringValue = data.StringValue;
-        _primitiveUnionValue = data.PrimitiveUnionValue.GetUnionValue();
+        _primitiveUnionValue = data.PrimitiveUnionValue.GetUnionValue()!;
         _nullableUnionValue = data.NullableStringUnionValue;
         _complexValue = data.ComplexValue;
     }

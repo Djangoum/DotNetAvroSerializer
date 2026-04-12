@@ -17,7 +17,7 @@ internal static class MapGenerator
         if (context.SerializableTypeMetadata is not DictionarySerializableTypeMetadata dictionaryTypeMetadata)
             throw new AvroGeneratorException($"Type for map schema was not satisfied. Maps must implement IDictionary but {context.SerializableTypeMetadata} found");
 
-        if (!string.Equals(dictionaryTypeMetadata.KeysTypeName, "global::System.String", StringComparison.Ordinal))
+        if (dictionaryTypeMetadata.KeysSpecialType is not Microsoft.CodeAnalysis.SpecialType.System_String)
             throw new AvroGeneratorException(
                 DiagnosticsDescriptors.UnsupportedMapKeyTypeDescriptor,
                 $"Map schemas require dictionary keys of type string, but found {dictionaryTypeMetadata.KeysTypeName ?? "<unknown>"}.");

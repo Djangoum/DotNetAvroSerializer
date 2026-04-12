@@ -9,11 +9,14 @@ internal sealed record DictionarySerializableTypeMetadata : SerializableTypeMeta
         : base(dictionaryTypeSymbol)
     {
         ValuesMetadata = valuesTypeMetadata;
-        KeysTypeName = GetDictionaryTypeSymbol(dictionaryTypeSymbol)?.TypeArguments.ElementAt(0).ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
+        var keyType = GetDictionaryTypeSymbol(dictionaryTypeSymbol)?.TypeArguments.ElementAt(0);
+        KeysTypeName = keyType?.ToString();
+        KeysSpecialType = keyType?.SpecialType ?? SpecialType.None;
     }
 
     internal SerializableTypeMetadata ValuesMetadata { get; }
     internal string KeysTypeName { get; }
+    internal SpecialType KeysSpecialType { get; }
 
     internal static bool IsValidMapType(ITypeSymbol symbol, Compilation compilation)
     {
@@ -36,6 +39,9 @@ internal sealed record DictionarySerializableTypeMetadata : SerializableTypeMeta
     {
         if (symbol is not INamedTypeSymbol namedTypeSymbol)
             return null;
+
+        if (namedTypeSymbol.ConstructedFrom.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat) == "global::System.Collections.Generic.IDictionary<TKey, TValue>")
+            return namedTypeSymbol;
 
         if (dictionaryType is not null && namedTypeSymbol.OriginalDefinition.Equals(dictionaryType, SymbolEqualityComparer.Default))
             return namedTypeSymbol;

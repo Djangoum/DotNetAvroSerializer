@@ -5,7 +5,7 @@ namespace DotNetAvroSerializer.Generators.Exceptions;
 
 public class AvroGeneratorException : Exception
 {
-    public DiagnosticDescriptor? Descriptor { get; }
+    public DiagnosticDescriptor Descriptor { get; }
 
     public AvroGeneratorException(string message) : base(message)
     {

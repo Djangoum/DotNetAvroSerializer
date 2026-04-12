@@ -1,6 +1,7 @@
 using System;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using DotNetAvroSerializer.Generators.Diagnostics;
 using DotNetAvroSerializer.Generators.Exceptions;
 using DotNetAvroSerializer.Generators.Models;
 using DotNetAvroSerializer.Generators.Schemas;
@@ -26,6 +27,24 @@ internal static class SchemaExtensions
 
     private static void Generate(this RecordSchema schema, AvroGenerationContext ctx)
     {
+        var recordTypeMetadata = ctx.SerializableTypeMetadata as RecordSerializableTypeMetadata;
+
+        if (recordTypeMetadata is not null)
+        {
+            var duplicateAlias = recordTypeMetadata.Fields
+                .SelectMany(f => f.Names.Select(alias => (Alias: alias, PropertyName: f.Name)))
+                .GroupBy(a => a.Alias, StringComparer.InvariantCultureIgnoreCase)
+                .FirstOrDefault(g => g.Count() > 1);
+
+            if (duplicateAlias is not null)
+            {
+                var properties = string.Join(", ", duplicateAlias.Select(d => d.PropertyName).Distinct(StringComparer.InvariantCultureIgnoreCase));
+                throw new AvroGeneratorException(
+                    DiagnosticsDescriptors.DuplicateAvroFieldAliasDescriptor,
+                    $"AvroField alias '{duplicateAlias.Key}' is used by multiple properties in {recordTypeMetadata}: {properties}.");
+            }
+        }
+
         foreach (var field in schema.Fields)
         {
             field.Generate(ctx with { Schema = schema });
@@ -35,16 +54,27 @@ internal static class SchemaExtensions
     private static void Generate(this Field field, AvroGenerationContext ctx)
     {
         var recordTypeMetadata = ctx.SerializableTypeMetadata as RecordSerializableTypeMetadata;
-        var property = recordTypeMetadata!.Fields.FirstOrDefault(f =>
-            f.Name.Equals(field.Name, StringComparison.InvariantCultureIgnoreCase)
-            || f.Names.Contains(field.Name)
-        );
+        var matches = recordTypeMetadata!.Fields.Where(f => IsFieldMatch(f, field.Name)).ToArray();
+
+        if (matches.Length > 1)
+        {
+            var properties = string.Join(", ", matches.Select(m => m.Name));
+            throw new AvroGeneratorException(
+                DiagnosticsDescriptors.AmbiguousFieldBindingDescriptor,
+                $"Avro field '{field.Name}' in {recordTypeMetadata} matches multiple properties: {properties}.");
+        }
+
+        var property = matches.FirstOrDefault();
 
         if (property is null)
             throw new AvroGeneratorException($"Property {field.Name} not found in {recordTypeMetadata}");
 
         field.Schema.Generate(ctx with { Schema = field.Schema, SerializableTypeMetadata = property.InnerSerializableType, SourceAccessor = $"{ctx.SourceAccessor}.{property.Name}" });
     }
+
+    private static bool IsFieldMatch(FieldSerializableTypeMetadata fieldMetadata, string avroFieldName)
+        => fieldMetadata.Name.Equals(avroFieldName, StringComparison.InvariantCultureIgnoreCase)
+            || fieldMetadata.Names.Any(a => a.Equals(avroFieldName, StringComparison.InvariantCultureIgnoreCase));
 
     internal static void Generate(this Schema schema, AvroGenerationContext context)
     {

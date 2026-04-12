@@ -1,4 +1,5 @@
 using DotNetAvroSerializer.Generators.Exceptions;
+using DotNetAvroSerializer.Generators.Diagnostics;
 using DotNetAvroSerializer.Generators.Models;
 using DotNetAvroSerializer.Generators.Schemas;
 
@@ -12,6 +13,11 @@ internal static class PrimitiveTypesGenerator
 
         if (context.SerializableTypeMetadata is null)
             throw new AvroGeneratorException($"Primitive type was not satisfied {context.SerializableTypeMetadata}");
+
+        if (schema!.Name is not "null" && context.SerializableTypeMetadata is NullableSerializableTypeMetadata)
+            throw new AvroGeneratorException(
+                DiagnosticsDescriptors.UnsupportedNullablePatternDescriptor,
+                $"Nullable type {context.SerializableTypeMetadata.FullNameDisplay} must be represented by an Avro union that includes 'null'.");
 
         var serializerCallCode = schema!.Name switch
         {

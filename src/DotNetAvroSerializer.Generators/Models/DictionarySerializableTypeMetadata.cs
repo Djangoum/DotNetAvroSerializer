@@ -9,11 +9,7 @@ internal sealed record DictionarySerializableTypeMetadata : SerializableTypeMeta
         : base(dictionaryTypeSymbol)
     {
         ValuesMetadata = valuesTypeMetadata;
-
-        if (dictionaryTypeSymbol is INamedTypeSymbol namedTypeSymbol)
-        {
-            KeysTypeName = namedTypeSymbol.TypeArguments.ElementAt(0).Name;
-        }
+        KeysTypeName = GetDictionaryTypeSymbol(dictionaryTypeSymbol)?.TypeArguments.ElementAt(0).ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
     }
 
     internal SerializableTypeMetadata ValuesMetadata { get; }
@@ -23,16 +19,28 @@ internal sealed record DictionarySerializableTypeMetadata : SerializableTypeMeta
     {
         var dictionaryType = compilation.GetTypeByMetadataName("System.Collections.Generic.IDictionary`2");
 
-        return symbol is INamedTypeSymbol dictionaryTypeSymbol
-            && (dictionaryTypeSymbol.OriginalDefinition.Equals(dictionaryType, SymbolEqualityComparer.Default)
-                || dictionaryTypeSymbol.AllInterfaces.Any(i => i.OriginalDefinition.Equals(dictionaryType, SymbolEqualityComparer.Default) && i.TypeArguments.First().SpecialType is SpecialType.System_String));
+        return GetDictionaryTypeSymbol(symbol, dictionaryType) is not null;
     }
 
     internal static ITypeSymbol GetValuesTypeSymbol(ITypeSymbol symbol)
     {
-        if (symbol is INamedTypeSymbol dictionaryTypeSymbol)
+        var dictionaryTypeSymbol = GetDictionaryTypeSymbol(symbol);
+
+        if (dictionaryTypeSymbol is not null)
             return dictionaryTypeSymbol.TypeArguments.ElementAt(1);
 
         return null;
+    }
+
+    private static INamedTypeSymbol GetDictionaryTypeSymbol(ITypeSymbol symbol, INamedTypeSymbol dictionaryType = null)
+    {
+        if (symbol is not INamedTypeSymbol namedTypeSymbol)
+            return null;
+
+        if (dictionaryType is not null && namedTypeSymbol.OriginalDefinition.Equals(dictionaryType, SymbolEqualityComparer.Default))
+            return namedTypeSymbol;
+
+        return namedTypeSymbol.AllInterfaces.FirstOrDefault(i =>
+            i.ConstructedFrom.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat) == "global::System.Collections.Generic.IDictionary<TKey, TValue>");
     }
 }

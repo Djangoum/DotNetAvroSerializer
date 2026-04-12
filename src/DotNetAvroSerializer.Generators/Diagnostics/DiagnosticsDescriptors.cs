@@ -113,4 +113,70 @@ public static class DiagnosticsDescriptors
             isEnabledByDefault: true,
             description: $"Avro serializers must directly inherit from DotNetAvroSerializer.AvroSerializer<T> or DotNetAvroSerializer.AsyncAvroSerializer<T>."
         );
+
+    public static DiagnosticDescriptor AmbiguousFieldBindingDescriptor =>
+        new DiagnosticDescriptor(
+            id: "AVRO00012",
+            title: "Ambiguous field binding",
+            messageFormat: "{0}",
+            category: typeof(AvroSerializerSourceGenerator).FullName,
+            defaultSeverity: DiagnosticSeverity.Error,
+            isEnabledByDefault: true,
+            description: "Multiple properties could map to the same Avro field."
+        );
+
+    public static DiagnosticDescriptor DuplicateAvroFieldAliasDescriptor =>
+        new DiagnosticDescriptor(
+            id: "AVRO00013",
+            title: "Duplicate AvroField alias",
+            messageFormat: "{0}",
+            category: typeof(AvroSerializerSourceGenerator).FullName,
+            defaultSeverity: DiagnosticSeverity.Error,
+            isEnabledByDefault: true,
+            description: "The same AvroField alias is used on multiple properties in a record type."
+        );
+
+    public static DiagnosticDescriptor UnionSchemaOrderMismatchDescriptor =>
+        new DiagnosticDescriptor(
+            id: "AVRO00014",
+            title: "Union/schema order mismatch",
+            messageFormat: "{0}",
+            category: typeof(AvroSerializerSourceGenerator).FullName,
+            defaultSeverity: DiagnosticSeverity.Error,
+            isEnabledByDefault: true,
+            description: "Union type arguments must align with Avro union schema ordering."
+        );
+
+    public static DiagnosticDescriptor UnsupportedNullablePatternDescriptor =>
+        new DiagnosticDescriptor(
+            id: "AVRO00015",
+            title: "Unsupported nullable pattern",
+            messageFormat: "{0}",
+            category: typeof(AvroSerializerSourceGenerator).FullName,
+            defaultSeverity: DiagnosticSeverity.Error,
+            isEnabledByDefault: true,
+            description: "The nullable .NET type pattern is not supported by the Avro schema shape."
+        );
+
+    public static DiagnosticDescriptor UnsupportedMapKeyTypeDescriptor =>
+        new DiagnosticDescriptor(
+            id: "AVRO00016",
+            title: "Unsupported map key type",
+            messageFormat: "{0}",
+            category: typeof(AvroSerializerSourceGenerator).FullName,
+            defaultSeverity: DiagnosticSeverity.Error,
+            isEnabledByDefault: true,
+            description: "Map schemas only support string dictionary keys."
+        );
+
+    public static DiagnosticDescriptor MultipleAvroSchemaAttributesDescriptor =>
+        new DiagnosticDescriptor(
+            id: "AVRO00017",
+            title: "Multiple AvroSchema attributes found",
+            messageFormat: "{0}",
+            category: typeof(AvroSerializerSourceGenerator).FullName,
+            defaultSeverity: DiagnosticSeverity.Warning,
+            isEnabledByDefault: true,
+            description: "Only the first AvroSchema attribute is used when multiple are applied."
+        );
 }

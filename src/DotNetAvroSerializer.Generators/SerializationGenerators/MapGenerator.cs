@@ -1,4 +1,5 @@
 using System;
+using DotNetAvroSerializer.Generators.Diagnostics;
 using DotNetAvroSerializer.Generators.Exceptions;
 using DotNetAvroSerializer.Generators.Extensions;
 using DotNetAvroSerializer.Generators.Helpers;
@@ -16,8 +17,10 @@ internal static class MapGenerator
         if (context.SerializableTypeMetadata is not DictionarySerializableTypeMetadata dictionaryTypeMetadata)
             throw new AvroGeneratorException($"Type for map schema was not satisfied. Maps must implement IDictionary but {context.SerializableTypeMetadata} found");
 
-        if (!dictionaryTypeMetadata.KeysTypeName.Equals("string", StringComparison.InvariantCultureIgnoreCase))
-            throw new AvroGeneratorException($"Map keys have to be strings but {dictionaryTypeMetadata.KeysTypeName}");
+        if (!string.Equals(dictionaryTypeMetadata.KeysTypeName, "global::System.String", StringComparison.Ordinal))
+            throw new AvroGeneratorException(
+                DiagnosticsDescriptors.UnsupportedMapKeyTypeDescriptor,
+                $"Map schemas require dictionary keys of type string, but found {dictionaryTypeMetadata.KeysTypeName ?? "<unknown>"}.");
 
         var itemVar = $"item{VariableNamesHelpers.RemoveSpecialCharacters(context.SourceAccessor)}";
 

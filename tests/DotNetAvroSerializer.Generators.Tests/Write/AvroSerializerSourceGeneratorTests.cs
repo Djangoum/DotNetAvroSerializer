@@ -52,6 +52,10 @@ public partial class IntSerializer : AvroSerializer<int>
         generatedSource.Should().Contain("public override byte[] Serialize");
         generatedSource.Should().Contain("public override void SerializeToStream");
         generatedSource.Should().Contain("IntSchema.Write(outputStream, source);");
+        generatedSource.Should().Contain("/// Serializes <paramref name=\"source\"/> to Avro binary format and returns the resulting payload.");
+        generatedSource.Should().Contain("/// <param name=\"source\">The value to serialize.</param>");
+        generatedSource.Should().Contain("/// <exception cref=\"AvroSerializationException\">Thrown when serialization fails because the source value does not match the configured Avro schema.</exception>");
+        generatedSource.Should().Contain("/// <exception cref=\"System.ArgumentNullException\">Thrown when <paramref name=\"source\"/> is <see langword=\"null\"/>.</exception>");
         generatedSource.Should().NotContain("public override async Task<byte[]> SerializeAsync");
         generatedSource.Should().NotContain("public override async Task SerializeToStreamAsync");
         generatedSource.Should().NotContain("using System.Linq;");
@@ -102,6 +106,10 @@ public partial class IntSerializer : AsyncAvroSerializer<int>
         generatedSource.Should().Contain("public override async Task<byte[]> SerializeAsync");
         generatedSource.Should().Contain("public override async Task SerializeToStreamAsync");
         generatedSource.Should().Contain("await IntSchema.WriteAsync(outputStream, source, cancellationToken);");
+        generatedSource.Should().Contain("/// <param name=\"cancellationToken\">A token that can be used to cancel asynchronous serialization.</param>");
+        generatedSource.Should().Contain("/// For array and map schemas, serialization is streamed in Avro blocks.");
+        generatedSource.Should().Contain("/// A final zero-sized block is written to mark the end of the collection.");
+        generatedSource.Should().Contain("/// <exception cref=\"AvroSerializationException\">Thrown when serialization fails because the source value does not match the configured Avro schema, or when async collection block size is invalid.</exception>");
         generatedSource.Should().NotContain("public override byte[] Serialize");
         generatedSource.Should().NotContain("public override void SerializeToStream");
     }

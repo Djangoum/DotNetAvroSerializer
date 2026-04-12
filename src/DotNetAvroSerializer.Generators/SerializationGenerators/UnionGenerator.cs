@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using DotNetAvroSerializer.Generators.Diagnostics;
 using DotNetAvroSerializer.Generators.Exceptions;
 using DotNetAvroSerializer.Generators.Extensions;
 using DotNetAvroSerializer.Generators.Models;
@@ -13,13 +14,41 @@ internal static class UnionGenerator
     {
         var unionSchema = context.Schema as UnionSchema;
 
+        if (context.SerializableTypeMetadata is UnionSerializableTypeMetadata unionSerializableTypeMetadata)
+        {
+            var unionTypes = unionSerializableTypeMetadata.UnionTypes.AsImmutableArray();
+
+            if (unionTypes.Length != unionSchema!.Schemas.Count)
+            {
+                throw new AvroGeneratorException(
+                    DiagnosticsDescriptors.UnionSchemaOrderMismatchDescriptor,
+                    $"Union type {context.SerializableTypeMetadata.FullNameDisplay} has {unionTypes.Length} members but Avro union has {unionSchema.Schemas.Count} schemas.");
+            }
+
+            for (var i = 0; i < unionSchema.Schemas.Count; i++)
+            {
+                if (IsSchemaCompatibleWithType(unionSchema.Schemas[i], unionTypes[i]))
+                    continue;
+
+                throw new AvroGeneratorException(
+                    DiagnosticsDescriptors.UnionSchemaOrderMismatchDescriptor,
+                    $"Union member order mismatch at index {i}: schema '{unionSchema.Schemas[i].Name}' does not match type '{unionTypes[i].FullNameDisplay}'.");
+            }
+        }
+        else if (IsNullableSerializableType(context.SerializableTypeMetadata) && unionSchema!.Schemas.All(s => s is not PrimitiveSchema { Name: "null" }))
+        {
+            throw new AvroGeneratorException(
+                DiagnosticsDescriptors.UnsupportedNullablePatternDescriptor,
+                $"Nullable type {context.SerializableTypeMetadata.FullNameDisplay} requires an Avro union containing 'null'.");
+        }
+
         for (var unionSchemaIndex = 0; unionSchemaIndex < unionSchema!.Schemas.Count; unionSchemaIndex++)
         {
             var schema = unionSchema.Schemas[unionSchemaIndex];
 
-            if (context.SerializableTypeMetadata is UnionSerializableTypeMetadata unionSerializableTypeMetadata)
+            if (context.SerializableTypeMetadata is UnionSerializableTypeMetadata currentUnionMetadata)
             {
-                var unionTypeSerializableTypeMetadata = unionSerializableTypeMetadata.UnionTypes.ElementAt(unionSchemaIndex);
+                var unionTypeSerializableTypeMetadata = currentUnionMetadata.UnionTypes.ElementAt(unionSchemaIndex);
 
                 var canSerializedCheck = GetCanSerializeCheck(schema, $"{context.SourceAccessor}.GetUnionValue()", context.CustomLogicalTypesMetadata, unionTypeSerializableTypeMetadata.FullNameDisplay);
 
@@ -65,6 +94,35 @@ internal static class UnionGenerator
             }
         }
     }
+
+    private static bool IsNullableSerializableType(SerializableTypeMetadata serializableTypeMetadata)
+        => serializableTypeMetadata is NullableSerializableTypeMetadata
+            or RecordSerializableTypeMetadata { IsNullable: true }
+            or DictionarySerializableTypeMetadata
+            or IterableSerializableTypeMetadata;
+
+    private static bool IsSchemaCompatibleWithType(Schema schema, SerializableTypeMetadata typeMetadata)
+        => schema switch
+        {
+            PrimitiveSchema { Name: "boolean" } => typeMetadata is PrimitiveSerializableTypeMetadata { SpecialType: Microsoft.CodeAnalysis.SpecialType.System_Boolean },
+            PrimitiveSchema { Name: "int" } => typeMetadata is PrimitiveSerializableTypeMetadata { SpecialType: Microsoft.CodeAnalysis.SpecialType.System_Int32 },
+            PrimitiveSchema { Name: "long" } => typeMetadata is PrimitiveSerializableTypeMetadata { SpecialType: Microsoft.CodeAnalysis.SpecialType.System_Int64 },
+            PrimitiveSchema { Name: "string" } => typeMetadata is PrimitiveSerializableTypeMetadata { SpecialType: Microsoft.CodeAnalysis.SpecialType.System_String },
+            PrimitiveSchema { Name: "bytes" } => typeMetadata is IterableSerializableTypeMetadata { ItemsTypeMetadata: PrimitiveSerializableTypeMetadata { SpecialType: Microsoft.CodeAnalysis.SpecialType.System_Byte } },
+            PrimitiveSchema { Name: "double" } => typeMetadata is PrimitiveSerializableTypeMetadata { SpecialType: Microsoft.CodeAnalysis.SpecialType.System_Double },
+            PrimitiveSchema { Name: "float" } => typeMetadata is PrimitiveSerializableTypeMetadata { SpecialType: Microsoft.CodeAnalysis.SpecialType.System_Single },
+            PrimitiveSchema { Name: "null" } => IsNullableSerializableType(typeMetadata) || typeMetadata.IsNullable || IsDotNetAvroNullType(typeMetadata),
+            LogicalSchema logicalSchema => typeMetadata is LogicalTypeSerializableTypeMetadata || IsSchemaCompatibleWithType(logicalSchema.BaseSchema, typeMetadata),
+            RecordSchema => typeMetadata is RecordSerializableTypeMetadata,
+            ArraySchema => typeMetadata is IterableSerializableTypeMetadata,
+            FixedSchema => typeMetadata is IterableSerializableTypeMetadata { ItemsTypeMetadata: PrimitiveSerializableTypeMetadata { SpecialType: Microsoft.CodeAnalysis.SpecialType.System_Byte } },
+            MapSchema => typeMetadata is DictionarySerializableTypeMetadata,
+            UnionSchema => false,
+            _ => false
+        };
+
+    private static bool IsDotNetAvroNullType(SerializableTypeMetadata typeMetadata)
+        => typeMetadata.FullNameDisplay == "global::DotNetAvroSerializer.Null";
 
     private static string GetCanSerializeCheck(Schema schema, string sourceAccesor, IEnumerable<CustomLogicalTypeMetadata> customLogicalTypes, string typeFullName = null)
     {

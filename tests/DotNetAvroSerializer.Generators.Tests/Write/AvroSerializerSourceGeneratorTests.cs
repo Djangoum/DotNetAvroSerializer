@@ -556,6 +556,299 @@ public partial class InvalidSerializer : AvroSerializer<IAsyncEnumerable<int>>
             && d.GetMessage(CultureInfo.InvariantCulture).Contains("materialize it to a sync collection", StringComparison.Ordinal));
     }
 
+    [Fact]
+    public void Initialize_MustWarnWhenMultipleAvroSchemaAttributesArePresent()
+    {
+        const string source = """
+using DotNetAvroSerializer;
+
+namespace DotNetAvroSerializer
+{
+    public abstract class AvroSerializer<T>
+    {
+        public virtual byte[] Serialize(T source) => throw new System.NotImplementedException();
+    }
+
+    [System.AttributeUsage(System.AttributeTargets.Class, AllowMultiple = true)]
+    public sealed class AvroSchemaAttribute : System.Attribute
+    {
+        public AvroSchemaAttribute(string schema, System.Type[] allowedCustomLogicalTypes = null)
+        {
+        }
+    }
+}
+
+namespace Sample;
+
+[AvroSchema("{\"type\":\"int\"}")]
+[AvroSchema("{\"type\":\"long\"}")]
+public partial class IntSerializer : AvroSerializer<int>
+{
+}
+""";
+
+        var compilation = CreateCompilation(source);
+        GeneratorDriver driver = CSharpGeneratorDriver.Create(new AvroSerializerSourceGenerator().AsSourceGenerator());
+
+        driver = driver.RunGenerators(compilation);
+
+        var diagnostics = driver.GetRunResult().Results.Single().Diagnostics;
+
+        diagnostics.Should().ContainSingle(d =>
+            d.Id == DiagnosticsDescriptors.MultipleAvroSchemaAttributesDescriptor.Id
+            && d.Severity == DiagnosticSeverity.Warning
+            && d.GetMessage(CultureInfo.InvariantCulture).Contains("only the first one will be used", StringComparison.Ordinal));
+    }
+
+    [Fact]
+    public void Initialize_MustEmitDiagnosticForDuplicateAvroFieldAlias()
+    {
+        const string source = """
+using DotNetAvroSerializer;
+
+namespace DotNetAvroSerializer
+{
+    public abstract class AvroSerializer<T>
+    {
+        public virtual byte[] Serialize(T source) => throw new System.NotImplementedException();
+    }
+
+    [System.AttributeUsage(System.AttributeTargets.Class)]
+    public sealed class AvroSchemaAttribute : System.Attribute
+    {
+        public AvroSchemaAttribute(string schema, System.Type[] allowedCustomLogicalTypes = null)
+        {
+        }
+    }
+
+    [System.AttributeUsage(System.AttributeTargets.Property)]
+    public sealed class AvroFieldAttribute : System.Attribute
+    {
+        public AvroFieldAttribute(string fieldName)
+        {
+        }
+    }
+}
+
+namespace Sample;
+
+public class Item
+{
+    [AvroField("id")]
+    public int FirstId { get; set; }
+
+    [AvroField("id")]
+    public int SecondId { get; set; }
+}
+
+[AvroSchema("{\"type\":\"record\",\"name\":\"Item\",\"fields\":[{\"name\":\"id\",\"type\":\"int\"}]}")]
+public partial class ItemSerializer : AvroSerializer<Item>
+{
+}
+""";
+
+        var compilation = CreateCompilation(source);
+        GeneratorDriver driver = CSharpGeneratorDriver.Create(new AvroSerializerSourceGenerator().AsSourceGenerator());
+
+        driver = driver.RunGenerators(compilation);
+
+        var diagnostics = driver.GetRunResult().Results.Single().Diagnostics;
+
+        diagnostics.Should().ContainSingle(d =>
+            d.Id == DiagnosticsDescriptors.DuplicateAvroFieldAliasDescriptor.Id
+            && d.GetMessage(CultureInfo.InvariantCulture).Contains("AvroField alias 'id'", StringComparison.Ordinal));
+    }
+
+    [Fact]
+    public void Initialize_MustEmitDiagnosticForAmbiguousFieldBinding()
+    {
+        const string source = """
+using DotNetAvroSerializer;
+
+namespace DotNetAvroSerializer
+{
+    public abstract class AvroSerializer<T>
+    {
+        public virtual byte[] Serialize(T source) => throw new System.NotImplementedException();
+    }
+
+    [System.AttributeUsage(System.AttributeTargets.Class)]
+    public sealed class AvroSchemaAttribute : System.Attribute
+    {
+        public AvroSchemaAttribute(string schema, System.Type[] allowedCustomLogicalTypes = null)
+        {
+        }
+    }
+
+    [System.AttributeUsage(System.AttributeTargets.Property)]
+    public sealed class AvroFieldAttribute : System.Attribute
+    {
+        public AvroFieldAttribute(string fieldName)
+        {
+        }
+    }
+}
+
+namespace Sample;
+
+public class Item
+{
+    public int Id { get; set; }
+
+    [AvroField("id")]
+    public int LegacyId { get; set; }
+}
+
+[AvroSchema("{\"type\":\"record\",\"name\":\"Item\",\"fields\":[{\"name\":\"id\",\"type\":\"int\"}]}")]
+public partial class ItemSerializer : AvroSerializer<Item>
+{
+}
+""";
+
+        var compilation = CreateCompilation(source);
+        GeneratorDriver driver = CSharpGeneratorDriver.Create(new AvroSerializerSourceGenerator().AsSourceGenerator());
+
+        driver = driver.RunGenerators(compilation);
+
+        var diagnostics = driver.GetRunResult().Results.Single().Diagnostics;
+
+        diagnostics.Should().ContainSingle(d =>
+            d.Id == DiagnosticsDescriptors.AmbiguousFieldBindingDescriptor.Id
+            && d.GetMessage(CultureInfo.InvariantCulture).Contains("matches multiple properties", StringComparison.Ordinal));
+    }
+
+    [Fact]
+    public void Initialize_MustEmitDiagnosticForUnionOrderMismatch()
+    {
+        const string source = """
+using DotNetAvroSerializer;
+
+namespace DotNetAvroSerializer
+{
+    public abstract class AvroSerializer<T>
+    {
+        public virtual byte[] Serialize(T source) => throw new System.NotImplementedException();
+    }
+
+    public sealed class Union<T1, T2>
+    {
+        public object GetUnionValue() => throw new System.NotImplementedException();
+    }
+
+    [System.AttributeUsage(System.AttributeTargets.Class)]
+    public sealed class AvroSchemaAttribute : System.Attribute
+    {
+        public AvroSchemaAttribute(string schema, System.Type[] allowedCustomLogicalTypes = null)
+        {
+        }
+    }
+}
+
+namespace Sample;
+
+[AvroSchema("[\"int\",\"string\"]")]
+public partial class UnionSerializer : AvroSerializer<Union<string, int>>
+{
+}
+""";
+
+        var compilation = CreateCompilation(source);
+        GeneratorDriver driver = CSharpGeneratorDriver.Create(new AvroSerializerSourceGenerator().AsSourceGenerator());
+
+        driver = driver.RunGenerators(compilation);
+
+        var diagnostics = driver.GetRunResult().Results.Single().Diagnostics;
+
+        diagnostics.Should().ContainSingle(d =>
+            d.Id == DiagnosticsDescriptors.UnionSchemaOrderMismatchDescriptor.Id
+            && d.GetMessage(CultureInfo.InvariantCulture).Contains("Union member order mismatch", StringComparison.Ordinal));
+    }
+
+    [Fact]
+    public void Initialize_MustEmitDiagnosticForUnsupportedNullablePattern()
+    {
+        const string source = """
+using DotNetAvroSerializer;
+
+namespace DotNetAvroSerializer
+{
+    public abstract class AvroSerializer<T>
+    {
+        public virtual byte[] Serialize(T source) => throw new System.NotImplementedException();
+    }
+
+    [System.AttributeUsage(System.AttributeTargets.Class)]
+    public sealed class AvroSchemaAttribute : System.Attribute
+    {
+        public AvroSchemaAttribute(string schema, System.Type[] allowedCustomLogicalTypes = null)
+        {
+        }
+    }
+}
+
+namespace Sample;
+
+[AvroSchema("[\"int\",\"long\"]")]
+public partial class NullableSerializer : AvroSerializer<int?>
+{
+}
+""";
+
+        var compilation = CreateCompilation(source);
+        GeneratorDriver driver = CSharpGeneratorDriver.Create(new AvroSerializerSourceGenerator().AsSourceGenerator());
+
+        driver = driver.RunGenerators(compilation);
+
+        var diagnostics = driver.GetRunResult().Results.Single().Diagnostics;
+
+        diagnostics.Should().ContainSingle(d =>
+            d.Id == DiagnosticsDescriptors.UnsupportedNullablePatternDescriptor.Id
+            && d.GetMessage(CultureInfo.InvariantCulture).Contains("requires an Avro union containing 'null'", StringComparison.Ordinal));
+    }
+
+    [Fact]
+    public void Initialize_MustEmitDiagnosticForUnsupportedMapKeyType()
+    {
+        const string source = """
+using System.Collections.Generic;
+using DotNetAvroSerializer;
+
+namespace DotNetAvroSerializer
+{
+    public abstract class AvroSerializer<T>
+    {
+        public virtual byte[] Serialize(T source) => throw new System.NotImplementedException();
+    }
+
+    [System.AttributeUsage(System.AttributeTargets.Class)]
+    public sealed class AvroSchemaAttribute : System.Attribute
+    {
+        public AvroSchemaAttribute(string schema, System.Type[] allowedCustomLogicalTypes = null)
+        {
+        }
+    }
+}
+
+namespace Sample;
+
+[AvroSchema("{\"type\":\"map\",\"values\":\"int\"}")]
+public partial class InvalidMapSerializer : AvroSerializer<Dictionary<int, int>>
+{
+}
+""";
+
+        var compilation = CreateCompilation(source);
+        GeneratorDriver driver = CSharpGeneratorDriver.Create(new AvroSerializerSourceGenerator().AsSourceGenerator());
+
+        driver = driver.RunGenerators(compilation);
+
+        var diagnostics = driver.GetRunResult().Results.Single().Diagnostics;
+
+        diagnostics.Should().ContainSingle(d =>
+            d.Id == DiagnosticsDescriptors.UnsupportedMapKeyTypeDescriptor.Id
+            && d.GetMessage(CultureInfo.InvariantCulture).Contains("require dictionary keys of type string", StringComparison.Ordinal));
+    }
+
 
     private static CSharpCompilation CreateCompilation(string source)
     {

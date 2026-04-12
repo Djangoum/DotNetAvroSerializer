@@ -64,42 +64,38 @@ internal static class UnionGenerator
         UnionSchema unionSchema,
         UnionSerializableTypeMetadata currentUnionMetadata)
     {
-        for (var unionSchemaIndex = 0; unionSchemaIndex < unionSchema.Schemas.Count; unionSchemaIndex++)
+        context.SerializationCode.WriteLine($"switch ({context.SourceAccessor}.Index)");
+        using (context.SerializationCode.WriteBlock())
         {
-            var schema = unionSchema.Schemas[unionSchemaIndex];
-            var unionTypeSerializableTypeMetadata = currentUnionMetadata.UnionTypes.ElementAt(unionSchemaIndex);
-
-            if (unionSchemaIndex == 0)
+            for (var unionSchemaIndex = 0; unionSchemaIndex < unionSchema.Schemas.Count; unionSchemaIndex++)
             {
-                context.SerializationCode.WriteLine($"switch ({context.SourceAccessor}.Index)");
-                context.SerializationCode.WriteLine("{");
+                var schema = unionSchema.Schemas[unionSchemaIndex];
+                var unionTypeSerializableTypeMetadata = currentUnionMetadata.UnionTypes.ElementAt(unionSchemaIndex);
+
+                context.SerializationCode.WriteLine($"case {unionSchemaIndex + 1}:");
+                using (context.SerializationCode.WriteBlock())
+                {
+                    context.SerializationCode.WriteLine(context.WriteCall("IntSchema", unionSchemaIndex.ToString()));
+
+                    var unionValueVariableName = $"unionValue{unionSchemaIndex + 1}";
+                    context.SerializationCode.WriteLine(
+                        $"var {unionValueVariableName} = ({unionTypeSerializableTypeMetadata.FullNameDisplay}){context.SourceAccessor}.Value{unionSchemaIndex + 1};");
+
+                    schema.Generate(context with
+                    {
+                        Schema = schema,
+                        SerializableTypeMetadata = unionTypeSerializableTypeMetadata,
+                        SourceAccessor = unionValueVariableName
+                    });
+
+                    context.SerializationCode.WriteLine("break;");
+                }
             }
 
-            context.SerializationCode.WriteLine($"case {unionSchemaIndex + 1}:");
-            context.SerializationCode.WriteLine("{");
-            context.SerializationCode.WriteLine(context.WriteCall("IntSchema", unionSchemaIndex.ToString()));
-
-            var unionValueVariableName = $"unionValue{unionSchemaIndex + 1}";
-            context.SerializationCode.WriteLine(
-                $"var {unionValueVariableName} = ({unionTypeSerializableTypeMetadata.FullNameDisplay}){context.SourceAccessor}.Value{unionSchemaIndex + 1};");
-
-            schema.Generate(context with
+            context.SerializationCode.WriteLine("default:");
+            using (context.SerializationCode.WriteBlock())
             {
-                Schema = schema,
-                SerializableTypeMetadata = unionTypeSerializableTypeMetadata,
-                SourceAccessor = unionValueVariableName
-            });
-
-            context.SerializationCode.WriteLine("break;");
-            context.SerializationCode.WriteLine("}");
-
-            if (unionSchemaIndex == unionSchema.Schemas.Count - 1)
-            {
-                context.SerializationCode.WriteLine("default:");
-                context.SerializationCode.WriteLine("{");
                 context.SerializationCode.WriteLine($"throw new AvroSerializationException($\"Union index {{{context.SourceAccessor}.Index}} is not valid for {context.SerializableTypeMetadata.FullNameDisplay}.\");");
-                context.SerializationCode.WriteLine("}");
-                context.SerializationCode.WriteLine("}");
             }
         }
     }

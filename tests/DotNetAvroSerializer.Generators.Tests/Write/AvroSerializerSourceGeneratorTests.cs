@@ -732,7 +732,9 @@ namespace DotNetAvroSerializer
 
     public sealed class Union<T1, T2>
     {
-        public object GetUnionValue() => throw new System.NotImplementedException();
+        public byte Index => throw new System.NotImplementedException();
+        public T1 Value1 => throw new System.NotImplementedException();
+        public T2 Value2 => throw new System.NotImplementedException();
     }
 
     [System.AttributeUsage(System.AttributeTargets.Class)]

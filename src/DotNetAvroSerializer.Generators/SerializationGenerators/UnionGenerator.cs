@@ -49,28 +49,49 @@ internal static class UnionGenerator
             if (context.SerializableTypeMetadata is UnionSerializableTypeMetadata currentUnionMetadata)
             {
                 var unionTypeSerializableTypeMetadata = currentUnionMetadata.UnionTypes.ElementAt(unionSchemaIndex);
-
-                var canSerializedCheck = GetCanSerializeCheck(schema, $"{context.SourceAccessor}.GetUnionValue()", context.CustomLogicalTypesMetadata, unionTypeSerializableTypeMetadata.FullNameDisplay);
-
-                context.SerializationCode.WriteLine(unionSchemaIndex == 0
-                    ? $"if ({canSerializedCheck})"
-                    : $"else if ({canSerializedCheck})");
-
-                using (context.SerializationCode.WriteBlock())
+                if (unionSchemaIndex == 0)
                 {
-                    context.SerializationCode.WriteLine(context.WriteCall("IntSchema", unionSchemaIndex.ToString()));
+                    context.SerializationCode.WriteLine($"switch ({context.SourceAccessor}.Index)");
+                    context.SerializationCode.WriteLine("{");
+                }
 
-                    schema.Generate(context with
-                    {
-                        Schema = schema,
-                        SerializableTypeMetadata = unionTypeSerializableTypeMetadata,
-                        SourceAccessor = $"(({unionTypeSerializableTypeMetadata.FullNameDisplay}){context.SourceAccessor})"
-                    });
+                context.SerializationCode.WriteLine($"case {unionSchemaIndex + 1}:");
+                context.SerializationCode.WriteLine("{");
+                context.SerializationCode.WriteLine(context.WriteCall("IntSchema", unionSchemaIndex.ToString()));
+
+                var unionValueAccessor = $"unionValue{unionSchemaIndex + 1}";
+                context.SerializationCode.WriteLine(
+                    $"var {unionValueAccessor} = ({unionTypeSerializableTypeMetadata.FullNameDisplay}){context.SourceAccessor}.Value{unionSchemaIndex + 1}!;");
+
+                schema.Generate(context with
+                {
+                    Schema = schema,
+                    SerializableTypeMetadata = unionTypeSerializableTypeMetadata,
+                    SourceAccessor = unionValueAccessor
+                });
+
+                context.SerializationCode.WriteLine("break;");
+                context.SerializationCode.WriteLine("}");
+
+                if (unionSchemaIndex == unionSchema.Schemas.Count - 1)
+                {
+                    context.SerializationCode.WriteLine("default:");
+                    context.SerializationCode.WriteLine("{");
+                    context.SerializationCode.WriteLine($"throw new AvroSerializationException(\"Union index {{ {context.SourceAccessor}.Index }} is not valid for {context.SerializableTypeMetadata.FullNameDisplay}.\");");
+                    context.SerializationCode.WriteLine("}");
+                    context.SerializationCode.WriteLine("}");
                 }
             }
             else if (context.SerializableTypeMetadata is NullableSerializableTypeMetadata or RecordSerializableTypeMetadata { IsNullable: true } or DictionarySerializableTypeMetadata or IterableSerializableTypeMetadata)
             {
-                var canSerializedCheck = GetCanSerializeCheck(schema, context.SourceAccessor, context.CustomLogicalTypesMetadata, context.SerializableTypeMetadata.FullNameDisplay);
+                var nullableSerializableTypeMetadata = context.SerializableTypeMetadata as NullableSerializableTypeMetadata;
+                var effectiveSerializableTypeMetadata = nullableSerializableTypeMetadata?.InnerNullableTypeSymbol ?? context.SerializableTypeMetadata;
+                var isRecordSchema = schema is RecordSchema;
+                var actualRecordVariableName = $"actualRecord{unionSchemaIndex}";
+
+                var canSerializedCheck = isRecordSchema
+                    ? $"{context.SourceAccessor} is {effectiveSerializableTypeMetadata.FullNameDisplay} {actualRecordVariableName}"
+                    : GetCanSerializeCheck(schema, context.SourceAccessor, context.CustomLogicalTypesMetadata, context.SerializableTypeMetadata.FullNameDisplay);
 
                 context.SerializationCode.WriteLine(unionSchemaIndex == 0
                     ? $"if ({canSerializedCheck})"
@@ -83,7 +104,8 @@ internal static class UnionGenerator
                     schema.Generate(context with
                     {
                         Schema = schema,
-                        SerializableTypeMetadata = context.SerializableTypeMetadata is NullableSerializableTypeMetadata nullableSerializableTypeMetadata ? nullableSerializableTypeMetadata.InnerNullableTypeSymbol : context.SerializableTypeMetadata
+                        SerializableTypeMetadata = effectiveSerializableTypeMetadata,
+                        SourceAccessor = isRecordSchema ? actualRecordVariableName : context.SourceAccessor
                     });
                 }
             }

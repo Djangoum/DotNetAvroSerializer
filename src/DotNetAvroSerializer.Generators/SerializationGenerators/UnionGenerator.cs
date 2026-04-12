@@ -46,9 +46,9 @@ internal static class UnionGenerator
         {
             var schema = unionSchema.Schemas[unionSchemaIndex];
 
-            if (context.SerializableTypeMetadata is UnionSerializableTypeMetadata unionTypeMetadata)
+            if (context.SerializableTypeMetadata is UnionSerializableTypeMetadata currentUnionMetadata)
             {
-                var unionTypeSerializableTypeMetadata = unionTypeMetadata.UnionTypes.ElementAt(unionSchemaIndex);
+                var unionTypeSerializableTypeMetadata = currentUnionMetadata.UnionTypes.ElementAt(unionSchemaIndex);
 
                 var canSerializedCheck = GetCanSerializeCheck(schema, $"{context.SourceAccessor}.GetUnionValue()", context.CustomLogicalTypesMetadata, unionTypeSerializableTypeMetadata.FullNameDisplay);
 

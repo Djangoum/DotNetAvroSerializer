@@ -38,7 +38,10 @@ internal static class SchemaExtensions
 
             if (duplicateAlias is not null)
             {
-                var properties = string.Join(", ", duplicateAlias.Select(d => d.PropertyName).Distinct(StringComparer.InvariantCultureIgnoreCase));
+                var properties = string.Join(", ", duplicateAlias
+                    .Select(d => d.PropertyName)
+                    .Distinct(StringComparer.InvariantCultureIgnoreCase)
+                    .OrderBy(name => name, StringComparer.InvariantCultureIgnoreCase));
                 throw new AvroGeneratorException(
                     DiagnosticsDescriptors.DuplicateAvroFieldAliasDescriptor,
                     $"AvroField alias '{duplicateAlias.Key}' is used by multiple properties in {recordTypeMetadata}: {properties}.");
@@ -54,17 +57,19 @@ internal static class SchemaExtensions
     private static void Generate(this Field field, AvroGenerationContext ctx)
     {
         var recordTypeMetadata = ctx.SerializableTypeMetadata as RecordSerializableTypeMetadata;
-        var matches = recordTypeMetadata!.Fields.Where(f => IsFieldMatch(f, field.Name)).ToArray();
+        var matchingProperties = recordTypeMetadata!.Fields.Where(f => IsFieldMatch(f, field.Name)).ToArray();
 
-        if (matches.Length > 1)
+        if (matchingProperties.Length > 1)
         {
-            var properties = string.Join(", ", matches.Select(m => m.Name));
+            var properties = string.Join(", ", matchingProperties
+                .Select(m => m.Name)
+                .OrderBy(name => name, StringComparer.InvariantCultureIgnoreCase));
             throw new AvroGeneratorException(
                 DiagnosticsDescriptors.AmbiguousFieldBindingDescriptor,
                 $"Avro field '{field.Name}' in {recordTypeMetadata} matches multiple properties: {properties}.");
         }
 
-        var property = matches.FirstOrDefault();
+        var property = matchingProperties.FirstOrDefault();
 
         if (property is null)
             throw new AvroGeneratorException($"Property {field.Name} not found in {recordTypeMetadata}");

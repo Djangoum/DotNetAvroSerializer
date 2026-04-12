@@ -5,6 +5,8 @@ namespace DotNetAvroSerializer.Generators.Models;
 
 internal sealed record DictionarySerializableTypeMetadata : SerializableTypeMetadata
 {
+    private const string DictionaryMetadataName = "global::System.Collections.Generic.IDictionary<TKey, TValue>";
+
     public DictionarySerializableTypeMetadata(SerializableTypeMetadata valuesTypeMetadata, ITypeSymbol dictionaryTypeSymbol)
         : base(dictionaryTypeSymbol)
     {
@@ -40,13 +42,13 @@ internal sealed record DictionarySerializableTypeMetadata : SerializableTypeMeta
         if (symbol is not INamedTypeSymbol namedTypeSymbol)
             return null;
 
-        if (namedTypeSymbol.ConstructedFrom.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat) == "global::System.Collections.Generic.IDictionary<TKey, TValue>")
+        if (namedTypeSymbol.ConstructedFrom.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat) == DictionaryMetadataName)
             return namedTypeSymbol;
 
         if (dictionaryType is not null && namedTypeSymbol.OriginalDefinition.Equals(dictionaryType, SymbolEqualityComparer.Default))
             return namedTypeSymbol;
 
         return namedTypeSymbol.AllInterfaces.FirstOrDefault(i =>
-            i.ConstructedFrom.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat) == "global::System.Collections.Generic.IDictionary<TKey, TValue>");
+            i.ConstructedFrom.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat) == DictionaryMetadataName);
     }
 }

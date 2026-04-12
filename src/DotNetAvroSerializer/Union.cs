@@ -13,6 +13,7 @@ public readonly struct Union<T1, T2>
     public T2? Value2 => _v2;
 
     public object? GetValue() => Index switch { 1 => _v1, 2 => _v2, _ => null };
+    public object? GetUnionValue() => GetValue();
 
     public static implicit operator Union<T1, T2>(T1 val) => new(val);
     public static implicit operator Union<T1, T2>(T2 val) => new(val);
@@ -30,6 +31,7 @@ public readonly struct Union<T1, T2, T3>
     public T1? Value1 => _v1; public T2? Value2 => _v2; public T3? Value3 => _v3;
 
     public object? GetValue() => Index switch { 1 => _v1, 2 => _v2, 3 => _v3, _ => null };
+    public object? GetUnionValue() => GetValue();
 
     public static implicit operator Union<T1, T2, T3>(T1 val) => new(val);
     public static implicit operator Union<T1, T2, T3>(T2 val) => new(val);
@@ -49,6 +51,7 @@ public readonly struct Union<T1, T2, T3, T4>
     public T1? Value1 => _v1; public T2? Value2 => _v2; public T3? Value3 => _v3; public T4? Value4 => _v4;
 
     public object? GetValue() => Index switch { 1 => _v1, 2 => _v2, 3 => _v3, 4 => _v4, _ => null };
+    public object? GetUnionValue() => GetValue();
 
     public static implicit operator Union<T1, T2, T3, T4>(T1 val) => new(val);
     public static implicit operator Union<T1, T2, T3, T4>(T2 val) => new(val);
@@ -74,6 +77,7 @@ public readonly struct Union<T1, T2, T3, T4, T5>
     public T5? Value5 => _v5;
 
     public object? GetValue() => Index switch { 1 => _v1, 2 => _v2, 3 => _v3, 4 => _v4, 5 => _v5, _ => null };
+    public object? GetUnionValue() => GetValue();
 
     public static implicit operator Union<T1, T2, T3, T4, T5>(T1 val) => new(val);
     public static implicit operator Union<T1, T2, T3, T4, T5>(T2 val) => new(val);
@@ -102,6 +106,7 @@ public readonly struct Union<T1, T2, T3, T4, T5, T6>
     public T6? Value6 => _v6;
 
     public object? GetValue() => Index switch { 1 => _v1, 2 => _v2, 3 => _v3, 4 => _v4, 5 => _v5, 6 => _v6, _ => null };
+    public object? GetUnionValue() => GetValue();
 
     public static implicit operator Union<T1, T2, T3, T4, T5, T6>(T1 val) => new(val);
     public static implicit operator Union<T1, T2, T3, T4, T5, T6>(T2 val) => new(val);
@@ -133,6 +138,7 @@ public readonly struct Union<T1, T2, T3, T4, T5, T6, T7>
     public T7? Value7 => _v7;
 
     public object? GetValue() => Index switch { 1 => _v1, 2 => _v2, 3 => _v3, 4 => _v4, 5 => _v5, 6 => _v6, 7 => _v7, _ => null };
+    public object? GetUnionValue() => GetValue();
 
     public static implicit operator Union<T1, T2, T3, T4, T5, T6, T7>(T1 val) => new(val);
     public static implicit operator Union<T1, T2, T3, T4, T5, T6, T7>(T2 val) => new(val);
@@ -167,6 +173,7 @@ public readonly struct Union<T1, T2, T3, T4, T5, T6, T7, T8>
     public T8? Value8 => _v8;
 
     public object? GetValue() => Index switch { 1 => _v1, 2 => _v2, 3 => _v3, 4 => _v4, 5 => _v5, 6 => _v6, 7 => _v7, 8 => _v8, _ => null };
+    public object? GetUnionValue() => GetValue();
 
     public static implicit operator Union<T1, T2, T3, T4, T5, T6, T7, T8>(T1 val) => new(val);
     public static implicit operator Union<T1, T2, T3, T4, T5, T6, T7, T8>(T2 val) => new(val);

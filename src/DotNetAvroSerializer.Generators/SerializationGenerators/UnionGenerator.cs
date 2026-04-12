@@ -54,8 +54,9 @@ internal static class UnionGenerator
             return;
         }
 
+        var firstSchemaName = unionSchema!.Schemas.Count > 0 ? unionSchema.Schemas[0].Name : "<empty union>";
         throw new AvroGeneratorException(
-            $"Union index 0 for schema {unionSchema!.Schemas[0].Name} instead {context.SerializableTypeMetadata.FullNameDisplay}");
+            $"Unexpected metadata type {context.SerializableTypeMetadata.FullNameDisplay} for union schema {firstSchemaName}.");
     }
 
     private static void GenerateSerializationSourceForExplicitUnion(

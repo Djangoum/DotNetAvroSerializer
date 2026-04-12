@@ -1,4 +1,5 @@
 using System;
+using System.Buffers.Binary;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
@@ -20,12 +21,9 @@ public static class FloatSchema
 
     public static void Write(Stream outputStream, float value)
     {
-        var bytes = BitConverter.GetBytes(value);
-        if (!BitConverter.IsLittleEndian)
-        {
-            Array.Reverse(bytes);
-        }
-        outputStream.Write(bytes, 0, bytes.Length);
+        Span<byte> buffer = stackalloc byte[sizeof(float)];
+        BinaryPrimitives.WriteSingleLittleEndian(buffer, value);
+        outputStream.Write(buffer);
     }
 
     public static Task WriteAsync(Stream outputStream, float? value, CancellationToken cancellationToken = default)
@@ -38,12 +36,13 @@ public static class FloatSchema
 
     public static Task WriteAsync(Stream outputStream, float value, CancellationToken cancellationToken = default)
     {
-        var bytes = BitConverter.GetBytes(value);
-        if (!BitConverter.IsLittleEndian)
-        {
-            Array.Reverse(bytes);
-        }
+        return WriteCoreAsync(outputStream, value, cancellationToken).AsTask();
+    }
 
-        return outputStream.WriteAsync(bytes, cancellationToken).AsTask();
+    private static ValueTask WriteCoreAsync(Stream outputStream, float value, CancellationToken cancellationToken)
+    {
+        var buffer = new byte[sizeof(float)];
+        BinaryPrimitives.WriteSingleLittleEndian(buffer, value);
+        return outputStream.WriteAsync(buffer.AsMemory(0, buffer.Length), cancellationToken);
     }
 }

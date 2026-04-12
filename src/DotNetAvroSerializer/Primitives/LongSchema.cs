@@ -20,13 +20,9 @@ public class LongSchema
 
     public static void Write(Stream outputStream, long value)
     {
-        ulong n = (ulong)(value << 1 ^ value >> 63);
-        while ((n & ~0x7FUL) != 0)
-        {
-            outputStream.WriteByte((byte)(n & 0x7f | 0x80));
-            n >>= 7;
-        }
-        outputStream.WriteByte((byte)n);
+        Span<byte> buffer = stackalloc byte[10];
+        var length = Encode(value, buffer);
+        outputStream.Write(buffer[..length]);
     }
 
     public static Task WriteAsync(Stream outputStream, long? value, CancellationToken cancellationToken = default)
@@ -39,17 +35,28 @@ public class LongSchema
 
     public static Task WriteAsync(Stream outputStream, long value, CancellationToken cancellationToken = default)
     {
-        ulong n = (ulong)(value << 1 ^ value >> 63);
+        return WriteCoreAsync(outputStream, value, cancellationToken).AsTask();
+    }
+
+    private static ValueTask WriteCoreAsync(Stream outputStream, long value, CancellationToken cancellationToken)
+    {
         var buffer = new byte[10];
+        var length = Encode(value, buffer);
+        return outputStream.WriteAsync(buffer.AsMemory(0, length), cancellationToken);
+    }
+
+    private static int Encode(long value, Span<byte> destination)
+    {
+        ulong n = (ulong)((value << 1) ^ (value >> 63));
         var length = 0;
 
         while ((n & ~0x7FUL) != 0)
         {
-            buffer[length++] = (byte)(n & 0x7f | 0x80);
+            destination[length++] = (byte)((n & 0x7F) | 0x80);
             n >>= 7;
         }
 
-        buffer[length++] = (byte)n;
-        return outputStream.WriteAsync(buffer.AsMemory(0, length), cancellationToken).AsTask();
+        destination[length++] = (byte)n;
+        return length;
     }
 }

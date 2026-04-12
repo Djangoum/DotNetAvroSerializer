@@ -48,6 +48,7 @@ public partial class AvroSerializerSourceGenerator
                 writer.WriteLine("/// </summary>");
                 writer.WriteLine("/// <param name=\"outputStream\">The destination stream that receives the Avro payload.</param>");
                 writer.WriteLine("/// <param name=\"source\">The value to serialize.</param>");
+                writer.WriteLine("/// <exception cref=\"System.ArgumentNullException\">Thrown when <paramref name=\"outputStream\"/> is <see langword=\"null\"/>.</exception>");
                 writer.WriteLine("/// <exception cref=\"AvroSerializationException\">Thrown when serialization fails because the source value does not match the configured Avro schema.</exception>");
                 writer.WriteLine($"public override void SerializeToStream(Stream outputStream, {serializableFullyQualifiedTypeName} source)");
                 using (writer.WriteBlock())
@@ -128,6 +129,7 @@ public partial class AvroSerializerSourceGenerator
                 writer.WriteLine("/// <param name=\"outputStream\">The destination stream that receives the Avro payload.</param>");
                 writer.WriteLine("/// <param name=\"source\">The value to serialize.</param>");
                 writer.WriteLine("/// <param name=\"cancellationToken\">A token that can be used to cancel asynchronous serialization.</param>");
+                writer.WriteLine("/// <exception cref=\"System.ArgumentNullException\">Thrown when <paramref name=\"outputStream\"/> is <see langword=\"null\"/>.</exception>");
                 writer.WriteLine("/// <exception cref=\"AvroSerializationException\">Thrown when serialization fails because the source value does not match the configured Avro schema, or when async collection block size is invalid.</exception>");
                 writer.WriteLine($"public override async Task SerializeToStreamAsync(Stream outputStream, {serializableFullyQualifiedTypeName} source, CancellationToken cancellationToken = default)");
                 using (writer.WriteBlock())

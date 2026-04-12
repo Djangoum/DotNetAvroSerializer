@@ -8,6 +8,9 @@ namespace DotNetAvroSerializer.Primitives;
 
 public static class BooleanSchema
 {
+    private const byte TrueByte = 1;
+    private const byte FalseByte = 0;
+
     public static bool CanSerialize(object? value) => value is bool;
 
     public static void Write(Stream outputStream, bool? value)
@@ -20,7 +23,9 @@ public static class BooleanSchema
 
     public static void Write(Stream outputStream, bool value)
     {
-        outputStream.WriteByte((byte)(value ? 1 : 0));
+        Span<byte> buffer = stackalloc byte[1];
+        buffer[0] = value ? TrueByte : FalseByte;
+        outputStream.Write(buffer);
     }
 
     public static Task WriteAsync(Stream outputStream, bool? value, CancellationToken cancellationToken = default)
@@ -33,7 +38,13 @@ public static class BooleanSchema
 
     public static Task WriteAsync(Stream outputStream, bool value, CancellationToken cancellationToken = default)
     {
-        var byteBuffer = new[] { (byte)(value ? 1 : 0) };
-        return outputStream.WriteAsync(byteBuffer, cancellationToken).AsTask();
+        return WriteCoreAsync(outputStream, value, cancellationToken).AsTask();
+    }
+
+    private static ValueTask WriteCoreAsync(Stream outputStream, bool value, CancellationToken cancellationToken)
+    {
+        byte[] buffer = new byte[1];
+        buffer[0] = value ? TrueByte : FalseByte;
+        return outputStream.WriteAsync(buffer.AsMemory(0, 1), cancellationToken);
     }
 }

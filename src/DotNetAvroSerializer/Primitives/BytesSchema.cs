@@ -12,12 +12,15 @@ public class BytesSchema
     public static void Write(Stream outputStream, byte[] value)
     {
         LongSchema.Write(outputStream, value.Length);
-        outputStream.Write(value, 0, value.Length);
+        outputStream.Write(value);
     }
 
-    public static async Task WriteAsync(Stream outputStream, byte[] value, CancellationToken cancellationToken = default)
+    public static Task WriteAsync(Stream outputStream, byte[] value, CancellationToken cancellationToken = default)
+        => WriteCoreAsync(outputStream, value, cancellationToken).AsTask();
+
+    private static async ValueTask WriteCoreAsync(Stream outputStream, byte[] value, CancellationToken cancellationToken)
     {
         await LongSchema.WriteAsync(outputStream, value.Length, cancellationToken).ConfigureAwait(false);
-        await outputStream.WriteAsync(value, cancellationToken).ConfigureAwait(false);
+        await outputStream.WriteAsync(value.AsMemory(0, value.Length), cancellationToken).ConfigureAwait(false);
     }
 }

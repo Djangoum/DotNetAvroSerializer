@@ -14,13 +14,16 @@ public class StringSchema
     {
         var stringBytes = Encoding.UTF8.GetBytes(value);
         LongSchema.Write(outputStream, stringBytes.Length);
-        outputStream.Write(stringBytes, 0, stringBytes.Length);
+        outputStream.Write(stringBytes);
     }
 
-    public static async Task WriteAsync(Stream outputStream, string value, CancellationToken cancellationToken = default)
+    public static Task WriteAsync(Stream outputStream, string value, CancellationToken cancellationToken = default)
+        => WriteCoreAsync(outputStream, value, cancellationToken).AsTask();
+
+    private static async ValueTask WriteCoreAsync(Stream outputStream, string value, CancellationToken cancellationToken)
     {
         var stringBytes = Encoding.UTF8.GetBytes(value);
         await LongSchema.WriteAsync(outputStream, stringBytes.Length, cancellationToken).ConfigureAwait(false);
-        await outputStream.WriteAsync(stringBytes, cancellationToken).ConfigureAwait(false);
+        await outputStream.WriteAsync(stringBytes.AsMemory(0, stringBytes.Length), cancellationToken).ConfigureAwait(false);
     }
 }

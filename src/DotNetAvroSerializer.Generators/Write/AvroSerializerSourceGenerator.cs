@@ -73,6 +73,14 @@ public partial class AvroSerializerSourceGenerator : IIncrementalGenerator
             return (null, diagnostics);
         }
 
+        if (ctx.Attributes.Length > 1)
+        {
+            diagnostics = diagnostics.Add(Diagnostic.Create(
+                DiagnosticsDescriptors.MultipleAvroSchemaAttributesDescriptor,
+                serializerSyntax.GetLocation(),
+                $"{serializerSyntax.Identifier} has {ctx.Attributes.Length} AvroSchema attributes; only the first one will be used."));
+        }
+
         var avroSchemaAttribute = ctx.Attributes[0];
 
         var schemaStringConstant = avroSchemaAttribute.ConstructorArguments.Length > 0
@@ -196,7 +204,10 @@ public partial class AvroSerializerSourceGenerator : IIncrementalGenerator
         }
         catch (AvroGeneratorException ex)
         {
-            return (string.Empty, string.Empty, string.Empty, Diagnostic.Create(DiagnosticsDescriptors.SerializableTypeMissMatchDescriptor, serializerMetadata.GetSerializerLocation(), ex.Message));
+            return (string.Empty, string.Empty, string.Empty, Diagnostic.Create(
+                ex.Descriptor ?? DiagnosticsDescriptors.SerializableTypeMissMatchDescriptor,
+                serializerMetadata.GetSerializerLocation(),
+                ex.Message));
         }
     }
 }

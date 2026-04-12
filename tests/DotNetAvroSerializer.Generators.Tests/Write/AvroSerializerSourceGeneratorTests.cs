@@ -52,6 +52,7 @@ public partial class IntSerializer : AvroSerializer<int>
         generatedSource.Should().Contain("public override byte[] Serialize");
         generatedSource.Should().Contain("public override void SerializeToStream");
         generatedSource.Should().Contain("IntSchema.Write(outputStream, source);");
+        generatedSource.Should().Contain("[global::System.CodeDom.Compiler.GeneratedCodeAttribute(\"DotNetAvroSerializer\", \"1.0.0.0\")]");
         generatedSource.Should().NotContain("public override async Task<byte[]> SerializeAsync");
         generatedSource.Should().NotContain("public override async Task SerializeToStreamAsync");
         generatedSource.Should().NotContain("using System.Linq;");
@@ -102,6 +103,7 @@ public partial class IntSerializer : AsyncAvroSerializer<int>
         generatedSource.Should().Contain("public override async Task<byte[]> SerializeAsync");
         generatedSource.Should().Contain("public override async Task SerializeToStreamAsync");
         generatedSource.Should().Contain("await IntSchema.WriteAsync(outputStream, source, cancellationToken);");
+        generatedSource.Should().Contain("[global::System.CodeDom.Compiler.GeneratedCodeAttribute(\"DotNetAvroSerializer\", \"1.0.0.0\")]");
         generatedSource.Should().NotContain("public override byte[] Serialize");
         generatedSource.Should().NotContain("public override void SerializeToStream");
     }
